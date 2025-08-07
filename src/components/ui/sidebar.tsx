@@ -45,7 +45,7 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <div
-        className={`fixed z-20 top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 text-gray-800 flex flex-col pt-16 transition-transform duration-300 ${
+        className={`fixed z-40 md:z-20 top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 text-gray-800 flex flex-col pt-16 transition-transform duration-300 ${
           open ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
@@ -54,10 +54,10 @@ export default function Sidebar() {
           <ul className="space-y-2">
             <li>
               <Link
-                href="/dashboard"
+                href="/admin/dashboard"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                  pathname === "/dashboard"
-                    ? "bg-[#2563EB] text-white"
+                  pathname === "/admin/dashboard"
+                    ? "bg-primary text-white"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >

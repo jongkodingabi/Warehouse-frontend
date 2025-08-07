@@ -12,11 +12,13 @@ export default function Layout({
   stock,
   stockBarChart,
   stockPieChart,
+  auditLogTable,
 }: {
   children: React.ReactNode;
   stock: React.ReactNode;
   stockBarChart: React.ReactNode;
   stockPieChart: React.ReactNode;
+  auditLogTable: React.ReactNode;
 }) {
   return (
     <>
@@ -30,10 +32,11 @@ export default function Layout({
           {children}
           {/* Stock components */}
           {stock}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+          <div className="grid grid-cols-1 mt-80 md:mt-0 md:grid-cols-2 gap-4 w-full p-4">
             {stockBarChart}
             {stockPieChart}
           </div>
+          {auditLogTable}
         </div>
       </div>
     </>

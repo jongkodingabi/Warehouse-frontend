@@ -19,17 +19,19 @@ const data = [
 
 export default function StockBarChart() {
   return (
-    <div className="w-full max-w-3xl mx-auto bg-white rounded-md border p-4">
+    <div className="w-full md:w-full lg:w-full xl:w-[755px] bg-white rounded-md border p-4">
       <h2 className="text-xl font-semibold mb-4">Data Barang</h2>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="value" fill="#1D4ED8" radius={[5, 5, 0, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
+      <div className="w-full" style={{ minWidth: 0 }}>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value" fill="#1D4ED8" radius={[5, 5, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

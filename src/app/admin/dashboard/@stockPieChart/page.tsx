@@ -12,7 +12,7 @@ const COLORS = ["#3B82F6", "#9CA3AF", "#10B981", "#111827"]; // biru, abu, hijau
 
 export default function DonutChart() {
   return (
-    <div className="w-full max-w-md mx-auto bg-white rounded-md border p-4">
+    <div className="w-full max-w-md bg-white rounded-md border ml-0 xl:ml-40 self-end p-4">
       <h2 className="text-xl font-semibold mb-4">Most Recently</h2>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>

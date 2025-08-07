@@ -4,7 +4,7 @@ export default function Stock() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-50 px-5">
       {/* Card 1 */}
-      <div className="bg-white rounded-lg shadow border p-4 flex flex-col gap-4">
+      <div className="bg-white rounded-lg shadow-md border p-4 flex flex-col gap-4">
         <div className="flex justify-between items-start">
           <div className="bg-primary text-white p-2 rounded-md">
             <BoxesIcon className="w-8 h-8" />
@@ -20,7 +20,7 @@ export default function Stock() {
       </div>
 
       {/* Card 2 */}
-      <div className="bg-white rounded-lg shadow border p-4 flex flex-col gap-4">
+      <div className="bg-white rounded-lg shadow-md border p-4 flex flex-col gap-4">
         <div className="flex justify-between items-start">
           <div className="bg-primary text-white p-2 rounded-md">
             <TrendingUp className="w-8 h-8" />
@@ -36,7 +36,7 @@ export default function Stock() {
       </div>
 
       {/* Card 3 */}
-      <div className="bg-white rounded-lg shadow border p-4 flex flex-col gap-4">
+      <div className="bg-white rounded-lg shadow-md border p-4 flex flex-col gap-4">
         <div className="flex justify-between items-start">
           <div className="bg-primary text-white p-2 rounded-md">
             <TrendingDown className="w-8 h-8" />
