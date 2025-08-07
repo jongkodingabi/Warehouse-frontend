@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -37,7 +39,7 @@ const bottomNavigation = [
   { name: "Logout", href: "#", icon: LogOut },
 ];
 
-export default function Sidbar() {
+export default function Sidebar() {
   const [open, setOpen] = useState(false);
 
   const pathname = usePathname();
@@ -45,7 +47,7 @@ export default function Sidbar() {
     <>
       {/* Hamburger for mobile */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 bg-gray-950 p-2 rounded-lg border border-gray-800"
+        className="md:hidden fixed top-4 left-4 z-50 bg-slate-50 p-2 rounded-lg border border-gray-800"
         onClick={() => setOpen(true)}
         aria-label="Open sidebar"
       >

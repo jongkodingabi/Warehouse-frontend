@@ -22,7 +22,7 @@ export default function Layout({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-900 via-gray-950 to-gray-800 md:flex-row">
+      <div className="flex flex-col min-h-screen bg-slate-50 md:flex-row">
         {/* Sidebar */}
         <Sidebar />
 
@@ -31,17 +31,9 @@ export default function Layout({
           {/* Main content area */}
           {children}
           {/* Stock components */}
-          <div className="p-4 md:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-lg shadow p-4">{stock}</div>
-              <div className="bg-white rounded-lg shadow p-4">
-                {stockBarChart}
-              </div>
-              <div className="bg-white rounded-lg shadow p-4">
-                {stockPieChart}
-              </div>
-            </div>
-          </div>
+          {stock}
+          {stockBarChart}
+          {stockPieChart}
         </div>
       </div>
     </>

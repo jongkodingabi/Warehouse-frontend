@@ -6,8 +6,8 @@ import { useQRCode } from "next-qrcode";
 import { useProductDetail } from "@/hooks/useProductDetail";
 
 export default function ProductDetailPage() {
-  const { params } = useParams();
-  const id = params?.id as any;
+  const params = useParams();
+  const id = params?.id as string;
   const { Canvas } = useQRCode();
 
   const { product, isError, isLoading } = useProductDetail(id);
