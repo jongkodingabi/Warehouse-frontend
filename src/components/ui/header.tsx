@@ -1,14 +1,34 @@
+import Image from "next/image";
+import Logo from "../../../public/assets/logo.png";
+import Person from "../../../public/assets/person.png";
+import { Bell } from "lucide-react";
 export default function Header() {
   return (
-    <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mt-14 md:mt-4 px-4 py-3 md:px-6 md:py-4">
-      <div className="flex items-center space-x-3 md:space-x-4">
-        <h1 className="text-lg md:text-xl font-semibold text-white">
-          Dashboard Super Admin
-        </h1>
-        <div className="flex items-center space-x-2">
-          <div className="h-3 w-3 md:h-4 md:w-4 rounded-full bg-blue-500 animate-pulse"></div>
-        </div>
-      </div>{" "}
+    <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-30">
+      {/* Logo */}
+      <div className="flex space-x-2 text-xl font-semibold text-gray-800">
+        <Image
+          src={Logo}
+          height={50}
+          width={50}
+          alt="logo"
+          className="w-8 mr-1.5"
+        />
+        Warehouse Management
+      </div>
+
+      {/* Profil */}
+      <div className="flex items-center gap-3">
+        <Bell className="w-6 h-6 text-gray-600" />
+        <Image
+          src={Person}
+          alt="Avatar"
+          height={32}
+          width={32}
+          className="w-8 h-8 rounded-full object-contain"
+        />
+        <span className="text-sm font-medium text-gray-700">Jhon Doe</span>
+      </div>
     </header>
   );
 }

@@ -1,57 +1,38 @@
 "use client";
 
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import React, { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
-  Target,
   LogOut,
-  Home,
-  Banknote,
-  Folder,
+  ClipboardList,
   Menu,
   HomeIcon,
   Box,
-  FolderArchive,
+  ChevronDown,
+  ChevronUp,
+  TrendingUp,
+  TrendingDown,
+  Scroll,
+  Users,
 } from "lucide-react";
 
-const navigation = [
-  { name: "Overview", link: "/admin/dashboard", icon: Home, current: true },
-  {
-    name: "Barang",
-    link: "/admin/transaction",
-    current: false,
-    icon: Box,
-  },
-  {
-    name: "Categories",
-    link: "/admin/categories",
-    current: false,
-    icon: FolderArchive,
-  },
-  { name: "Gudang", link: "/admin/goals", icon: HomeIcon, current: false },
-  // { name: "Smart", link: "#", icon: Zap, current: false },
-];
-
-const bottomNavigation = [
-  // { name: "Settings", href: "#", icon: Settings },
-  // { name: "Help", href: "#", icon: HelpCircle },
-  { name: "Logout", href: "#", icon: LogOut },
-];
+import { ChartLine } from "lucide-react";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
-
+  const [isStockDropdownOpen, setStockDropdownOpen] = useState(false);
   const pathname = usePathname();
+
   return (
     <>
-      {/* Hamburger for mobile */}
+      {/* Mobile Hamburger */}
       <button
-        className="md:hidden fixed top-4 left-4 z-50 bg-slate-50 p-2 rounded-lg border border-gray-800"
+        className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg border border-gray-300"
         onClick={() => setOpen(true)}
         aria-label="Open sidebar"
       >
-        <Menu className="w-6 h-6 text-white" />
+        <Menu className="w-6 h-6 text-gray-800" />
       </button>
 
       {/* Overlay */}
@@ -64,86 +45,150 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <div
-        className={`
-          fixed z-50 top-0 left-0 min-h-screen w-64 bg-gray-950 border-r border-gray-800 text-white flex flex-col
-          transition-transform duration-300
-          ${open ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0 md:flex md:min-h-screen
-        `}
+        className={`fixed z-20 top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 text-gray-800 flex flex-col pt-16 transition-transform duration-300 ${
+          open ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0`}
       >
-        {/* Close button on mobile */}
-        <div className="md:hidden flex justify-end p-4">
-          <button
-            onClick={() => setOpen(false)}
-            aria-label="Close sidebar"
-            className="text-gray-400 hover:text-white"
-          >
-            ×
-          </button>
-        </div>
-
-        {/* Logo */}
-        <div className="flex items-center gap-2 px-6 py-4">
-          <span className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-            Super Admin
-          </span>
-        </div>
-
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-4">
+        <nav className="flex-1 px-4 py-4 overflow-auto">
           <ul className="space-y-2">
-            {navigation.map((item) => {
-              const isActive = pathname === item.link;
+            <li>
+              <Link
+                href="/dashboard"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname === "/dashboard"
+                    ? "bg-[#2563EB] text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <ChartLine className="w-5 h-5" />
+                Dashboard
+              </Link>
+            </li>
 
-              return (
-                <li key={item.name}>
-                  <Link
-                    href={item.link}
-                    className={`flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                      isActive
-                        ? "bg-gray-800 text-white"
-                        : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                    }`}
-                    onClick={() => setOpen(false)}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.name}</span>
-                  </Link>
-                </li>
-              );
-            })}
+            <li>
+              <Link
+                href="/admin/goals"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname === "/admin/goals"
+                    ? "bg-gray-100 text-blue-600"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <HomeIcon className="w-5 h-5" />
+                Gudang
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/admin/categories"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname === "/admin/categories"
+                    ? "bg-gray-100 text-blue-600"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <ClipboardList className="w-5 h-5" />
+                Data Barang
+              </Link>
+            </li>
+
+            {/* Dropdown Stock Barang */}
+            <li>
+              <button
+                onClick={() => setStockDropdownOpen(!isStockDropdownOpen)}
+                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg ${
+                  pathname.includes("/admin/stock")
+                    ? "bg-gray-100 text-blue-600"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Box className="w-5 h-5" />
+                  Stock Barang
+                </div>
+                {isStockDropdownOpen ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </button>
+
+              {isStockDropdownOpen && (
+                <ul className="ml-8 mt-1 space-y-1">
+                  <li>
+                    <Link
+                      href="/admin/stock/data"
+                      className={`block px-3 py-2 text-sm rounded-lg ${
+                        pathname === "/admin/stock/data"
+                          ? "bg-gray-100 text-blue-600"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <TrendingUp className="inline w-4 h-4 mr-2" />
+                      Stock Masuk
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/admin/stock/history"
+                      className={`block px-3 py-2 text-sm rounded-lg ${
+                        pathname === "/admin/stock/history"
+                          ? "bg-gray-100 text-blue-600"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <TrendingDown className="inline w-4 h-4 mr-2" />
+                      Stock Keluar
+                    </Link>
+                  </li>
+                </ul>
+              )}
+            </li>
+
+            <li>
+              <Link
+                href="/admin/users"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname === "/admin/users"
+                    ? "bg-[#2563EB] text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <Users className="w-5 h-5" />
+                Admin Gudang
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/admin/users"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname === "/admin/users"
+                    ? "bg-[#2563EB] text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <Scroll className="w-5 h-5" />
+                Audit Log
+              </Link>
+            </li>
           </ul>
         </nav>
 
-        {/* Bottom Navigation */}
-        <div className="px-4 py-4">
-          <ul className="space-y-2">
-            {bottomNavigation.map((item) => (
-              <li key={item.name}>
-                {item.name === "Logout" ? (
-                  <button
-                    type="button"
-                    className="w-full flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-white"
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.name}</span>
-                  </button>
-                ) : (
-                  <Link
-                    href={item.href}
-                    className="flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-white"
-                    onClick={() => setOpen(false)}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.name}</span>
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
+        {/* Logout */}
+        <div className="px-4 py-4 border-t border-gray-200">
+          <button
+            type="button"
+            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+          >
+            <LogOut className="w-5 h-5" />
+            Logout
+          </button>
         </div>
       </div>
-      {/* Spacer for sidebar on desktop */}
+
+      {/* Spacer (desktop) */}
       <div className="hidden md:block w-64 flex-shrink-0" />
     </>
   );

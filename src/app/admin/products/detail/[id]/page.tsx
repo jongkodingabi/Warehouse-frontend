@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useQRCode } from "next-qrcode";
-import { useProductDetail } from "@/hooks/useProductDetail";
+import { useProductDetail } from "@/hooks/useProducts";
 
 export default function ProductDetailPage() {
   const params = useParams();

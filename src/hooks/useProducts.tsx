@@ -27,3 +27,12 @@ export const useProducts = () => {
     isError: error,
   };
 };
+
+export const useProductDetail = (id: string) => {
+  const { data, error, isLoading } = useSWR(`/api/v1/barang/${id}`, fetcher);
+  return {
+    product: data?.data || null,
+    isLoading,
+    isError: error,
+  };
+};

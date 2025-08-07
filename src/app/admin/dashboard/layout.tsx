@@ -1,7 +1,11 @@
-import Head from "next/head";
 import React from "react";
 import Sidebar from "@/components/ui/sidebar";
 import Header from "@/components/ui/header";
+
+export const metadata = {
+  title: "Dashboard",
+  description: "Admin Dashboard",
+};
 
 export default function Layout({
   children,
@@ -16,12 +20,6 @@ export default function Layout({
 }) {
   return (
     <>
-      <Head>
-        <title>Dashboard</title>
-        <meta name="description" content="Admin Dashboard" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
       <div className="flex flex-col min-h-screen bg-slate-50 md:flex-row">
         {/* Sidebar */}
         <Sidebar />
@@ -32,8 +30,10 @@ export default function Layout({
           {children}
           {/* Stock components */}
           {stock}
-          {stockBarChart}
-          {stockPieChart}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+            {stockBarChart}
+            {stockPieChart}
+          </div>
         </div>
       </div>
     </>
