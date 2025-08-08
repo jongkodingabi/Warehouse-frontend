@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logout } from "@/services/auth";
+import { useRouter } from "next/navigation";
 import {
   LogOut,
   ClipboardList,
@@ -16,13 +18,30 @@ import {
   Scroll,
   Users,
 } from "lucide-react";
+import Cookies from "js-cookie";
 
 import { ChartLine } from "lucide-react";
+import axiosInstance from "@/lib/axios";
+import { NextResponse } from "next/server";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const [isStockDropdownOpen, setStockDropdownOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const response = await axiosInstance.post("/api/v1/logout");
+      const token = response.data.token;
+      Cookies.remove("token", token);
+      console.log(token);
+      router.push("/auth/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Handle error (e.g., show a notification)
+    }
+  };
 
   return (
     <>
@@ -180,6 +199,7 @@ export default function Sidebar() {
         <div className="px-4 py-4 border-t border-gray-200">
           <button
             type="button"
+            onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
           >
             <LogOut className="w-5 h-5" />
