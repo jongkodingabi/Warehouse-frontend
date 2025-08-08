@@ -68,10 +68,10 @@ export default function Sidebar() {
 
             <li>
               <Link
-                href="/admin/goals"
+                href="/admin/gudang"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                  pathname === "/admin/goals"
-                    ? "bg-gray-100 text-blue-600"
+                  pathname === "/admin/gudang"
+                    ? "bg-primary text-white"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >

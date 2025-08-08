@@ -7,7 +7,7 @@ export default function Stock() {
       <div className="bg-white rounded-lg shadow-md border p-4 flex flex-col gap-4">
         <div className="flex justify-between items-start">
           <div className="bg-primary text-white p-2 rounded-md">
-            <BoxesIcon className="w-8 h-8" />
+            <BoxesIcon className="w-10 h-10" />
           </div>
           <span className="bg-primary text-white text-md font-semibold px-2 py-1 rounded">
             12 %
