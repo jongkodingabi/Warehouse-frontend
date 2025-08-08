@@ -19,7 +19,12 @@ export default function Header() {
 
       {/* Profil */}
       <div className="flex items-center gap-3">
-        <Bell className="w-6 h-6 text-gray-600" />
+        <button className="relative ">
+          <Bell className="w-8 h-8 text-gray-600 cursor-pointer hover:text-gray-500 transition-colors duration-200 ease-in-out" />
+          <span className="absolute -top-2 -right-2 text-white bg-secondary rounded-full px-2 py-0.5 text-xs font-bold shadow-md">
+            0
+          </span>
+        </button>
         <Image
           src={Person}
           alt="Avatar"

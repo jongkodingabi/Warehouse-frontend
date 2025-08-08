@@ -2,4 +2,11 @@
 
 @theme {
   --color-primary: #2563eb;
+  --color-secondary: #64748b;
+  --color-background: #f8fafc;
+  --color-text: #1e293b;
+}
+
+.glow-box {
+  box-shadow: 0 0 4px rgba(0, 255, 127, 0.75);
 }

@@ -5,8 +5,7 @@ export default function Gudang() {
         <div className="">
           <h1 className="text-3xl font-bold text-primary">Data Gudang</h1>
           <p className="mt-4 text-gray-800">
-            Kelola informasi gudang Anda dengan mudah. Tambahkan, edit, atau
-            hapus data barang sesuai kebutuhan.
+            Kelola informasi gudang dan inventaris.
           </p>
         </div>
       </div>
