@@ -24,7 +24,8 @@ export default function Dashboard() {
 
         <div className="font-semibold text-gray-700 mr-2">
           {" "}
-          {time.toLocaleTimeString("en-US", { timeZone: "Asia/Jakarta" })}
+          {typeof window !== "undefined" &&
+            time.toLocaleTimeString("en-US", { timeZone: "Asia/Jakarta" })}
         </div>
       </div>
       {/* Additional dashboard content can go here */}

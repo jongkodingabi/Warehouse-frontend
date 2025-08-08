@@ -3,6 +3,7 @@ import Logo from "../../../public/assets/logo.png";
 import Person from "../../../public/assets/person.png";
 import { Bell } from "lucide-react";
 export default function Header() {
+  // const { data: any } = user();
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-30">
       {/* Logo */}
