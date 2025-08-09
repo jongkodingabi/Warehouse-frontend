@@ -8,31 +8,39 @@ import axiosInstance from "@/lib/axios";
 import Logo from "../../../../public/assets/logo.png";
 import Image from "next/image";
 import { Mail, Lock } from "lucide-react";
+import { useUser } from "@/context/UserContext";
+import { login } from "@/services/auth";
 
 export default function LoginPage() {
+  const { refreshUser } = useUser();
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      const response = await axiosInstance.post("/api/v1/login", {
-        email,
-        password,
-      });
-      const token = response.data.token; // Assuming the token is returned in the response
-      console.log("Login successful:" + token);
-      Cookies.set("token", token);
-      router.push("/admin/dashboard");
-    } catch (error) {
-      console.error("Login failed:", error);
+      const res = await login(email, password);
+      // If backend returns token in JSON, optionally store as fallback (NOT recommended for security)
+      const token = (res.data as any).token;
+      if (token) {
+        Cookies.set("token", token, { expires: 1 }); // fallback, optional
+      }
+      // refresh global user from server
+      await refreshUser();
+      router.replace("/admin/dashboard");
+    } catch (err) {
+      console.error("Login failed:", err);
+      // show notification
+    } finally {
+      setLoading(false);
     }
   };
-
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className="flex flex-col max-w-md shadow-xl flex items-center justify-center rounded-xl border border-slate-800 p-8">
+      <div className="flex-col max-w-md shadow-xl flex items-center justify-center rounded-xl border border-slate-800 p-8">
         <div className="flex space-x-2 text-xl font-semibold text-gray-800">
           <Image
             src={Logo}
@@ -77,7 +85,7 @@ export default function LoginPage() {
                 <Lock className="w-5 h-5 text-gray-400" />
               </span>
               <input
-                type="email"
+                type="password"
                 placeholder="Masukkan password anda disini"
                 className="border p-3 pl-10 mb-2 w-full rounded-md"
                 value={password}
@@ -103,7 +111,7 @@ export default function LoginPage() {
                 fill="#F8FAFC"
               />
             </svg>
-            Sign In
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

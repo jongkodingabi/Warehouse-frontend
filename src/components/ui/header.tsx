@@ -1,9 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Logo from "../../../public/assets/logo.png";
 import Person from "../../../public/assets/person.png";
 import { Bell } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 export default function Header() {
   // const { data: any } = user();
+
+  const { user, loading } = useUser();
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-30">
       {/* Logo */}
@@ -33,7 +38,9 @@ export default function Header() {
           width={32}
           className="w-8 h-8 rounded-full object-contain"
         />
-        <span className="text-sm font-medium text-gray-700">Jhon Doe</span>
+        <span className="text-sm font-medium text-gray-700">
+          {user?.name ?? "Guset"}
+        </span>
       </div>
     </header>
   );
