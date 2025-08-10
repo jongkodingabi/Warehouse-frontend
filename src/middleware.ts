@@ -13,11 +13,11 @@ export function middleware(request: NextRequest) {
   const isAdminPath = pathname.startsWith("/admin");
 
   if (isAdminPath && !hasSession) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   // prevent logged-in users from visiting login
-  if (hasSession && pathname === "/auth/login") {
+  if (hasSession && pathname === "/login") {
     return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
 
@@ -25,5 +25,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/auth/login"],
+  matcher: ["/admin/:path*", "/login"],
 };
