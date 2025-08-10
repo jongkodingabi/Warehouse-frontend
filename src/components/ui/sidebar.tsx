@@ -36,7 +36,7 @@ export default function Sidebar() {
       const token = response.data.token;
       Cookies.remove("token", token);
       console.log(token);
-      router.push("/auth/login");
+      router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
       // Handle error (e.g., show a notification)

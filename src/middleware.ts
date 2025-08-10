@@ -1,21 +1,23 @@
+// middleware.ts
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("token")?.value;
+  const cookies = request.cookies;
+  // common Laravel session cookie name (laravel_session) or your custom fallback 'token'
+  const hasSession =
+    !!cookies.get("laravel_session")?.value || !!cookies.get("token")?.value;
+
   const { pathname } = request.nextUrl;
 
-  // 1️⃣ Halaman admin (hanya untuk yang sudah login)
-  const protectedRoutes = ["/admin"];
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
+  // protect admin paths
+  const isAdminPath = pathname.startsWith("/admin");
 
-  if (isProtectedRoute && !token) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+  if (isAdminPath && !hasSession) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // 2️⃣ Halaman login (hanya untuk yang belum login)
-  if (token && pathname.startsWith("/auth/login")) {
+  // prevent logged-in users from visiting login
+  if (hasSession && pathname === "/login") {
     return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
 
@@ -23,8 +25,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/admin/:path*", // Lindungi halaman admin
-    "/auth/login", // Blokir akses login jika sudah login
-  ],
+  matcher: ["/admin/:path*", "/login"],
 };

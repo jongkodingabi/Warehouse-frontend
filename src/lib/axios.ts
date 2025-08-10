@@ -6,9 +6,16 @@ const axiosInstance = axios.create({
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
-    Authorization:
-      "Bearer " + (typeof window !== "undefined" ? Cookies.get("token") : ""),
   },
+});
+
+// Interceptor untuk menambahkan token setiap request
+axiosInstance.interceptors.request.use((config) => {
+  const token = Cookies.get("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export default axiosInstance;
