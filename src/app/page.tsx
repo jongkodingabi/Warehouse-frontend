@@ -1,8 +1,48 @@
 import Image from "next/image";
 import styles from "./page.module.css";
-import { Warehouse, ArrowRight, Store, Rocket } from "lucide-react";
+import {
+  Warehouse,
+  ArrowRight,
+  Store,
+  Rocket,
+  Boxes,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 import Link from "next/link";
 import Footer from "@/components/ui/footer";
+import { title } from "process";
+
+const datas = [
+  {
+    id: "1",
+    icon: Store,
+    title: "Manajemen Data Gudang",
+    description:
+      "Mengelola informasi setiap gudang, termasuk nama, lokasi, kapasitas, dan detail lainnya.",
+  },
+  {
+    id: "2",
+    icon: Boxes,
+    title: "Manajemen Data Barang",
+    description:
+      "Mencatat dan memperbarui detail setiap barang, seperti kode, nama, kategori, dan stok awal.",
+  },
+  {
+    id: "3",
+    icon: TrendingUp,
+    title: "Manajemen Barang Masuk",
+    description:
+      "Mencatat setiap transaksi penerimaan barang dari pemasok atau gudang lain, lengkap dengan tanggal, jumlah, dan sumber barang.",
+  },
+  {
+    id: "4",
+    icon: TrendingDown,
+    title: "Manajemen Barang Keluar",
+    description:
+      "Mencatat pengeluaran barang ke pelanggan, produksi, atau gudang lain, dengan detail jumlah, tujuan, dan waktu pengiriman.",
+  },
+];
 
 export default function Home() {
   return (
@@ -72,78 +112,31 @@ export default function Home() {
               Solusi Untuk Manajemen Operasi Gudang Anda
             </h1>
             {/* 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="my-5 border-2 border-slate-800 rounded-sm p-5 shadow-custom-2 relative w-80">
-                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-text text-white px-3 py-1.5 rounded-full font-medium text-xs">
-                  1
-                </span>
-                <div className="flex flex-col items-center mt-1">
-                  <div className="bg-background/25 flex justify-center p-1.5 rounded-full text-text">
-                    <Store />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-5">
+              {datas.map((data, idx) => {
+                const Icon = data.icon;
+                return (
+                  <div
+                    className=" border-2 border-slate-800 rounded-sm p-5 shadow-custom-2 relative w-80"
+                    key={idx}
+                  >
+                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-text text-white px-3 py-1.5 rounded-full font-medium text-xs">
+                      {data.id}
+                    </span>
+                    <div className="flex flex-col items-center mt-1">
+                      <div className="bg-background/25 flex justify-center p-1.5 rounded-full text-text">
+                        <Icon />
+                      </div>
+                      <h1 className="mt-1.5 items-center font-medium text-sm text-text">
+                        {data.title}
+                      </h1>
+                      <p className="text-center text-xs text-white mt-2">
+                        {data.description}{" "}
+                      </p>
+                    </div>
                   </div>
-                  <h1 className="mt-1.5 items-center font-medium text-sm text-text">
-                    Manajemen Data Gudang
-                  </h1>
-                  <p className="text-center text-xs text-white mt-2">
-                    Mengelola informasi setiap gudang, termasuk nama, lokasi,
-                    kapasitas, dan detail lainnya.
-                  </p>
-                </div>
-              </div>
-              {/* 2 */}
-              <div className="my-5 border-2 border-slate-800 rounded-sm p-5 shadow-custom-2 relative w-80">
-                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-text text-white px-3 py-1.5 rounded-full font-medium text-xs">
-                  1
-                </span>
-                <div className="flex flex-col items-center mt-1">
-                  <div className="bg-background/25 flex justify-center p-1.5 rounded-full text-text">
-                    <Store />
-                  </div>
-                  <h1 className="mt-1.5 items-center font-medium text-sm text-text">
-                    Manajemen Data Gudang
-                  </h1>
-                  <p className="text-center text-xs text-white mt-2">
-                    Mengelola informasi setiap gudang, termasuk nama, lokasi,
-                    kapasitas, dan detail lainnya.
-                  </p>
-                </div>
-              </div>
-              {/* 3 */}
-              <div className="mb-5 border-2 border-slate-800 rounded-sm p-5 shadow-custom-2 relative w-80">
-                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-text text-white px-3 py-1.5 rounded-full font-medium text-xs">
-                  1
-                </span>
-                <div className="flex flex-col items-center mt-1">
-                  <div className="bg-background/25 flex justify-center p-1.5 rounded-full text-text">
-                    <Store />
-                  </div>
-                  <h1 className="mt-1.5 items-center font-medium text-sm text-text">
-                    Manajemen Data Gudang
-                  </h1>
-                  <p className="text-center text-xs text-white mt-2">
-                    Mengelola informasi setiap gudang, termasuk nama, lokasi,
-                    kapasitas, dan detail lainnya.
-                  </p>
-                </div>
-              </div>
-              {/* 4 */}
-              <div className="mb-5 border-2 border-slate-800 rounded-sm p-5 shadow-custom-2 relative w-80">
-                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-text text-white px-3 py-1.5 rounded-full font-medium text-xs">
-                  1
-                </span>
-                <div className="flex flex-col items-center mt-1">
-                  <div className="bg-background/25 flex justify-center p-1.5 rounded-full text-text">
-                    <Store />
-                  </div>
-                  <h1 className="mt-1.5 items-center font-medium text-sm text-text">
-                    Manajemen Data Gudang
-                  </h1>
-                  <p className="text-center text-xs text-white mt-2">
-                    Mengelola informasi setiap gudang, termasuk nama, lokasi,
-                    kapasitas, dan detail lainnya.
-                  </p>
-                </div>
-              </div>
+                );
+              })}
             </div>
             <Link
               href=""
