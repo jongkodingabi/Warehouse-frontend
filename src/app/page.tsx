@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Footer from "@/components/ui/footer";
-import { title } from "process";
 
 const datas = [
   {
