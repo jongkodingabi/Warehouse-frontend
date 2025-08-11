@@ -1,7 +1,7 @@
+"use client";
+
 import Image from "next/image";
-import Logo from "../../public/assets/logo.png";
-import BlobHero from "../../public/assets/blob-hero.png";
-import styles from "./page.module.css";
+
 import {
   Warehouse,
   ArrowRight,
@@ -13,7 +13,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Footer from "@/components/ui/footer";
-import { title } from "process";
+import Cookies from "js-cookie";
+import { useUser } from "@/context/UserContext";
 
 const datas = [
   {
@@ -47,6 +48,10 @@ const datas = [
 ];
 
 export default function Home() {
+  const token = Cookies.get("token");
+  console.log(token);
+  const { user, loading } = useUser();
+
   return (
     <>
       <header>
@@ -140,13 +145,28 @@ export default function Home() {
                 );
               })}
             </div>
-            <Link
-              href=""
-              className="inline-flex items-center justify-center bg-primary rounded-lg py-5 w-full font-bold text-2xl text-white shadow-custom-3 hover:bg-primary/80 hover:scale-105 focus:scale-100 active:scale-95 active:bg-primary transition-all duration-300 ease-in-out"
-            >
-              <Rocket className="mr-2" />
-              Coba Sekarang
-            </Link>
+
+            {loading ? (
+              <div className="py-5 w-full text-center text-white">
+                Loading...
+              </div>
+            ) : user ? (
+              <Link
+                href="/admin/dashboard"
+                className="inline-flex items-center justify-center bg-accent rounded-lg py-5 w-full font-bold text-2xl text-white shadow-custom-3 hover:bg-accent/80 hover:scale-105 focus:scale-100 active:scale-95 active:bg-accent transition-all duration-300 ease-in-out"
+              >
+                <Rocket className="mr-2" />
+                Lanjut Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center bg-primary rounded-lg py-5 w-full font-bold text-2xl text-white shadow-custom-3 hover:bg-primary/80 hover:scale-105 focus:scale-100 active:scale-95 active:bg-primary transition-all duration-300 ease-in-out"
+              >
+                <Rocket className="mr-2" />
+                Login Sekarang
+              </Link>
+            )}
           </div>
         </div>
       </div>

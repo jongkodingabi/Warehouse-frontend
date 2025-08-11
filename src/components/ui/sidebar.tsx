@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/services/auth";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 import {
   LogOut,
   ClipboardList,
@@ -22,21 +23,22 @@ import Cookies from "js-cookie";
 
 import { ChartLine } from "lucide-react";
 import axiosInstance from "@/lib/axios";
-import { NextResponse } from "next/server";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const [isStockDropdownOpen, setStockDropdownOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { setUser } = useUser();
 
   const handleLogout = async () => {
     try {
       const response = await axiosInstance.post("/api/v1/logout");
       const token = response.data.token;
       Cookies.remove("token", token);
+      setUser(null);
       console.log(token);
-      router.push("/login");
+      router.push("/");
     } catch (error) {
       console.error("Logout failed:", error);
       // Handle error (e.g., show a notification)
