@@ -5,14 +5,15 @@ import z from "zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { Warehouse } from "lucide-react";
 
-const categoryFormSchema = z.object({
-  kategori: z.string().min(1, "Kategori wajib diisi"),
+const divisiFormSchema = z.object({
+  kodedivisi: z.string().min(1, "Kode wajib diisi"),
+  divisi: z.string().min(1, "Divisi wajib diisi"),
   status: z.string().min(1, "Status wajib diisi"),
 });
 
-type CategoryFormSchema = z.infer<typeof categoryFormSchema>;
+type DivisiFormSchema = z.infer<typeof divisiFormSchema>;
 
-export default function EditCategoryModal({
+export default function EditDivisiModal({
   isOpen,
   onClose,
   onSubmit,
@@ -20,15 +21,15 @@ export default function EditCategoryModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: CategoryFormSchema) => void;
-  initialData: CategoryFormSchema;
+  onSubmit: (data: DivisiFormSchema) => void;
+  initialData: DivisiFormSchema;
 }) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CategoryFormSchema>({
-    resolver: zodResolver(categoryFormSchema),
+  } = useForm<DivisiFormSchema>({
+    resolver: zodResolver(divisiFormSchema),
     defaultValues: initialData,
   });
 
@@ -53,19 +54,30 @@ export default function EditCategoryModal({
             <div className="inline-block bg-primary p-3 rounded-lg text-white mr-2">
               <Warehouse className="w-6 h-6" />
             </div>
-            <h1 className="font-semibold text-2xl text-text">Edit Kategori</h1>
+            <h1 className="font-semibold text-2xl text-text">Edit Divisi</h1>
           </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="block mb-1">Kategori</label>
+              <label className="block mb-1">Kode Div</label>
               <input
-                {...register("kategori")}
+                {...register("kodedivisi")}
                 className="border rounded w-full px-3 py-2"
               />
-              {errors.kategori && (
+              {errors.kodedivisi && (
                 <p className="text-red-500 text-sm">
-                  {errors.kategori.message}
+                  {errors?.kodedivisi.message}
                 </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block mb-1">divisi</label>
+              <input
+                {...register("divisi")}
+                className="border rounded w-full px-3 py-2"
+              />
+              {errors.divisi && (
+                <p className="text-red-500 text-sm">{errors.divisi.message}</p>
               )}
             </div>
 
@@ -78,6 +90,7 @@ export default function EditCategoryModal({
                 <option value="aktif">Aktif</option>
                 <option value="non-aktif">Non-aktif</option>
               </select>
+
               {errors.status && (
                 <p className="text-red-500 text-sm">{errors.status.message}</p>
               )}

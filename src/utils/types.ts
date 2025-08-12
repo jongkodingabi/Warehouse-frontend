@@ -18,3 +18,14 @@ type Category = {
 };
 
 export type { Category };
+
+type Divisi = {
+  id: number;
+  kodedivisi: string;
+  divisi: string;
+  short: number;
+  status: string;
+  created_at: string;
+};
+
+export type { Divisi };

@@ -1,15 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import {
   BoxesIcon,
-  Store,
   Archive,
   ChartPie,
   Search,
-  Eye,
   SquarePen,
   Trash,
+  Group,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Category } from "@/utils/types";
@@ -47,6 +45,15 @@ export default function Kategori() {
   const [deleteModal, setDeleteModal] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
+
+  const totalCategories = datas.length;
+  const activeCategories = datas.filter((c) => c.status === "aktif").length;
+  const unActiveCategories = datas.filter(
+    (c) => c.status == "non-aktif"
+  ).length;
+  const activePercentage = totalCategories
+    ? ((activeCategories / totalCategories) * 100).toFixed(2)
+    : 0;
 
   const fetchCategories = async () => {
     try {
@@ -169,11 +176,13 @@ export default function Kategori() {
         <div className="bg-white rounded-lg shadow-md border p-5">
           <div className="flex justify-between">
             <div>
-              <h3 className="text-text font-medium text-sm">Total Barang</h3>
-              <p className="text-text font-medium text-xl pt-2.5">20</p>
+              <h3 className="text-text font-medium text-sm">Total Kategori</h3>
+              <p className="text-text font-medium text-xl pt-2.5">
+                {totalCategories}
+              </p>
             </div>
             <div className="bg-primary p-4 rounded-sm text-background">
-              <Store className="w-8 h-8" />
+              <Group className="w-8 h-8" />
             </div>
           </div>
         </div>
@@ -181,8 +190,10 @@ export default function Kategori() {
         <div className="bg-white rounded-lg shadow-md border p-5">
           <div className="flex justify-between">
             <div>
-              <h3 className="text-text font-medium text-sm">Kapasitas Total</h3>
-              <p className="text-text font-medium text-xl pt-2.5">50.000</p>
+              <h3 className="text-text font-medium text-sm">Kategori Aktif</h3>
+              <p className="text-text font-medium text-xl pt-2.5">
+                {activeCategories}
+              </p>
             </div>
             <div className="bg-primary p-4 rounded-sm text-background">
               <BoxesIcon className="w-8 h-8" />
@@ -194,9 +205,11 @@ export default function Kategori() {
           <div className="flex justify-between">
             <div>
               <h3 className="text-text font-medium text-sm">
-                Kapasitas Terisi
+                Kategori Non Aktif
               </h3>
-              <p className="text-text font-medium text-xl pt-2.5">38.756</p>
+              <p className="text-text font-medium text-xl pt-2.5">
+                {unActiveCategories}
+              </p>
             </div>
             <div className="bg-primary p-4 rounded-sm text-background">
               <Archive className="w-8 h-8" />
@@ -207,8 +220,12 @@ export default function Kategori() {
         <div className="bg-white rounded-lg shadow-md border p-5">
           <div className="flex justify-between">
             <div>
-              <h3 className="text-text font-medium text-sm">Persentase</h3>
-              <p className="text-text font-medium text-xl pt-2.5">77.51%</p>
+              <h3 className="text-text font-medium text-sm">
+                Persentase Aktif
+              </h3>
+              <p className="text-text font-medium text-xl pt-2.5">
+                {activePercentage} %
+              </p>
             </div>
             <div className="bg-primary p-4 rounded-sm text-background">
               <ChartPie className="w-8 h-8" />
@@ -283,10 +300,25 @@ export default function Kategori() {
                     {data.kategori}
                   </td>
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                    {data.status}
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                            ${
+                              data.status === "aktif"
+                                ? "bg-green-500 text-green-100 border border-green-800"
+                                : data.status === "non-aktif"
+                                ? "bg-red-900/50 text-red-300 border border-red-800"
+                                : data.status === "transfer"
+                                ? "bg-blue-900/50 text-blue-300 border border-blue-800"
+                                : "bg-gray-800/50 text-gray-300 border border-gray-700"
+                            }`}
+                    >
+                      {data.status}
+                    </span>{" "}
                   </td>
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                    {data.created_at}
+                    {data.created_at
+                      ? new Date(data.created_at).toLocaleDateString()
+                      : "—"}{" "}
                   </td>
 
                   <td className="px-4 sm:px-6 py-4 flex gap-2.5 justify-center">

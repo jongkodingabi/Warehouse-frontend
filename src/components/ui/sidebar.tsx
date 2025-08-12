@@ -23,12 +23,14 @@ import Cookies from "js-cookie";
 
 import { ChartLine } from "lucide-react";
 import axiosInstance from "@/lib/axios";
+import LogoutConfirmationModal from "../core/LogoutModal";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const [isStockDropdownOpen, setStockDropdownOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const [logoutModal, setLogoutModal] = useState(false);
   const { setUser } = useUser();
 
   const handleLogout = async () => {
@@ -97,7 +99,7 @@ export default function Sidebar() {
                 }`}
               >
                 <HomeIcon className="w-5 h-5" />
-                Gudang
+                Divisi
               </Link>
             </li>
 
@@ -215,7 +217,7 @@ export default function Sidebar() {
         <div className="px-4 py-4 border-t border-gray-200">
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={() => setLogoutModal(true)}
             className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
           >
             <LogOut className="w-5 h-5" />
@@ -226,6 +228,14 @@ export default function Sidebar() {
 
       {/* Spacer (desktop) */}
       <div className="hidden md:block w-64 flex-shrink-0" />
+
+      {logoutModal && (
+        <LogoutConfirmationModal
+          onConfirm={handleLogout}
+          onClose={() => setLogoutModal(false)}
+          isOpen={logoutModal}
+        />
+      )}
     </>
   );
 }
