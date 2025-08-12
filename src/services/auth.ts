@@ -5,6 +5,7 @@ export type User = {
   id: number;
   name: string;
   email: string;
+  role: string;
 };
 
 type login = {
@@ -20,6 +21,7 @@ export const login = async (values: login) => {
 };
 
 export const fetchUser = async () => {
+  const token = Cookies.get("token");
   const res = await axiosInstance.get<{ user: User } | User>("/api/v1/me");
 
   return (res.data as any).user ?? (res.data as any);

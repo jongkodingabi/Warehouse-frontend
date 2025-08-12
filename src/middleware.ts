@@ -1,29 +1,41 @@
-// middleware.ts
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const cookies = request.cookies;
-  // common Laravel session cookie name (laravel_session) or your custom fallback 'token'
-  const hasSession =
-    !!cookies.get("laravel_session")?.value || !!cookies.get("token")?.value;
-
+  const token = request.cookies.get("token")?.value;
+  const role = request.cookies.get("role")?.value;
   const { pathname } = request.nextUrl;
 
-  // protect admin paths
-  const isAdminPath = pathname.startsWith("/admin");
+  // Kalau sudah login dan buka /login → redirect sesuai role
+  if (pathname === "/login" && token) {
+    if (role === "superadmin") {
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    }
+    if (role === "admingudang") {
+      return NextResponse.redirect(
+        new URL("/adminGudang/dashboard", request.url)
+      );
+    }
+  }
 
-  if (isAdminPath && !hasSession) {
+  // Kalau tidak login, blok akses ke admin
+  if (
+    (pathname.startsWith("/admin") || pathname.startsWith("/adminGudang")) &&
+    !token
+  ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // prevent logged-in users from visiting login
-  if (hasSession && pathname === "/login") {
-    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+  // Proteksi cross-access
+  if (pathname.startsWith("/admin/") && role !== "superadmin") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+  if (pathname.startsWith("/adminGudang/") && role !== "admingudang") {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login"],
+  matcher: ["/admin/:path*", "/adminGudang/:path*", "/login"],
 };

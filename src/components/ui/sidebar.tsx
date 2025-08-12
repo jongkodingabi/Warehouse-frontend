@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { logout } from "@/services/auth";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import {
@@ -18,6 +17,7 @@ import {
   TrendingDown,
   Scroll,
   Users,
+  Group,
 } from "lucide-react";
 import Cookies from "js-cookie";
 
@@ -98,6 +98,20 @@ export default function Sidebar() {
               >
                 <HomeIcon className="w-5 h-5" />
                 Gudang
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/admin/categories"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname === "/admin/categories"
+                    ? "bg-primary text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <Group className="w-5 h-5" />
+                Kategori
               </Link>
             </li>
 

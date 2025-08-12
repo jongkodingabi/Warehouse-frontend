@@ -9,3 +9,12 @@ type Product = {
 };
 
 export type { Product };
+
+type Category = {
+  id: number;
+  kategori: string;
+  status: string;
+  created_at: string;
+};
+
+export type { Category };
