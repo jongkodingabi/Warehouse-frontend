@@ -12,6 +12,7 @@
     "@hookform/resolvers": "^5.2.1",
     "@tailwindcss/postcss": "^4.1.11",
     "axios": "^1.11.0",
+    "dayjs": "^1.11.13",
     "font-awesome": "^4.7.0",
     "framer-motion": "^12.23.12",
     "js-cookie": "^3.0.5",

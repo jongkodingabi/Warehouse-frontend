@@ -29,3 +29,16 @@ type Divisi = {
 };
 
 export type { Divisi };
+
+type Barang = {
+  id: number;
+  kategori: string[];
+  divisi?: string[];
+  createdBy?: string[];
+  namaBarang: string;
+  productionDate: string;
+  stockAwal: number;
+  stockSekarang: number;
+};
+
+export type { Barang };

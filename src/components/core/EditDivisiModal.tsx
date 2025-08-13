@@ -74,7 +74,7 @@ export default function EditDivisiModal({
               <label className="block mb-1">divisi</label>
               <input
                 {...register("divisi")}
-                className="border rounded w-full px-3 py-2"
+                className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
               />
               {errors.divisi && (
                 <p className="text-red-500 text-sm">{errors.divisi.message}</p>
@@ -85,7 +85,7 @@ export default function EditDivisiModal({
               <label className="block mb-1">Status</label>
               <select
                 {...register("status")}
-                className="border rounded w-full px-3 py-2"
+                className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
               >
                 <option value="aktif">Aktif</option>
                 <option value="non-aktif">Non-aktif</option>

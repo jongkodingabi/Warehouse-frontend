@@ -13,6 +13,7 @@ import { Toaster, toast } from "react-hot-toast";
 import { isAxiosError } from "axios";
 import Head from "next/head";
 import { useUser } from "@/context/UserContext";
+import dayjs from "dayjs";
 
 const loginFormSchema = z.object({
   email: z.string().email({
@@ -42,19 +43,26 @@ export default function LoginPage() {
     try {
       const res = await login(values);
 
-      const token = (res.data as any)?.token;
-      const role = (res.data as any)?.user?.role;
+      const token = res.data?.token;
+      const role = res.data?.user?.role;
+      const expiresAt = res.data?.expires_at; // dari Laravel (format Carbon)
 
       if (token) {
+        // Simpan token
         Cookies.set("token", token, { expires: 1 });
+
+        // Simpan waktu expired (pakai dari server)
+        if (expiresAt) {
+          Cookies.set("token_expires_at", expiresAt, { expires: 1 });
+        }
       }
+
       if (role) {
         Cookies.set("role", role, { expires: 1 });
       }
 
       await refreshUser();
 
-      // Redirect sesuai role
       if (role === "superadmin") {
         router.replace("/admin/dashboard");
       } else if (role === "admingudang") {
@@ -63,7 +71,6 @@ export default function LoginPage() {
         toast.error("Role tidak dikenali");
       }
     } catch (err) {
-      console.error("Login failed:", err);
       if (isAxiosError(err)) {
         if (err.response?.status === 401) {
           toast.error("Login tidak sesuai atau tidak match dengan credentials");

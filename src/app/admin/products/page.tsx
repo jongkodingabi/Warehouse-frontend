@@ -1,117 +1,421 @@
 "use client";
 
-import { useProducts } from "@/hooks/useProducts";
-import Link from "next/link";
-import { Product } from "@/utils/types"; // Adjust the import path as necessary
-import { useQRCode } from "next-qrcode";
-// import { useEffect, useState } from "react";
-// import { Product } from "@/types/products";
-// import Image from "next/image";
-export default function ProductNewPage() {
-  const { products, isLoading, isError } = useProducts();
-  console.log("Products:", products);
-  const { Canvas } = useQRCode();
+import {
+  BoxesIcon,
+  Archive,
+  ChartPie,
+  Search,
+  SquarePen,
+  Trash,
+  Group,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Category } from "@/utils/types";
+import axiosInstance from "@/lib/axios";
+import CreateCategoryModal from "@/components/core/CreateCategoryModal";
+import {
+  createCategory,
+  deleteCategory,
+  updateCategory,
+} from "@/app/api/category/route";
+import toast, { Toaster } from "react-hot-toast";
+import z from "zod";
+import DeleteConfirmationModal from "@/components/core/Delete.Modal";
+import EditCategoryModal from "@/components/core/EditCategoryModal";
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error loading products</div>;
+const categoryFormSchema = z.object({
+  kategori: z.string(),
+  status: z.string(),
+});
 
-  //   const [products, setProducts] = useState<Product[]>([]);
+type CategoryFormSchema = z.infer<typeof categoryFormSchema>;
 
-  //   const fetchProducts = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         `${
-  //           process.env.NEXT_PUBLIC_API_URL + "/api/barang" ||
-  //           "https://fakestoreapi.com/products"
-  //         }`
-  //       );
-  //       const data = await response.json();
-  //       setProducts(data);
-  //     } catch (error) {
-  //       console.error("Error fetching products:", error);
-  //     }
-  //   };
+export default function Kategori() {
+  const [datas, setData] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("-");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [categoryIdToDelete, setCategoryIdToDelete] = useState<Category | null>(
+    null
+  );
+  const [perPage] = useState(5); // Menampilkan 5 data per halaman
+  const [filteredData, setFilteredData] = useState<Category[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
 
-  //   useEffect(() => {
-  //     fetchProducts();
-  //   }, []);
+  const totalCategories = datas.length;
+  const activeCategories = datas.filter((c) => c.status === "aktif").length;
+  const unActiveCategories = datas.filter(
+    (c) => c.status == "non-aktif"
+  ).length;
+  const activePercentage = totalCategories
+    ? ((activeCategories / totalCategories) * 100).toFixed(2)
+    : 0;
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axiosInstance.get("/api/v1/kategori");
+      setIsLoading(true);
+      setData(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleEditCategoryClick = (category: Category) => {
+    setCategoryToEdit(category);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateCategory = async (updatedData: CategoryFormSchema) => {
+    if (!categoryToEdit) return;
+    try {
+      await updateCategory(categoryToEdit.id, updatedData);
+      toast.success("Kategori berhasil diperbarui");
+      setIsEditModalOpen(false);
+      fetchCategories();
+    } catch (error) {
+      toast.error("Gagal memperbarui kategori");
+    }
+  };
+
+  const handleCreateCategory = async (newCategory: CategoryFormSchema) => {
+    try {
+      await createCategory(newCategory);
+      toast.success("Berhasil menambahkan kategori");
+      fetchCategories();
+      setIsModalOpen(false);
+    } catch (error) {
+      toast.error("Gagal menambahkan kategori");
+    }
+  };
+
+  const handleDeleteIdCategory = async (id: Category) => {
+    setCategoryIdToDelete(id);
+    setDeleteModal(true);
+  };
+
+  const handleDeleteCategory = async (id: number) => {
+    try {
+      await deleteCategory(id);
+      toast.success("Berhasil menghapus kategori");
+      setDeleteModal(false);
+      fetchCategories();
+    } catch (error) {
+      toast.error("Gagal menghapus kategori");
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // Menyaring data berdasarkan status dan pencarian
+  useEffect(() => {
+    const filtered = datas.filter((data) => {
+      const matchesStatus =
+        statusFilter === "-" || data.status === statusFilter;
+      const matchesSearch =
+        data.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        data.kategori.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return matchesStatus && matchesSearch;
+    });
+    setFilteredData(filtered);
+  }, [statusFilter, searchTerm, datas]);
+
+  // Menangani perubahan filter status
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Menangani perubahan halaman
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Slice data untuk pagination
+  const indexOfLastItem = currentPage * perPage;
+  const indexOfFirstItem = indexOfLastItem - perPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-extrabold text-gray-800">
-          Daftar Produk Baru
-        </h1>
-        <Link
-          href="/products/create"
-          className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition font-semibold"
-        >
-          + Tambah Produk
-        </Link>
+    <>
+      <Toaster position="top-right" />
+      <div className="mt-20 p-4">
+        <div className="flex items-center justify-between mb-6">
+          <div className="">
+            <h1 className="text-3xl font-bold text-primary">Data Barang</h1>
+            <p className="mt-4 text-gray-800">
+              Kelola data barang gudang anda.
+            </p>
+          </div>
+
+          <div className="">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="px-4 py-2 bg-primary text-white rounded-md cursor-pointer"
+            >
+              Tambah Kategori +
+            </button>
+          </div>
+        </div>
+        {/* Additional dashboard content can go here */}
       </div>
-      <div className="overflow-x-auto rounded-lg shadow-lg bg-white">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead>
-            <tr className="bg-blue-50">
-              <th className="py-4 px-6 font-semibold text-gray-700 text-center">
-                QR Code
-              </th>
-              <th className="py-4 px-6 font-semibold text-gray-700">
-                Nama Barang
-              </th>
-              <th className="py-4 px-6 font-semibold text-gray-700 text-center">
-                Stock Awal
-              </th>
-              <th className="py-4 px-6 font-semibold text-gray-700 text-center">
-                Stock Sekarang
-              </th>
-              <th className="py-4 px-6 font-semibold text-gray-700">
-                Line Divisi
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product: Product) => (
-              <tr
-                key={product.id}
-                className="border-b hover:bg-blue-50 transition"
-              >
-                <td className="py-4 px-6 text-center">
-                  <div className="flex justify-center">
-                    <Canvas
-                      text={product.kodeQr || product.productionDate || "N/A"}
-                      options={{
-                        margin: 2,
-                        scale: 4,
-                        width: 80,
-                        color: {
-                          dark: "#1e293b",
-                          light: "#f1f5f9",
-                        },
-                      }}
-                    />
-                  </div>
-                </td>
-                <td className="py-4 px-6 font-medium text-gray-900">
-                  {product.namaBarang}
-                </td>
-                <td className="py-4 px-6 text-center">{product.stockAwal}</td>
-                <td className="py-4 px-6 text-center">
-                  {product.stockSekarang ?? "N/A"}
-                </td>
-                <td className="py-4 px-6">{product.lineDivisi ?? "N/A"}</td>
-              </tr>
-            ))}
-            {products.length === 0 && (
+      {/* Card content goes here */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-5">
+        {/* Card 1 */}
+        <div className="bg-white rounded-lg shadow-md border p-5">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-text font-medium text-sm">Total Kategori</h3>
+              <p className="text-text font-medium text-xl pt-2.5">
+                {totalCategories}
+              </p>
+            </div>
+            <div className="bg-primary p-4 rounded-sm text-background">
+              <Group className="w-8 h-8" />
+            </div>
+          </div>
+        </div>
+        {/* Card 2 */}
+        <div className="bg-white rounded-lg shadow-md border p-5">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-text font-medium text-sm">Kategori Aktif</h3>
+              <p className="text-text font-medium text-xl pt-2.5">
+                {activeCategories}
+              </p>
+            </div>
+            <div className="bg-primary p-4 rounded-sm text-background">
+              <BoxesIcon className="w-8 h-8" />
+            </div>
+          </div>
+        </div>
+        {/* Card 3 */}
+        <div className="bg-white rounded-lg shadow-md border p-5">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-text font-medium text-sm">
+                Kategori Non Aktif
+              </h3>
+              <p className="text-text font-medium text-xl pt-2.5">
+                {unActiveCategories}
+              </p>
+            </div>
+            <div className="bg-primary p-4 rounded-sm text-background">
+              <Archive className="w-8 h-8" />
+            </div>
+          </div>
+        </div>
+        {/* Card 4 */}
+        <div className="bg-white rounded-lg shadow-md border p-5">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-text font-medium text-sm">
+                Persentase Aktif
+              </h3>
+              <p className="text-text font-medium text-xl pt-2.5">
+                {activePercentage} %
+              </p>
+            </div>
+            <div className="bg-primary p-4 rounded-sm text-background">
+              <ChartPie className="w-8 h-8" />
+            </div>
+          </div>
+        </div>
+      </div>{" "}
+      {/* Filter content goes here */}
+      <div className="bg-background mx-2 sm:mx-6 my-6 sm:my-9 border border-secondary rounded-lg px-3 sm:px-6 py-3 flex flex-col sm:flex-row items-stretch sm:items-center flex-wrap gap-4 sm:gap-6 shadow-md">
+        <div className="lg:flex lg:items-center grid gap-3">
+          <h1 className="text-sm font-medium text-text">Filter:</h1>
+          <select
+            name="nama-gudang"
+            id="nama-gudang"
+            value={statusFilter}
+            onChange={handleStatusChange}
+            className="border border-secondary px-3 sm:px-4 py-2 rounded-sm text-text font-medium text-sm"
+          >
+            <option value="-">Semua Status</option>
+            <option value="aktif">Aktif</option>
+            <option value="non-aktif">Non-aktif</option>
+          </select>
+        </div>
+        <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          <input
+            type="search"
+            name="search"
+            id="search"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder="Pencarian..."
+            className="border border-secondary px-3 sm:px-4 py-2 rounded-sm font-medium text-sm flex-1"
+          />
+          <button
+            type="submit"
+            className="bg-primary/90 hover:bg-primary transition-colors duration-200 cursor-pointer ease-in-out p-2 rounded-sm text-white"
+          >
+            <Search className="w-6 h-6" />
+          </button>
+        </div>
+      </div>
+      <div className="bg-background border border-secondary rounded-lg mx-2 sm:mx-6 mb-6">
+        <h2 className="font-medium text-text text-2xl px-4 sm:px-6 py-6">
+          Data Gudang
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead className="bg-text/15">
               <tr>
-                <td colSpan={5} className="py-8 px-6 text-center text-gray-500">
-                  Tidak ada produk ditemukan.
-                </td>
+                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
+                  NAMA
+                </th>
+                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
+                  STATUS
+                </th>
+                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
+                  TANGGAL PRODUKSI
+                </th>
+
+                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
+                  Action
+                </th>
               </tr>
+            </thead>
+            <tbody>
+              {currentItems.map((data, idx) => (
+                <tr
+                  key={idx}
+                  className="bg-background text-sm font-medium text-text text-center border-y border-secondary"
+                >
+                  <td className="px-4 sm:px-6 py-4 uppercase whitespace-nowrap">
+                    {data.kategori}
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                            ${
+                              data.status === "aktif"
+                                ? "bg-green-500 text-green-100 border border-green-800"
+                                : data.status === "non-aktif"
+                                ? "bg-red-900/50 text-red-300 border border-red-800"
+                                : data.status === "transfer"
+                                ? "bg-blue-900/50 text-blue-300 border border-blue-800"
+                                : "bg-gray-800/50 text-gray-300 border border-gray-700"
+                            }`}
+                    >
+                      {data.status}
+                    </span>{" "}
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                    {data.created_at
+                      ? new Date(data.created_at).toLocaleDateString()
+                      : "—"}{" "}
+                  </td>
+
+                  <td className="px-4 sm:px-6 py-4 flex gap-2.5 justify-center">
+                    <button onClick={() => handleEditCategoryClick(data)}>
+                      <SquarePen />
+                    </button>
+
+                    {/* <button onClick={() => handleDeleteCategory(data.id)}>
+                      <Trash />
+                    </button> */}
+                    <button
+                      onClick={() =>
+                        handleDeleteIdCategory({
+                          id: data.id,
+                          kategori: data.kategori,
+                          status: data.status,
+                          created_at: data.created_at,
+                        })
+                      }
+                    >
+                      <Trash />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-6 py-4 gap-3">
+          <div>
+            <h3 className="text-sm sm:text-base">
+              Menampilkan {indexOfFirstItem + 1}-{indexOfLastItem} dari{" "}
+              {filteredData.length} gudang
+            </h3>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              className="px-3 sm:px-4 py-2 border border-secondary rounded-sm font-medium text-sm text-secondary"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            {/* Halaman Dinamis */}
+            {[...Array(Math.ceil(filteredData.length / perPage))].map(
+              (_, index) => (
+                <button
+                  key={index}
+                  className={`px-3 sm:px-4 py-2 border border-secondary rounded-sm font-medium text-sm ${
+                    index + 1 === currentPage ? "bg-text text-background" : ""
+                  }`}
+                  onClick={() => handlePageChange(index + 1)}
+                >
+                  {index + 1}
+                </button>
+              )
             )}
-          </tbody>
-        </table>
+            <button
+              className="px-3 sm:px-4 py-2 border border-secondary rounded-sm font-medium text-sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={
+                currentPage === Math.ceil(filteredData.length / perPage)
+              }
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+      {isModalOpen && (
+        <CreateCategoryModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleCreateCategory}
+        />
+      )}
+      {deleteModal && categoryIdToDelete && (
+        <DeleteConfirmationModal
+          isOpen={deleteModal}
+          onClose={() => setDeleteModal(false)}
+          itemName={categoryIdToDelete.kategori}
+          onConfirm={() => handleDeleteCategory(categoryIdToDelete.id)}
+        />
+      )}
+      {isEditModalOpen && categoryToEdit && (
+        <EditCategoryModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSubmit={handleUpdateCategory}
+          initialData={{
+            kategori: categoryToEdit.kategori,
+            status: categoryToEdit.status,
+          }}
+        />
+      )}
+    </>
   );
 }
