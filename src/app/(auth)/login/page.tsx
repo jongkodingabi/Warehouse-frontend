@@ -5,7 +5,6 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { Lock, X, Warehouse, User, Eye, LogIn, EyeClosed } from "lucide-react";
-import { useUser } from "@/context/UserContext";
 import { login } from "@/services/auth";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +12,8 @@ import { useForm } from "react-hook-form";
 import { Toaster, toast } from "react-hot-toast";
 import { isAxiosError } from "axios";
 import Head from "next/head";
+import { useUser } from "@/context/UserContext";
+import dayjs from "dayjs";
 
 const loginFormSchema = z.object({
   email: z.string().email({
@@ -41,16 +42,35 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res = await login(values);
-      // If backend returns token in JSON, optionally store as fallback (NOT recommended for security)
-      const token = (res.data as any).token;
+
+      const token = res.data?.token;
+      const role = res.data?.user?.role;
+      const expiresAt = res.data?.expires_at; // dari Laravel (format Carbon)
+
       if (token) {
-        Cookies.set("token", token, { expires: 1 }); // fallback, optional
+        // Simpan token
+        Cookies.set("token", token, { expires: 1 });
+
+        // Simpan waktu expired (pakai dari server)
+        if (expiresAt) {
+          Cookies.set("token_expires_at", expiresAt, { expires: 1 });
+        }
       }
-      // refresh global user from server
+
+      if (role) {
+        Cookies.set("role", role, { expires: 1 });
+      }
+
       await refreshUser();
-      router.replace("/admin/dashboard");
+
+      if (role === "superadmin") {
+        router.replace("/admin/dashboard");
+      } else if (role === "admingudang") {
+        router.replace("/adminGudang/dashboard");
+      } else {
+        toast.error("Role tidak dikenali");
+      }
     } catch (err) {
-      console.error("Login failed:", err);
       if (isAxiosError(err)) {
         if (err.response?.status === 401) {
           toast.error("Login tidak sesuai atau tidak match dengan credentials");
@@ -73,10 +93,10 @@ export default function LoginPage() {
       }
     } finally {
       setLoading(false);
-      // setError(false);
       form.reset();
     }
   };
+
   return (
     <>
       <Head>
@@ -260,7 +280,7 @@ export default function LoginPage() {
               className="w-full flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-lg cursor-pointer hover:bg-primary/90 hover:scale-105 active:bg-primary active:scale-95 transition-all duration-300 ease-in-out"
             >
               <LogIn className="mr-2" />
-              {loading ? "Logging in" : "Log In"}
+              {loading ? "Logging in..." : "Log In"}
             </button>
           </form>
           {error && (

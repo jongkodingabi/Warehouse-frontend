@@ -153,9 +153,9 @@ export default function Kategori() {
       <div className="mt-20 p-4">
         <div className="flex items-center justify-between mb-6">
           <div className="">
-            <h1 className="text-3xl font-bold text-primary">Data Barang</h1>
+            <h1 className="text-3xl font-bold text-primary">Data Kategori</h1>
             <p className="mt-4 text-gray-800">
-              Kelola data barang gudang anda.
+              Kelola kategori data barang gudang anda.
             </p>
           </div>
 

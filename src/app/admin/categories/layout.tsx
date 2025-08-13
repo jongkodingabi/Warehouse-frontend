@@ -4,11 +4,21 @@ import Header from "@/components/ui/header";
 import Footer from "@/components/ui/footer";
 
 export const metadata = {
-  title: "Gudang",
+  title: "Category",
   description: "Admin Gudang Management",
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({
+  children,
+}: // table,
+// card,
+// filter,
+{
+  // table: React.ReactNode;
+  children: React.ReactNode;
+  // card: React.ReactNode;
+  // filter: React.ReactNode;
+}) {
   return (
     <>
       <div className="flex flex-col min-h-screen bg-slate-50 md:flex-row">
@@ -19,7 +29,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Header />
           {/* Main content area */}
           {children}
-
+          {/* Card Data */}
+          {/* {card} */}
+          {/* Filter Data */}
+          {/* {filter} */}
+          {/* Gudang Table */}
+          {/* {table} */}
           <Footer />
         </div>
       </div>
