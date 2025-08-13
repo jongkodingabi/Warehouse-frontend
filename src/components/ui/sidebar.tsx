@@ -18,6 +18,7 @@ import {
   TrendingDown,
   Scroll,
   Users,
+  PackageOpen,
 } from "lucide-react";
 import Cookies from "js-cookie";
 
@@ -27,6 +28,7 @@ import axiosInstance from "@/lib/axios";
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
   const [isStockDropdownOpen, setStockDropdownOpen] = useState(false);
+  const [isProductDropdownOpen, setIsProductDropdownOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { setUser } = useUser();
@@ -101,18 +103,58 @@ export default function Sidebar() {
               </Link>
             </li>
 
+            {/* Barang & Produck  */}
             <li>
-              <Link
-                href="/admin/categories"
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                  pathname === "/admin/categories"
-                    ? "bg-gray-100 text-blue-600"
+              <button
+                onClick={() => setIsProductDropdownOpen(!isProductDropdownOpen)}
+                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg ${
+                  pathname === "/dataBarang-test"
+                    ? "bg-white text-text"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                <ClipboardList className="w-5 h-5" />
-                Data Barang
-              </Link>
+                <div className="flex items-center gap-3">
+                  <ClipboardList className="w-5 h-5" />
+                  Barang & Produk
+                </div>
+                {isProductDropdownOpen ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </button>
+
+              {/* Barang & Produck Dropdown */}
+              {isProductDropdownOpen && (
+                <ul className="ml-8 mt-1 space-y-1">
+                  <li>
+                    <Link
+                      href=""
+                      className={`block px-3 py-2 text-sm rounded-lg ${
+                        pathname === "/dataBarang-test"
+                          ? "bg-primary text-white"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <PackageOpen className="inline w-4 h-4 mr-2" />
+                      Produk Utama
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href=""
+                      className={`block px-3 py-2 text-sm rounded-lg ${
+                        pathname === ""
+                          ? "bg-gray-100 text-blue-600"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <ClipboardList className="inline w-4 h-4 mr-2" />
+                      Data Barang
+                    </Link>
+                  </li>
+                </ul>
+              )}
             </li>
 
             {/* Dropdown Stock Barang */}

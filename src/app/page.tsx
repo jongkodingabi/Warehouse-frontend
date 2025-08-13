@@ -13,11 +13,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Footer from "@/components/ui/footer";
-<<<<<<< HEAD
-=======
 import Cookies from "js-cookie";
 import { useUser } from "@/context/UserContext";
->>>>>>> 7a9ce7607096f54cd8c57cda8417f0cea8467a45
 
 const datas = [
   {
