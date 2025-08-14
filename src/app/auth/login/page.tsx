@@ -73,6 +73,7 @@ export default function LoginPage() {
                 className="border p-3 pl-10 mb-2 w-full rounded-md"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -90,6 +91,7 @@ export default function LoginPage() {
                 className="border p-3 pl-10 mb-2 w-full rounded-md"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
           </div>
