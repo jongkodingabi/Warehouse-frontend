@@ -1,11 +1,15 @@
 import axiosInstance from "@/lib/axios";
 
-export const createProduct = async (newProduct: {
-  nama_barang: string;
-  kode_qr: string;
-  line_divisi: string;
-  production_date: string;
+export const createBarang = async (newProduct: {
+  produk: string;
+  production_date: any;
   stock: number;
+  kategori_id: any;
+  kodegrp: string;
+  status: string;
+  line_divisi: number;
+  main_product: number;
+  created_by: any;
 }) => {
   try {
     const response = await axiosInstance.post("/api/v1/barang", newProduct, {
@@ -18,4 +22,8 @@ export const createProduct = async (newProduct: {
     console.error("Error creating product:", error);
     throw error;
   }
+};
+
+export const deleteBarang = async (id: number) => {
+  await axiosInstance.delete(`/api/v1/barang/${id}`);
 };

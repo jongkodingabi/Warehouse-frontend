@@ -1,3 +1,9 @@
+type User = {
+  id: number;
+  email: string;
+  name: string;
+};
+
 type Product = {
   id: number;
   namaBarang: string;
@@ -32,13 +38,23 @@ export type { Divisi };
 
 type Barang = {
   id: number;
-  kategori: string[];
-  divisi?: string[];
-  createdBy?: string[];
+  kategori: Category;
+  divisi: Divisi;
+  createdBy: User;
+  updatedBy: User;
   namaBarang: string;
+  kodeQr: string;
+  lineDivisi: string;
   productionDate: string;
   stockAwal: number;
   stockSekarang: number;
+  status: string;
 };
 
 export type { Barang };
+
+type BarangResponse = {
+  data: Barang[];
+};
+
+export type { BarangResponse };

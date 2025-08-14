@@ -6,6 +6,7 @@ export type User = {
   name: string;
   email: string;
   role: string;
+  divisi_id: number;
 };
 
 type login = {

@@ -119,10 +119,10 @@ export default function Sidebar() {
 
             <li>
               <Link
-                href="/admin/barang"
+                href="/admin/products"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                  pathname === "/admin/barang"
-                    ? "bg-gray-primary text-blue-600"
+                  pathname === "/admin/products"
+                    ? "bg-primary text-white"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
