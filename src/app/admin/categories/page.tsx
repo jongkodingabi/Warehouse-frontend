@@ -8,110 +8,102 @@ import {
   SquarePen,
   Trash,
   Group,
-  Download,
-  FolderInput,
-  Eye,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { BarangResponse, Barang } from "@/utils/types";
+import { Category } from "@/utils/types";
 import axiosInstance from "@/lib/axios";
+import CreateCategoryModal from "@/components/core/CreateCategoryModal";
+import {
+  createCategory,
+  deleteCategory,
+  updateCategory,
+} from "@/app/api/category/route";
 import toast, { Toaster } from "react-hot-toast";
 import z from "zod";
-import Link from "next/link";
-
-import { createBarang, deleteBarang } from "@/app/api/product/route";
 import DeleteConfirmationModal from "@/components/core/Delete.Modal";
-import CreateBarangModal from "@/components/core/CreateBarangModal";
+import EditCategoryModal from "@/components/core/EditCategoryModal";
 
-const barangFormSchema = z.object({
-  kategori_id: z.number(),
-  created_by: z.number(),
-  produk: z.string(),
-  production_date: z.string(),
-  stock: z.number(),
-  kodegrp: z.string(),
+const categoryFormSchema = z.object({
+  kategori: z.string(),
   status: z.string(),
-  line_divisi: z.number(),
-  main_product: z.number(),
 });
 
-type BarangFormSchema = z.infer<typeof barangFormSchema>;
+type CategoryFormSchema = z.infer<typeof categoryFormSchema>;
 
 export default function Kategori() {
-  const [datas, setData] = useState<Barang[]>([]);
+  const [datas, setData] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("-");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [barangIdToDelete, setBarangIdToDelete] = useState<Barang | null>(null);
+  const [categoryIdToDelete, setCategoryIdToDelete] = useState<Category | null>(
+    null
+  );
   const [perPage] = useState(5); // Menampilkan 5 data per halaman
-  const [filteredData, setFilteredData] = useState<BarangResponse[]>([]);
+  const [filteredData, setFilteredData] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
-  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  // const [categoryToEdit, setCategoryToEdit] = useState<BarangResponse | null>(
-  //   null
-  // );
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
 
-  // const totalCategories = datas.length;
-  // const activeCategories = datas.filter((c) => c.status === "aktif").length;
-  // const unActiveCategories = datas.filter(
-  //   (c) => c.status == "non-aktif"
-  // ).length;
-  // const activePercentage = totalCategories
-  //   ? ((activeCategories / totalCategories) * 100).toFixed(2)
-  //   : 0;
+  const totalCategories = datas.length;
+  const activeCategories = datas.filter((c) => c.status === "aktif").length;
+  const unActiveCategories = datas.filter(
+    (c) => c.status == "non-aktif"
+  ).length;
+  const activePercentage = totalCategories
+    ? ((activeCategories / totalCategories) * 100).toFixed(2)
+    : 0;
 
-  const fetchBarang = async () => {
+  const fetchCategories = async () => {
     try {
-      const response = await axiosInstance.get("/api/v1/barang");
+      const response = await axiosInstance.get("/api/v1/kategori");
       setIsLoading(true);
-      setData(response.data.data);
+      setData(response.data);
     } catch (error) {
       console.error(error);
     }
   };
 
-  // const handleEditCategoryClick = (category: Category) => {
-  //   setCategoryToEdit(category);
-  //   setIsEditModalOpen(true);
-  // };
+  const handleEditCategoryClick = (category: Category) => {
+    setCategoryToEdit(category);
+    setIsEditModalOpen(true);
+  };
 
-  // const handleUpdateCategory = async (updatedData: BarangFormSchema) => {
-  //   if (!categoryToEdit) return;
-  //   try {
-  //     await updateCategory(categoryToEdit.id, updatedData);
-  //     toast.success("Kategori berhasil diperbarui");
-  //     setIsEditModalOpen(false);
-  //     fetchCategories();
-  //   } catch (error) {
-  //     toast.error("Gagal memperbarui kategori");
-  //   }
-  // };
-
-  const handleCreateBarang = async (newBarang: BarangFormSchema) => {
+  const handleUpdateCategory = async (updatedData: CategoryFormSchema) => {
+    if (!categoryToEdit) return;
     try {
-      await createBarang(newBarang);
-      toast.success("Berhasil menambahkan barang");
-      fetchBarang();
-      setIsModalOpen(false);
-      console.log(newBarang);
+      await updateCategory(categoryToEdit.id, updatedData);
+      toast.success("Kategori berhasil diperbarui");
+      setIsEditModalOpen(false);
+      fetchCategories();
     } catch (error) {
-      toast.error("Gagal menambahkan barang");
+      toast.error("Gagal memperbarui kategori");
     }
   };
 
-  const handleDeleteIdBarang = async (barang: Barang) => {
-    setBarangIdToDelete(barang);
+  const handleCreateCategory = async (newCategory: CategoryFormSchema) => {
+    try {
+      await createCategory(newCategory);
+      toast.success("Berhasil menambahkan kategori");
+      fetchCategories();
+      setIsModalOpen(false);
+    } catch (error) {
+      toast.error("Gagal menambahkan kategori");
+    }
+  };
+
+  const handleDeleteIdCategory = async (id: Category) => {
+    setCategoryIdToDelete(id);
     setDeleteModal(true);
   };
 
   const handleDeleteCategory = async (id: number) => {
     try {
-      await deleteBarang(id);
+      await deleteCategory(id);
       toast.success("Berhasil menghapus kategori");
       setDeleteModal(false);
-      fetchBarang();
+      fetchCategories();
     } catch (error) {
       toast.error("Gagal menghapus kategori");
       console.log(error);
@@ -119,22 +111,22 @@ export default function Kategori() {
   };
 
   useEffect(() => {
-    fetchBarang();
+    fetchCategories();
   }, []);
 
   // Menyaring data berdasarkan status dan pencarian
-  // useEffect(() => {
-  //   const filtered = datas.filter((data) => {
-  //     const matchesStatus =
-  //       statusFilter === "-" || data.status === statusFilter;
-  //     const matchesSearch =
-  //       data.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       data.kategori.toLowerCase().includes(searchTerm.toLowerCase());
+  useEffect(() => {
+    const filtered = datas.filter((data) => {
+      const matchesStatus =
+        statusFilter === "-" || data.status === statusFilter;
+      const matchesSearch =
+        data.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        data.kategori.toLowerCase().includes(searchTerm.toLowerCase());
 
-  //     return matchesStatus && matchesSearch;
-  //   });
-  //   setFilteredData(filtered);
-  // }, [statusFilter, searchTerm, datas]);
+      return matchesStatus && matchesSearch;
+    });
+    setFilteredData(filtered);
+  }, [statusFilter, searchTerm, datas]);
 
   // Menangani perubahan filter status
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -161,9 +153,9 @@ export default function Kategori() {
       <div className="mt-20 p-4">
         <div className="flex items-center justify-between mb-6">
           <div className="">
-            <h1 className="text-3xl font-bold text-primary">Data Barang</h1>
+            <h1 className="text-3xl font-bold text-primary">Data Kategori</h1>
             <p className="mt-4 text-gray-800">
-              Kelola data barang gudang anda.
+              Kelola kategori data barang gudang anda.
             </p>
           </div>
 
@@ -172,7 +164,7 @@ export default function Kategori() {
               onClick={() => setIsModalOpen(true)}
               className="px-4 py-2 bg-primary text-white rounded-md cursor-pointer"
             >
-              Tambah Barang +
+              Tambah Kategori +
             </button>
           </div>
         </div>
@@ -186,7 +178,7 @@ export default function Kategori() {
             <div>
               <h3 className="text-text font-medium text-sm">Total Kategori</h3>
               <p className="text-text font-medium text-xl pt-2.5">
-                {/* {totalCategories} */} 20
+                {totalCategories}
               </p>
             </div>
             <div className="bg-primary p-4 rounded-sm text-background">
@@ -200,7 +192,7 @@ export default function Kategori() {
             <div>
               <h3 className="text-text font-medium text-sm">Kategori Aktif</h3>
               <p className="text-text font-medium text-xl pt-2.5">
-                {/* {activeCategories} */} 20
+                {activeCategories}
               </p>
             </div>
             <div className="bg-primary p-4 rounded-sm text-background">
@@ -216,7 +208,7 @@ export default function Kategori() {
                 Kategori Non Aktif
               </h3>
               <p className="text-text font-medium text-xl pt-2.5">
-                {/* {unActiveCategories} */} 40
+                {unActiveCategories}
               </p>
             </div>
             <div className="bg-primary p-4 rounded-sm text-background">
@@ -232,7 +224,7 @@ export default function Kategori() {
                 Persentase Aktif
               </h3>
               <p className="text-text font-medium text-xl pt-2.5">
-                {/* {activePercentage} % */} 100%
+                {activePercentage} %
               </p>
             </div>
             <div className="bg-primary p-4 rounded-sm text-background">
@@ -276,85 +268,77 @@ export default function Kategori() {
         </div>
       </div>
       <div className="bg-background border border-secondary rounded-lg mx-2 sm:mx-6 mb-6">
-        <div className="flex justify-between items-center mx-4 sm:mx-6 py-6">
-          <h2 className="font-medium text-text text-2xl">Data Barang</h2>
-          <div className="flex items-center gap-3">
-            <div className="bg-secondary text-white p-2 rounded-sm">
-              <Download />
-            </div>
-            <div className="bg-secondary text-white p-2 rounded-sm">
-              <FolderInput />
-            </div>
-          </div>
-        </div>
+        <h2 className="font-medium text-text text-2xl px-4 sm:px-6 py-6">
+          Data Gudang
+        </h2>
         <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead className="bg-text/15">
               <tr>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  NAMA BARANG
+                  NAMA
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  KATEGORI
-                </th>
-
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  STOK AWAL
-                </th>
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  STOK SEKARANG
+                  STATUS
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   TANGGAL PRODUKSI
                 </th>
+
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  KODE QR
-                </th>
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  AKSI
+                  Action
                 </th>
               </tr>
             </thead>
             <tbody>
-              {datas.map((data, idx) => (
+              {currentItems.map((data, idx) => (
                 <tr
                   key={idx}
                   className="bg-background text-sm font-medium text-text text-center border-y border-secondary"
                 >
                   <td className="px-4 sm:px-6 py-4 uppercase whitespace-nowrap">
-                    {data.namaBarang}
-                  </td>
-                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                    {data.kategori.kategori}
-                  </td>
-                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                    {data.stockAwal}
-                  </td>
-                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                    {data.stockSekarang}
-                  </td>
-                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                    {data.productionDate}
+                    {data.kategori}
                   </td>
                   <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                     <span
-                      className={
-                        data.status === "Aktif"
-                          ? "bg-accent px-4 py-2 rounded-sm"
-                          : "bg-[#ff5757] px-4 py-2 rounded-sm"
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                            ${
+                              data.status === "aktif"
+                                ? "bg-green-500 text-green-100 border border-green-800"
+                                : data.status === "non-aktif"
+                                ? "bg-red-900/50 text-red-300 border border-red-800"
+                                : data.status === "transfer"
+                                ? "bg-blue-900/50 text-blue-300 border border-blue-800"
+                                : "bg-gray-800/50 text-gray-300 border border-gray-700"
+                            }`}
+                    >
+                      {data.status}
+                    </span>{" "}
+                  </td>
+                  <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                    {data.created_at
+                      ? new Date(data.created_at).toLocaleDateString()
+                      : "—"}{" "}
+                  </td>
+
+                  <td className="px-4 sm:px-6 py-4 flex gap-2.5 justify-center">
+                    <button onClick={() => handleEditCategoryClick(data)}>
+                      <SquarePen />
+                    </button>
+
+                    {/* <button onClick={() => handleDeleteCategory(data.id)}>
+                      <Trash />
+                    </button> */}
+                    <button
+                      onClick={() =>
+                        handleDeleteIdCategory({
+                          id: data.id,
+                          kategori: data.kategori,
+                          status: data.status,
+                          created_at: data.created_at,
+                        })
                       }
                     >
-                      {data.status === "Aktif" ? "Aktif" : "Non Aktif"}
-                    </span>
-                  </td>
-                  <td className="px-4 sm:px-6 py-4 flex gap-2.5 justify-center">
-                    <Link href="/detail-gudang" className="">
-                      <Eye />
-                    </Link>
-                    <Link href="/edit-gudang" className="">
-                      <SquarePen />
-                    </Link>
-                    <button onClick={() => handleDeleteIdBarang(data)}>
                       <Trash />
                     </button>
                   </td>
@@ -363,47 +347,50 @@ export default function Kategori() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
         <div className="flex flex-col sm:flex-row justify-between items-center px-4 sm:px-6 py-4 gap-3">
           <div>
             <h3 className="text-sm sm:text-base">
-              Menampilkan 1-5 dari 10 gudang
+              Menampilkan {indexOfFirstItem + 1}-{indexOfLastItem} dari{" "}
+              {filteredData.length} gudang
             </h3>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <button className="px-3 sm:px-4 py-2 border border-secondary rounded-sm font-medium text-sm text-secondary">
+            <button
+              className="px-3 sm:px-4 py-2 border border-secondary rounded-sm font-medium text-sm text-secondary"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
               Previous
             </button>
-            <span className="px-3 sm:px-4 py-2 bg-text text-background rounded-sm font-medium text-sm glow-box">
-              1
-            </span>
-            <span className="px-3 sm:px-4 py-2 border border-secondary rounded-sm font-medium text-sm">
-              2
-            </span>
-            <span className="px-3 sm:px-4 py-2 border border-secondary rounded-sm font-medium text-sm">
-              3
-            </span>
-            <button className="px-3 sm:px-4 py-2 border border-secondary rounded-sm font-medium text-sm">
+            {/* Halaman Dinamis */}
+            {[...Array(Math.ceil(filteredData.length / perPage))].map(
+              (_, index) => (
+                <button
+                  key={index}
+                  className={`px-3 sm:px-4 py-2 border border-secondary rounded-sm font-medium text-sm ${
+                    index + 1 === currentPage ? "bg-text text-background" : ""
+                  }`}
+                  onClick={() => handlePageChange(index + 1)}
+                >
+                  {index + 1}
+                </button>
+              )
+            )}
+            <button
+              className="px-3 sm:px-4 py-2 border border-secondary rounded-sm font-medium text-sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={
+                currentPage === Math.ceil(filteredData.length / perPage)
+              }
+            >
               Next
             </button>
           </div>
         </div>
       </div>
-      {deleteModal && barangIdToDelete && (
-        <DeleteConfirmationModal
-          isOpen={deleteModal}
-          onClose={() => setDeleteModal(false)}
-          itemName={barangIdToDelete.namaBarang}
-          onConfirm={() => handleDeleteCategory(barangIdToDelete.id)}
-        />
-      )}
       {isModalOpen && (
-        <CreateBarangModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleCreateBarang}
-        />
-      )}
-      {/* {isModalOpen && (
         <CreateCategoryModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -428,7 +415,7 @@ export default function Kategori() {
             status: categoryToEdit.status,
           }}
         />
-      )} */}
+      )}
     </>
   );
 }

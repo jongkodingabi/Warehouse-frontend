@@ -1,12 +1,10 @@
 "use client";
 
-import { useUser } from "@/context/UserContext";
 import { useState, useEffect } from "react";
 
 export default function Dashboard() {
   const [time, setTime] = useState("");
   const [isMounted, setIsMounted] = useState(false);
-  const { user } = useUser();
 
   useEffect(() => {
     setIsMounted(true);
@@ -26,10 +24,10 @@ export default function Dashboard() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-primary">
-            Dashboard Overview
+            Dashboard Admin Gudang Overview
           </h1>
           <p className="mt-4 text-gray-800">
-            Selamat datang {user?.name}, mari lihat ada apa saja di gudang hari
+            Selamat datang Jhon Doe, mari lihat ada apa saja di gudang hari
             ini!, Semangat 😉
           </p>
         </div>

@@ -5,8 +5,66 @@
   --color-secondary: #64748b;
   --color-background: #f8fafc;
   --color-text: #1e293b;
+  --color-accent: #10b981;
 }
 
 .glow-box {
   box-shadow: 0 0 4px rgba(0, 255, 127, 0.75);
+}
+
+.shadow-custom {
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.25);
+}
+
+.shadow-custom-2 {
+  box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.35);
+}
+
+.shadow-custom-3 {
+  box-shadow: 2px 4px 10px rgba(7, 45, 128, 0.4);
+}
+
+.shadow-card {
+  box-shadow: 10px 10px 16px rgba(16, 185, 129, 0.25),
+    -10px -10px 16px rgba(16, 185, 129, 0.25);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+  -webkit-animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    -webkit-transform: translateY(-10px);
+    -moz-transform: translateY(-10px);
+    -ms-transform: translateY(-10px);
+    -o-transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    -webkit-transform: translateY(0);
+    -moz-transform: translateY(0);
+    -ms-transform: translateY(0);
+    -o-transform: translateY(0);
+  }
+}
+
+.mantul {
+  animation: mantul 3s ease-in-out infinite;
+  -webkit-animation: mantul 3s ease-in-out infinite;
+}
+
+@keyframes mantul {
+  50% {
+    transform: translateY(-40px);
+    -webkit-transform: translateY(-40px);
+    -moz-transform: translateY(-40px);
+    -ms-transform: translateY(-40px);
+    -o-transform: translateY(-40px);
+  }
 }

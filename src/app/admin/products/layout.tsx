@@ -4,7 +4,7 @@ import Header from "@/components/ui/header";
 import Footer from "@/components/ui/footer";
 
 export const metadata = {
-  title: "Gudang",
+  title: "Barang",
   description: "Admin Gudang Management",
 };
 
