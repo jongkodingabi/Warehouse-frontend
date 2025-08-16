@@ -91,21 +91,19 @@ export default function Home() {
 
       <div className="bg-gradient-to-br from-slate-400 to-slate-500 my-16 mx-18 rounded-2xl p-6 shadow-card animate-fade-in">
         <div className="flex justify-between">
-          <div className="relative top-5 left-7">
+          <div className="relative top-5 left-7 w-full max-w-md mx-auto">
             <Image
               src="/3d.png"
               alt="3D"
               width={452}
               height={452}
-              className="relative z-10 mantul"
+              className="relative z-10 mantul w-full h-auto"
             />
-            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 -top-3">
+            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 -top-3 w-full max-w-md">
               <svg
-                width="465"
-                height="463"
                 viewBox="0 0 465 463"
-                fill="none"
                 xmlns="http://www.w3.org/2000/svg"
+                className="w-full h-auto"
               >
                 <path
                   d="M341.176 42.576C388.6 69.632 431.768 109.456 451.528 159.92C471.288 210.08 467.64 270.272 450.008 326.512C432.376 382.752 400.76 434.736 355.16 453.584C309.56 472.432 250.28 458.144 198.6 447.808C146.616 437.472 102.232 431.392 69.096 408.592C35.96 385.488 14.072 346.272 5.256 305.536C-3.256 265.104 1.912 223.76 8.6 176.336C15.288 129.216 23.496 76.32 54.2 43.792C84.904 11.568 138.104 -0.288011 190.392 0.927989C242.376 1.83999 294.056 15.52 341.176 42.576Z"
@@ -114,17 +112,18 @@ export default function Home() {
               </svg>
             </span>
           </div>
+
           <div className="flex items-center flex-col ml-40 mr-10">
             <h1 className="font-bold text-3xl text-center text-text">
               Solusi Untuk Manajemen Operasi Gudang Anda
             </h1>
             {/* 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-5">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 py-5">
               {datas.map((data, idx) => {
                 const Icon = data.icon;
                 return (
                   <div
-                    className=" border-2 border-slate-800 rounded-sm p-5 shadow-custom-2 relative w-80"
+                    className=" border-2 border-slate-800 rounded-sm p-5 shadow-custom-2 relative w-full max-w-sm mx-auto"
                     key={idx}
                   >
                     <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-text text-white px-3 py-1.5 rounded-full font-medium text-xs">
