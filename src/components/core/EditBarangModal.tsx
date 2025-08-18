@@ -10,65 +10,95 @@ import { Category } from "@/utils/types";
 import axiosInstance from "@/lib/axios";
 import { useUser } from "@/context/UserContext";
 
-// Perbaiki schema dengan transformasi yang lebih eksplisit
+// Schema untuk edit - tambahkan id untuk update
 const barangFormSchema = z.object({
   kategori_id: z.coerce.number().min(1, "Kategori harus dipilih"),
-  created_by: z.number(),
+  user_id: z.number(),
   produk: z.string().min(1, "Nama produk harus diisi"),
   production_date: z.string().min(1, "Tanggal produksi harus diisi"),
-  stock: z.coerce.number().min(0, "Stock tidak boleh negatif"),
   kodegrp: z.string().min(1, "Kode grup harus diisi"),
-  status: z.enum(["active", "un-active"]),
-  line_divisi: z.number(),
-  main_produk: z.number(),
+  status: z.string(),
 });
 
 type BarangFormSchema = z.infer<typeof barangFormSchema>;
 
-export default function CreateBarangModal({
+export default function EditBarangModal({
   isOpen,
   onClose,
   onSubmit,
+  barang,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: BarangFormSchema) => void;
+  barang: any;
 }) {
   const { user } = useUser();
   const [categoriesOption, setCategoriesOption] = useState<Category[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<BarangFormSchema>({
     resolver: zodResolver(barangFormSchema),
     defaultValues: {
-      kategori_id: 4,
-      created_by: user?.id,
+      kategori_id: 1,
+      user_id: user?.id || 0,
       produk: "",
       production_date: "",
-      stock: 0,
       kodegrp: "",
-      status: "active" as const,
-      line_divisi: user?.divisi_id,
-      main_produk: 1,
+      status: "active",
     },
   });
 
+  // Fetch categories terlebih dahulu
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // Reset form ketika barang berubah DAN categories sudah loaded
+  useEffect(() => {
+    if (barang && categoriesOption.length > 0 && user?.id) {
+      console.log("Resetting form with data:", barang);
+
+      form.reset({
+        kategori_id: barang.kategori_id || barang.kategori?.id || 1,
+        user_id: user.id,
+        produk: barang.produk || barang.namaBarang || "",
+        production_date: barang.production_date || barang.productionDate || "",
+        kodegrp: barang.kodegrp || "",
+        status: barang.status || "active",
+      });
+    }
+  }, [barang, categoriesOption, user, form]);
 
   const fetchCategories = async () => {
     try {
       const response = await axiosInstance.get("/api/v1/kategori");
       setCategoriesOption(response.data);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching categories:", error);
     }
   };
 
-  // Handle submit dengan type assertion yang aman
-  const handleSubmit = (values: BarangFormSchema) => {
-    onSubmit(values);
-    form.reset();
+  const handleSubmit = async (values: BarangFormSchema) => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    try {
+      console.log("Submitting values:", values);
+      await onSubmit(values);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (!isSubmitting) {
+      form.reset();
+      onClose();
+    }
   };
 
   if (!isOpen) return null;
@@ -89,8 +119,9 @@ export default function CreateBarangModal({
           className="bg-background p-8 border border-secondary rounded-xl shadow-xl w-full max-w-lg relative"
         >
           <button
-            onClick={onClose}
-            className="absolute top-3 right-3 text-text/50 hover:text-text"
+            onClick={handleClose}
+            disabled={isSubmitting}
+            className="absolute top-3 right-3 text-text/50 hover:text-text disabled:opacity-50"
           >
             <X className="w-5 h-5" />
           </button>
@@ -99,7 +130,7 @@ export default function CreateBarangModal({
             <div className="inline-block bg-primary p-3 rounded-lg text-white mr-2">
               <Warehouse className="w-6 h-6" />
             </div>
-            <h1 className="font-semibold text-2xl text-text">Tambah Barang</h1>
+            <h1 className="font-semibold text-2xl text-text">Edit Barang</h1>
           </div>
 
           <form className="mt-5" onSubmit={form.handleSubmit(handleSubmit)}>
@@ -108,158 +139,116 @@ export default function CreateBarangModal({
               <div className="mb-5">
                 <label
                   htmlFor="produk"
-                  className="block text-text font-medium text-base mb-2"
+                  className="block text-text font-medium mb-2"
                 >
                   Nama Barang
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Home className="text-text/30" />
-                  </div>
+                  <Home className="absolute left-3 top-3 text-text/30" />
                   <input
                     type="text"
                     id="produk"
-                    placeholder="Contoh: Kaos oblong"
                     {...form.register("produk")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
+                    className="w-full pl-10 pr-3 py-3 border rounded-sm"
+                    disabled={isSubmitting}
                   />
                 </div>
                 {form.formState.errors.produk && (
-                  <span className="text-red-500 text-sm">
+                  <p className="text-red-500 text-sm mt-1">
                     {form.formState.errors.produk.message}
-                  </span>
+                  </p>
                 )}
               </div>
 
-              {/* Hidden inputs */}
-              <input type="hidden" {...form.register("created_by")} />
-              <input type="hidden" {...form.register("line_divisi")} />
-              <input type="hidden" {...form.register("main_produk")} />
+              {/* Hidden fields */}
 
-              {/* Input kodegrp */}
+              {/* kodegrp */}
               <div className="mb-5">
                 <label
                   htmlFor="kodegrp"
-                  className="block text-text font-medium text-base mb-2"
+                  className="block text-text font-medium mb-2"
                 >
                   KodeGrp
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Home className="text-text/30" />
-                  </div>
+                  <Home className="absolute left-3 top-3 text-text/30" />
                   <input
                     type="text"
                     id="kodegrp"
-                    placeholder="Contoh: A716"
                     {...form.register("kodegrp")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
+                    className="w-full pl-10 pr-3 py-3 border rounded-sm"
+                    disabled={isSubmitting}
                   />
                 </div>
                 {form.formState.errors.kodegrp && (
-                  <span className="text-red-500 text-sm">
+                  <p className="text-red-500 text-sm mt-1">
                     {form.formState.errors.kodegrp.message}
-                  </span>
+                  </p>
                 )}
               </div>
 
-              {/* Input stock */}
-              <div className="mb-5">
-                <label
-                  htmlFor="stock"
-                  className="block text-text font-medium text-base mb-2"
-                >
-                  Stock
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Boxes className="text-text/30" />
-                  </div>
-                  <input
-                    type="number"
-                    id="stock"
-                    placeholder="Contoh: 100"
-                    {...form.register("stock")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
-                  />
-                </div>
-                {form.formState.errors.stock && (
-                  <span className="text-red-500 text-sm">
-                    {form.formState.errors.stock.message}
-                  </span>
-                )}
-              </div>
-
-              {/* Input tanggal produksi */}
+              {/* tanggal produksi */}
               <div className="mb-5">
                 <label
                   htmlFor="production_date"
-                  className="block text-text font-medium text-base mb-2"
+                  className="block text-text font-medium mb-2"
                 >
                   Tanggal Produksi
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Calendar className="text-text/30" />
-                  </div>
+                  <Calendar className="absolute left-3 top-3 text-text/30" />
                   <input
                     type="date"
                     id="production_date"
                     {...form.register("production_date")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
+                    className="w-full pl-10 pr-3 py-3 border rounded-sm"
+                    disabled={isSubmitting}
                   />
                 </div>
                 {form.formState.errors.production_date && (
-                  <span className="text-red-500 text-sm">
+                  <p className="text-red-500 text-sm mt-1">
                     {form.formState.errors.production_date.message}
-                  </span>
+                  </p>
                 )}
               </div>
 
-              {/* Input status */}
+              {/* status */}
               <div className="mb-5">
                 <label
                   htmlFor="status"
-                  className="block text-text font-medium text-base mb-2"
+                  className="block text-text font-medium mb-2"
                 >
                   Status
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Clock className="text-text/30" />
-                  </div>
+                  <Clock className="absolute left-3 top-3 text-text/30" />
                   <select
                     id="status"
                     {...form.register("status")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
+                    className="w-full pl-10 pr-3 py-3 border rounded-sm"
+                    disabled={isSubmitting}
                   >
                     <option value="active">Aktif</option>
                     <option value="un-active">Non Aktif</option>
                   </select>
                 </div>
-                {form.formState.errors.status && (
-                  <span className="text-red-500 text-sm">
-                    {form.formState.errors.status.message}
-                  </span>
-                )}
               </div>
 
-              {/* Input kategori */}
+              {/* kategori */}
               <div className="mb-5">
                 <label
                   htmlFor="kategori_id"
-                  className="block text-text font-medium text-base mb-2"
+                  className="block text-text font-medium mb-2"
                 >
                   Kategori
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Clock className="text-text/30" />
-                  </div>
+                  <Clock className="absolute left-3 top-3 text-text/30" />
                   <select
                     id="kategori_id"
                     {...form.register("kategori_id")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
+                    className="w-full pl-10 pr-3 py-3 border rounded-sm"
+                    disabled={isSubmitting}
                   >
                     {categoriesOption.map((category) => (
                       <option key={category.id} value={category.id}>
@@ -269,19 +258,20 @@ export default function CreateBarangModal({
                   </select>
                 </div>
                 {form.formState.errors.kategori_id && (
-                  <span className="text-red-500 text-sm">
+                  <p className="text-red-500 text-sm mt-1">
                     {form.formState.errors.kategori_id.message}
-                  </span>
+                  </p>
                 )}
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-lg hover:bg-primary/90 hover:scale-105 active:bg-primary active:scale-95 transition-all"
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-lg hover:bg-primary/60 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="mr-2" />
-              Submit
+              {isSubmitting ? "Updating..." : "Update"}
             </button>
           </form>
         </motion.div>

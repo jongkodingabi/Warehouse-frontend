@@ -49,6 +49,7 @@ type Barang = {
   stockAwal: number;
   stockSekarang: number;
   status: string;
+  kodeGrp?: string;
 };
 
 export type { Barang };

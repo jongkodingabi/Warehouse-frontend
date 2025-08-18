@@ -87,13 +87,13 @@ export default function EditCategoryModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2 rounded-lg bg-text hover:bg-text/50 transition-colors font-medium text-white"
+                className="px-5 py-2 rounded-lg bg-red-700 hover:bg-red-600 transition-colors font-medium text-white"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg"
               >
                 Simpan
               </button>

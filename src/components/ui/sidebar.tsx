@@ -18,6 +18,7 @@ import {
   Scroll,
   Users,
   PackageOpen,
+  Group,
 } from "lucide-react";
 import Cookies from "js-cookie";
 
@@ -104,7 +105,24 @@ export default function Sidebar() {
               </Link>
             </li>
 
-            {/* Barang & Produck  */}
+            {/* Kategori  */}
+            <li>
+              <Link
+                href="/admin/categories"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname === "/admin/categories"
+                    ? "bg-primary text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Group className="w-5 h-5" />
+                  Kategori
+                </div>
+              </Link>
+            </li>
+
+            {/* Barang & Product */}
             <li>
               <Link
                 href="/admin/products"
