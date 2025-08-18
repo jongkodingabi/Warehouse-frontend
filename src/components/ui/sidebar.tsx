@@ -19,6 +19,7 @@ import {
   Users,
   PackageOpen,
   Group,
+  Briefcase,
 } from "lucide-react";
 import Cookies from "js-cookie";
 
@@ -205,11 +206,25 @@ export default function Sidebar() {
                 Admin Gudang
               </Link>
             </li>
+
             <li>
               <Link
-                href="/admin/users"
+                href="/admin/jabatan"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                  pathname === "/admin/users"
+                  pathname === "/admin/jabatan"
+                    ? "bg-[#2563EB] text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <Briefcase className="w-5 h-5" />
+                Jabatan
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/admin/audit"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname === "/admin/audit"
                     ? "bg-[#2563EB] text-white"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}

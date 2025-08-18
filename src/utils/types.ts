@@ -1,8 +1,24 @@
 type User = {
   id: number;
-  email: string;
   name: string;
+  email: string;
+  roles: string;
+  jabatan: {
+    id: number;
+    name: string;
+  };
+  divisi: {
+    id: number;
+    kodedivisi: string;
+    divisi: string;
+    short: number;
+    status: string;
+  };
+  createdAt: string;
+  updatedAt: string;
 };
+
+export type { User };
 
 type Product = {
   id: number;
@@ -57,5 +73,13 @@ export type { Barang };
 type BarangResponse = {
   data: Barang[];
 };
+
+type Jabatan = {
+  id: number;
+  jabatan: string;
+  created_at: string;
+};
+
+export type { Jabatan };
 
 export type { BarangResponse };
