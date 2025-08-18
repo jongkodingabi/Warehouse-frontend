@@ -13,7 +13,6 @@ import { Toaster, toast } from "react-hot-toast";
 import { isAxiosError } from "axios";
 import Head from "next/head";
 import { useUser } from "@/context/UserContext";
-import dayjs from "dayjs";
 
 const loginFormSchema = z.object({
   email: z.string().email({
@@ -45,7 +44,7 @@ export default function LoginPage() {
 
       const token = res.data?.token;
       const role = res.data?.user?.role;
-      const expiresAt = res.data?.expires_at; // dari Laravel (format Carbon)
+      const expiresAt = res.data?.expires_at;
 
       if (token) {
         // Simpan token
@@ -62,6 +61,8 @@ export default function LoginPage() {
       }
 
       await refreshUser();
+
+      toast.success("Berhasil login");
 
       if (role === "superadmin") {
         router.replace("/admin/dashboard");
@@ -275,13 +276,24 @@ export default function LoginPage() {
                 {form.formState.errors.password?.message}
               </span>
             </div>
-            <button
-              type="submit"
-              className="w-full flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-lg cursor-pointer hover:bg-primary/90 hover:scale-105 active:bg-primary active:scale-95 transition-all duration-300 ease-in-out"
-            >
-              <LogIn className="mr-2" />
-              {loading ? "Logging in..." : "Log In"}
-            </button>
+            {loading ? (
+              <button
+                type="submit"
+                disabled={true}
+                className="w-full flex items-center justify-center bg-primary/80 rounded-lg py-3 text-white font-semibold text-lg cursor-not-allowed hover:bg-primary/90  active:bg-primary transition-all duration-300 ease-in-out"
+              >
+                <LogIn className="mr-2" />
+                Logging In..
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="w-full flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-lg cursor-pointer hover:bg-primary/90 hover:scale-105 active:bg-primary active:scale-95 transition-all duration-300 ease-in-out"
+              >
+                <LogIn className="mr-2" />
+                Log In
+              </button>
+            )}
           </form>
           {error && (
             <div className="flex items-center gap-3 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg w-full mt-4 shadow-sm animate-fade-in">
