@@ -18,9 +18,10 @@ import { User } from "@/utils/types";
 import axiosInstance from "@/lib/axios";
 import toast, { Toaster } from "react-hot-toast";
 import z from "zod";
-import { createUser } from "@/app/api/user/route";
+import { createUser, deleteUser, updateUser } from "@/app/api/user/route";
 import DeleteConfirmationModal from "@/components/core/Delete.Modal";
 import CreateUserModal from "@/components/core/CreateUserModal";
+import EditUserModal from "@/components/core/EditUserModal";
 // import EditUserModal from "@/components/core/EditUserModal";
 // import DetailUserModal from "@/components/core/DetailUserModal";
 
@@ -130,25 +131,26 @@ export default function UserPage() {
     }
   };
 
-  // const handleUpdateUser = async (updatedData: any) => {
-  //   if (!userToEdit || !userToEdit.id) {
-  //     toast.error("ID user tidak ditemukan");
-  //     return;
-  //   }
+  const handleUpdateUser = async (updatedData: any) => {
+    if (!userToEdit || !userToEdit.id) {
+      toast.error("ID user tidak ditemukan");
+      return;
+    }
 
-  //   try {
-  //     await updateUser(userToEdit.id, updatedData);
-  //     toast.success("User berhasil diperbarui");
-  //     setIsEditModalOpen(false);
-  //     setUserToEdit(null);
-  //     await fetchUsers();
-  //   } catch (error) {
-  //     toast.error("Gagal memperbarui user");
-  //     console.error("Error updating user:", error);
-  //   }
-  // };
+    try {
+      await updateUser(userToEdit.id, updatedData);
+      toast.success("User berhasil diperbarui");
+      setIsEditModalOpen(false);
+      setUserToEdit(null);
+      await fetchUsers();
+    } catch (error) {
+      toast.error("Gagal memperbarui user");
+      console.error("Error updating user:", error);
+    }
+  };
 
   const handleEditUserClick = (user: User) => {
+    console.log(user);
     setUserToEdit(user);
     setIsEditModalOpen(true);
   };
@@ -170,17 +172,17 @@ export default function UserPage() {
     setDeleteModal(true);
   };
 
-  // const handleDeleteUser = async (id: number) => {
-  //   try {
-  //     await deleteUser(id);
-  //     toast.success("Berhasil menghapus user");
-  //     setDeleteModal(false);
-  //     fetchUsers();
-  //   } catch (error) {
-  //     toast.error("Gagal menghapus user");
-  //     console.error("Error deleting user:", error);
-  //   }
-  // };
+  const handleDeleteUser = async (id: number) => {
+    try {
+      await deleteUser(id);
+      toast.success("Berhasil menghapus user");
+      setDeleteModal(false);
+      fetchUsers();
+    } catch (error) {
+      toast.error("Gagal menghapus user");
+      console.error("Error deleting user:", error);
+    }
+  };
 
   const openDetailModal = (user: User) => {
     setSelectedUser(user);
@@ -603,7 +605,7 @@ export default function UserPage() {
                         </button>
                         <button
                           onClick={() => handleDeleteIdUser(data)}
-                          className="text-red-600 hover:text-red-800 transition-colors"
+                          className="text-red-600 hover:text-red-800 transition-colors cursor-pointer"
                           title="Hapus"
                         >
                           <Trash className="w-4 h-4" />
@@ -672,14 +674,14 @@ export default function UserPage() {
       </div>
 
       {/* Modals */}
-      {/* {deleteModal && userIdToDelete && (
+      {deleteModal && userIdToDelete && (
         <DeleteConfirmationModal
           isOpen={deleteModal}
           onClose={() => setDeleteModal(false)}
           itemName={userIdToDelete.name}
           onConfirm={() => handleDeleteUser(userIdToDelete.id)}
         />
-      )} */}
+      )}
       {isModalOpen && (
         <CreateUserModal
           isOpen={isModalOpen}
@@ -687,7 +689,7 @@ export default function UserPage() {
           onSubmit={handleCreateUser}
         />
       )}
-      {/* {isEditModalOpen && userToEdit && (
+      {isEditModalOpen && userToEdit && (
         <EditUserModal
           isOpen={isEditModalOpen}
           onClose={() => {
@@ -695,9 +697,9 @@ export default function UserPage() {
             setUserToEdit(null);
           }}
           onSubmit={handleUpdateUser}
-          user={userToEdit}
+          userData={userToEdit}
         />
-      )} */}
+      )}
       {/* Detail User Modal */}
       {/* {isDetailModalOpen && selectedUser && (
         <DetailUserModal

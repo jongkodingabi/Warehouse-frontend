@@ -12,11 +12,21 @@ import { useUser } from "@/context/UserContext";
 
 // Perbaiki schema dengan transformasi yang lebih eksplisit
 const barangFormSchema = z.object({
-  kategori_id: z.coerce.number().min(1, "Kategori harus dipilih"),
+  kategori_id: z.coerce
+    .number()
+    .min(1, "Kategori harus dipilih")
+    .refine((val) => !isNaN(val) && val > 0, {
+      message: "Kategori ID harus berupa angka positif",
+    }),
   created_by: z.number(),
   produk: z.string().min(1, "Nama produk harus diisi"),
   production_date: z.string().min(1, "Tanggal produksi harus diisi"),
-  stock: z.coerce.number().min(0, "Stock tidak boleh negatif"),
+  stock: z.coerce
+    .number()
+    .min(1, "Stock harus diisi")
+    .refine((val) => !isNaN(val) && val >= 0, {
+      message: "Stock tidak boleh negatif",
+    }),
   kodegrp: z.string().min(1, "Kode grup harus diisi"),
   status: z.enum(["active", "un-active"]),
   line_divisi: z.number(),
@@ -36,39 +46,94 @@ export default function CreateBarangModal({
 }) {
   const { user } = useUser();
   const [categoriesOption, setCategoriesOption] = useState<Category[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const form = useForm<BarangFormSchema>({
     resolver: zodResolver(barangFormSchema),
     defaultValues: {
-      kategori_id: 4,
-      created_by: user?.id,
+      kategori_id: 0,
+      created_by: user?.id || 0,
       produk: "",
       production_date: "",
       stock: 0,
       kodegrp: "",
       status: "active" as const,
-      line_divisi: user?.divisi_id,
+      line_divisi: user?.divisi_id || 0,
       main_produk: 1,
     },
   });
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
   const fetchCategories = async () => {
     try {
       const response = await axiosInstance.get("/api/v1/kategori");
       setCategoriesOption(response.data);
+      return response.data;
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching categories:", error);
+      return [];
     }
   };
 
-  // Handle submit dengan type assertion yang aman
-  const handleSubmit = (values: BarangFormSchema) => {
-    onSubmit(values);
-    form.reset();
+  // Load data ketika modal dibuka
+  useEffect(() => {
+    const loadData = async () => {
+      if (isOpen && user?.id) {
+        setIsDataLoaded(false);
+
+        // Fetch categories terlebih dahulu
+        const categoriesData = await fetchCategories();
+
+        // Set default values setelah data loaded
+        form.reset({
+          kategori_id: 0,
+          created_by: user.id,
+          produk: "",
+          production_date: "",
+          stock: 0,
+          kodegrp: "",
+          status: "active" as const,
+          line_divisi: user.divisi_id || 0,
+          main_produk: 1,
+        });
+
+        setIsDataLoaded(true);
+      }
+    };
+
+    loadData();
+  }, [isOpen, user, form]);
+
+  // Handle submit dengan loading state
+  const handleSubmit = async (values: BarangFormSchema) => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    try {
+      // Prepare data for submission - convert string values back to numbers
+      const submitData = {
+        ...values,
+        kategori_id: parseInt(values.kategori_id.toString(), 10),
+        stock: parseInt(values.stock.toString(), 10),
+      };
+
+      await onSubmit(submitData);
+      form.reset();
+      onClose();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (!isSubmitting) {
+      form.reset();
+      setIsDataLoaded(false);
+      onClose();
+    }
   };
 
   if (!isOpen) return null;
@@ -79,211 +144,265 @@ export default function CreateBarangModal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-zinc-900/50 backdrop-blur-md flex items-center justify-center z-50"
+        className="fixed inset-0 bg-zinc-900/50 backdrop-blur-md flex items-center justify-center z-50 p-4"
       >
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="bg-background p-8 border border-secondary rounded-xl shadow-xl w-full max-w-lg relative"
+          className="bg-background p-8 border border-secondary rounded-xl shadow-xl w-full max-w-2xl relative max-h-[90vh] overflow-y-auto"
         >
           <button
-            onClick={onClose}
-            className="absolute top-3 right-3 text-text/50 hover:text-text"
+            onClick={handleClose}
+            disabled={isSubmitting}
+            className="absolute top-3 right-3 text-text/50 hover:text-text disabled:opacity-50 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="flex items-center justify-center mb-6">
-            <div className="inline-block bg-primary p-3 rounded-lg text-white mr-2">
+            <div className="inline-block bg-primary p-3 rounded-lg text-white mr-3">
               <Warehouse className="w-6 h-6" />
             </div>
             <h1 className="font-semibold text-2xl text-text">Tambah Barang</h1>
           </div>
 
-          <form className="mt-5" onSubmit={form.handleSubmit(handleSubmit)}>
-            <div className="grid grid-cols-2 gap-4">
-              {/* Input nama barang */}
-              <div className="mb-5">
-                <label
-                  htmlFor="produk"
-                  className="block text-text font-medium text-base mb-2"
-                >
-                  Nama Barang
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Home className="text-text/30" />
-                  </div>
-                  <input
-                    type="text"
-                    id="produk"
-                    placeholder="Contoh: Kaos oblong"
-                    {...form.register("produk")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
-                  />
-                </div>
-                {form.formState.errors.produk && (
-                  <span className="text-red-500 text-sm">
-                    {form.formState.errors.produk.message}
-                  </span>
-                )}
-              </div>
-
+          {/* Show loading indicator while data is being loaded */}
+          {!isDataLoaded ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary/30 border-t-primary"></div>
+              <span className="ml-3 text-text">Memuat data...</span>
+            </div>
+          ) : (
+            <form
+              className="space-y-4"
+              onSubmit={form.handleSubmit(handleSubmit)}
+            >
               {/* Hidden inputs */}
               <input type="hidden" {...form.register("created_by")} />
               <input type="hidden" {...form.register("line_divisi")} />
               <input type="hidden" {...form.register("main_produk")} />
 
-              {/* Input kodegrp */}
-              <div className="mb-5">
-                <label
-                  htmlFor="kodegrp"
-                  className="block text-text font-medium text-base mb-2"
-                >
-                  KodeGrp
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Home className="text-text/30" />
-                  </div>
-                  <input
-                    type="text"
-                    id="kodegrp"
-                    placeholder="Contoh: A716"
-                    {...form.register("kodegrp")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
-                  />
-                </div>
-                {form.formState.errors.kodegrp && (
-                  <span className="text-red-500 text-sm">
-                    {form.formState.errors.kodegrp.message}
-                  </span>
-                )}
-              </div>
-
-              {/* Input stock */}
-              <div className="mb-5">
-                <label
-                  htmlFor="stock"
-                  className="block text-text font-medium text-base mb-2"
-                >
-                  Stock
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Boxes className="text-text/30" />
-                  </div>
-                  <input
-                    type="number"
-                    id="stock"
-                    placeholder="Contoh: 100"
-                    {...form.register("stock")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
-                  />
-                </div>
-                {form.formState.errors.stock && (
-                  <span className="text-red-500 text-sm">
-                    {form.formState.errors.stock.message}
-                  </span>
-                )}
-              </div>
-
-              {/* Input tanggal produksi */}
-              <div className="mb-5">
-                <label
-                  htmlFor="production_date"
-                  className="block text-text font-medium text-base mb-2"
-                >
-                  Tanggal Produksi
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Calendar className="text-text/30" />
-                  </div>
-                  <input
-                    type="date"
-                    id="production_date"
-                    {...form.register("production_date")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
-                  />
-                </div>
-                {form.formState.errors.production_date && (
-                  <span className="text-red-500 text-sm">
-                    {form.formState.errors.production_date.message}
-                  </span>
-                )}
-              </div>
-
-              {/* Input status */}
-              <div className="mb-5">
-                <label
-                  htmlFor="status"
-                  className="block text-text font-medium text-base mb-2"
-                >
-                  Status
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Clock className="text-text/30" />
-                  </div>
-                  <select
-                    id="status"
-                    {...form.register("status")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Input nama barang */}
+                <div>
+                  <label
+                    htmlFor="produk"
+                    className="block text-text font-medium text-sm mb-2"
                   >
-                    <option value="active">Aktif</option>
-                    <option value="un-active">Non Aktif</option>
-                  </select>
-                </div>
-                {form.formState.errors.status && (
-                  <span className="text-red-500 text-sm">
-                    {form.formState.errors.status.message}
-                  </span>
-                )}
-              </div>
-
-              {/* Input kategori */}
-              <div className="mb-5">
-                <label
-                  htmlFor="kategori_id"
-                  className="block text-text font-medium text-base mb-2"
-                >
-                  Kategori
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Clock className="text-text/30" />
+                    Nama Barang
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Boxes className="text-text/30 w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      id="produk"
+                      placeholder="Contoh: Kaos oblong"
+                      {...form.register("produk")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      disabled={isSubmitting}
+                    />
                   </div>
-                  <select
-                    id="kategori_id"
-                    {...form.register("kategori_id")}
-                    className="w-full pl-10 pr-3 py-3 bg-background border border-secondary text-text text-lg rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400"
-                  >
-                    {categoriesOption.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.kategori}
-                      </option>
-                    ))}
-                  </select>
+                  {form.formState.errors.produk && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.produk.message}
+                    </span>
+                  )}
                 </div>
-                {form.formState.errors.kategori_id && (
-                  <span className="text-red-500 text-sm">
-                    {form.formState.errors.kategori_id.message}
-                  </span>
-                )}
-              </div>
-            </div>
 
-            <button
-              type="submit"
-              className="w-full flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-lg hover:bg-primary/90 hover:scale-105 active:bg-primary active:scale-95 transition-all"
-            >
-              <Send className="mr-2" />
-              Submit
-            </button>
-          </form>
+                {/* Input kodegrp */}
+                <div>
+                  <label
+                    htmlFor="kodegrp"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Kode Grup
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Home className="text-text/30 w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      id="kodegrp"
+                      placeholder="Contoh: A716"
+                      {...form.register("kodegrp")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                  {form.formState.errors.kodegrp && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.kodegrp.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Input stock */}
+                <div>
+                  <label
+                    htmlFor="stock"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Stock
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Boxes className="text-text/30 w-4 h-4" />
+                    </div>
+                    <input
+                      type="number"
+                      id="stock"
+                      placeholder="Contoh: 100"
+                      min="0"
+                      {...form.register("stock")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                  {form.formState.errors.stock && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.stock.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Input tanggal produksi */}
+                <div>
+                  <label
+                    htmlFor="production_date"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Tanggal Produksi
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Calendar className="text-text/30 w-4 h-4" />
+                    </div>
+                    <input
+                      type="date"
+                      id="production_date"
+                      {...form.register("production_date")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                  {form.formState.errors.production_date && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.production_date.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Input status */}
+                <div>
+                  <label
+                    htmlFor="status"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Status
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Clock className="text-text/30 w-4 h-4" />
+                    </div>
+                    <select
+                      id="status"
+                      {...form.register("status")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      disabled={isSubmitting}
+                    >
+                      <option value="active">Aktif</option>
+                      <option value="un-active">Non Aktif</option>
+                    </select>
+                  </div>
+                  {form.formState.errors.status && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.status.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Input kategori */}
+                <div className="md:col-span-2">
+                  <label
+                    htmlFor="kategori_id"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Kategori
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Warehouse className="text-text/30 w-4 h-4" />
+                    </div>
+                    <select
+                      id="kategori_id"
+                      {...form.register("kategori_id")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Pilih Kategori</option>
+                      {categoriesOption.map((category) => (
+                        <option
+                          key={category.id}
+                          value={category.id.toString()}
+                        >
+                          {category.kategori}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {form.formState.errors.kategori_id && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.kategori_id.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Info Text */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-green-800 text-sm">
+                  <strong>Info:</strong> Pastikan semua informasi barang sudah
+                  benar sebelum menyimpan data.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  disabled={isSubmitting}
+                  className="flex-1 flex items-center justify-center bg-gray-500 rounded-lg py-3 text-white font-semibold text-base hover:bg-gray-600 hover:scale-[1.02] active:bg-gray-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <X className="mr-2 w-4 h-4" />
+                  Batal
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-base hover:bg-primary/90 hover:scale-[1.02] active:bg-primary/80 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white mr-2"></div>
+                      Menyimpan...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 w-4 h-4" />
+                      Tambah Barang
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
