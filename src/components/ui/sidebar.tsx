@@ -142,11 +142,11 @@ export default function Sidebar() {
 
             {/* Dropdown Stock Barang */}
             <li>
-              <button
-                onClick={() => setStockDropdownOpen(!isStockDropdownOpen)}
-                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg ${
-                  pathname.includes("/admin/stock")
-                    ? "bg-gray-100 text-blue-600"
+              <Link
+                href="/admin/stock"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname === "/admin/stock"
+                    ? "bg-primary text-white"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
@@ -154,43 +154,7 @@ export default function Sidebar() {
                   <Box className="w-5 h-5" />
                   Stock Barang
                 </div>
-                {isStockDropdownOpen ? (
-                  <ChevronUp className="w-4 h-4" />
-                ) : (
-                  <ChevronDown className="w-4 h-4" />
-                )}
-              </button>
-
-              {isStockDropdownOpen && (
-                <ul className="ml-8 mt-1 space-y-1">
-                  <li>
-                    <Link
-                      href="/admin/stock/data"
-                      className={`block px-3 py-2 text-sm rounded-lg ${
-                        pathname === "/admin/stock/data"
-                          ? "bg-gray-100 text-blue-600"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                    >
-                      <TrendingUp className="inline w-4 h-4 mr-2" />
-                      Stock Masuk
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/admin/stock/history"
-                      className={`block px-3 py-2 text-sm rounded-lg ${
-                        pathname === "/admin/stock/history"
-                          ? "bg-gray-100 text-blue-600"
-                          : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                    >
-                      <TrendingDown className="inline w-4 h-4 mr-2" />
-                      Stock Keluar
-                    </Link>
-                  </li>
-                </ul>
-              )}
+              </Link>
             </li>
 
             <li>

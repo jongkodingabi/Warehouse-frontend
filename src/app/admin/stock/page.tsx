@@ -1,51 +1,14 @@
 "use client";
-
-import {
-  BoxesIcon,
-  Archive,
-  ChartPie,
-  Search,
-  SquarePen,
-  Trash,
-  Group,
-  Download,
-  FolderInput,
-  Eye,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { BarangResponse, Barang } from "@/utils/types";
 import axiosInstance from "@/lib/axios";
-import toast, { Toaster } from "react-hot-toast";
-import z from "zod";
-import Link from "next/link";
-
-import {
-  createBarang,
-  deleteBarang,
-  updateBarang,
-} from "@/app/api/product/route";
-import DeleteConfirmationModal from "@/components/core/Delete.Modal";
-import CreateBarangModal from "@/components/core/CreateBarangModal";
-import EditBarangModal from "@/components/core/EditBarangModal";
+import { useState, useEffect } from "react"; // Tambahkan useEffect
+import { Group, BoxesIcon, ChartPie, Archive, FileInput, FileOutput } from "lucide-react";
+import { Barang } from "@/utils/types";
 import { useUser } from "@/context/UserContext";
-import { useQRCode } from "next-qrcode";
-import DetailBarangModal from "@/components/core/DetailModalBarang";
+import toast, { Toaster } from "react-hot-toast";
+import { Search } from "lucide-react";
+import StockInModal from "@/components/core/StockInModal";
 
-const barangFormSchema = z.object({
-  kategori_id: z.number(),
-  created_by: z.number(),
-  produk: z.string(),
-  production_date: z.string(),
-  stock: z.number(),
-  kodegrp: z.string(),
-  status: z.string(),
-  line_divisi: z.number(),
-  main_produk: z.number(),
-});
-
-type BarangFormSchema = z.infer<typeof barangFormSchema>;
-
-export default function BarangPage() {
+export default function In() {
   const [datas, setData] = useState<Barang[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("-");
@@ -61,17 +24,12 @@ export default function BarangPage() {
   const [barangToEdit, setCategoryToEdit] = useState<any>();
   const [selectedBarang, setSelectedBarang] = useState<Barang | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
+  
+  // State untuk StockIn Modal
+  const [isStockInModalOpen, setIsStockInModalOpen] = useState(false);
+  const [selectedBarangForStockIn, setSelectedBarangForStockIn] = useState<Barang | null>(null);
+  
   const { user } = useUser();
-  const { Canvas } = useQRCode();
-
-  // Hitung statistik berdasarkan data yang sudah difilter
-  const totalBarang = datas.length;
-  const activeBarang = datas.filter((b) => b.status === "active").length;
-  const unActiveBarang = datas.filter((b) => b.status === "un-active").length;
-  const activePercentage = totalBarang
-    ? ((activeBarang / totalBarang) * 100).toFixed(2)
-    : 0;
 
   // Mendapatkan daftar kategori unik untuk dropdown filter
   const uniqueCategories = Array.from(
@@ -90,95 +48,36 @@ export default function BarangPage() {
     }
   };
 
-  const handleUpdateBarang = async (updatedData: any) => {
-    if (!barangToEdit || !barangToEdit.id) {
-      toast.error("ID barang tidak ditemukan");
-      return;
-    }
-
-    try {
-      const result = await updateBarang(barangToEdit.id, updatedData);
-      toast.success("Barang berhasil diperbarui");
-      setIsEditModalOpen(false);
-      setCategoryToEdit(null);
-      await fetchBarang();
-    } catch (error) {
-      toast.error("Gagal memperbarui barang");
-    }
-  };
-
-  const handleEditBarangClick = (barang: Barang) => {
-    setCategoryToEdit(barang);
-    setIsEditModalOpen(true);
-  };
-
-  const handleCreateBarang = async (newBarang: BarangFormSchema) => {
-    try {
-      await createBarang(newBarang);
-      toast.success("Berhasil menambahkan barang");
-      fetchBarang();
-      setIsModalOpen(false);
-    } catch (error) {
-      toast.error("Gagal menambahkan barang");
-    }
-  };
-
-  const handleDeleteIdBarang = async (barang: Barang) => {
-    setBarangIdToDelete(barang);
-    setDeleteModal(true);
-  };
-
-  const handleDeleteCategory = async (id: number) => {
-    try {
-      await deleteBarang(id);
-      toast.success("Berhasil menghapus barang");
-      setDeleteModal(false);
-      fetchBarang();
-    } catch (error) {
-      toast.error("Gagal menghapus barang");
-    }
-  };
-
-  const openDetailModal = (barang: Barang) => {
-    setSelectedBarang(barang);
-    setIsDetailModalOpen(true);
-  };
-
+  // useEffect untuk fetch data saat component mount
   useEffect(() => {
     fetchBarang();
   }, []);
 
-  // Filter dan search data
+  // useEffect untuk filtering data
   useEffect(() => {
-    let filtered = datas;
+    let filtered = [...datas];
 
     // Filter berdasarkan status
     if (statusFilter !== "-") {
-      filtered = filtered.filter((data) => data.status === statusFilter);
+      filtered = filtered.filter((barang) => barang.status === statusFilter);
     }
 
     // Filter berdasarkan kategori
     if (categoryFilter !== "-") {
-      filtered = filtered.filter(
-        (data) => data.kategori.kategori === categoryFilter
-      );
+      filtered = filtered.filter((barang) => barang.kategori.kategori === categoryFilter);
     }
 
-    // Filter berdasarkan pencarian
+    // Filter berdasarkan search term
     if (searchTerm.trim() !== "") {
-      filtered = filtered.filter(
-        (data) =>
-          data.namaBarang.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          data.kategori.kategori
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          data.kodeQr.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter((barang) =>
+        barang.namaBarang.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        barang.kategori.kategori.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     setFilteredData(filtered);
     setCurrentPage(1); // Reset ke halaman pertama saat filter berubah
-  }, [statusFilter, categoryFilter, searchTerm, datas]);
+  }, [datas, statusFilter, categoryFilter, searchTerm]);
 
   // Handle perubahan filter status
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -197,6 +96,29 @@ export default function BarangPage() {
   // Handle perubahan halaman
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  // Handle Stock In - Perbaikan fungsi ini
+  const handleStockIn = (barang: Barang) => {
+    setSelectedBarangForStockIn(barang);
+    setIsStockInModalOpen(true);
+  };
+
+  // Handle Stock In Submit
+  const handleStockInSubmit = async (data: any) => {
+    try {
+      // Refresh data setelah stock in berhasil
+      await fetchBarang();
+      toast.success("berhasil stock in barang");
+    } catch (error) {
+      toast.error("Gagal Menambah Stock")
+    }
+  };
+
+  // Handle Stock Out (fungsi ini belum ada implementasinya, tambahkan jika diperlukan)
+  const handleStockOut = (barang: Barang) => {
+    // Implementasi stock out di sini
+    console.log('Stock out untuk barang:', barang);
   };
 
   // Pagination
@@ -230,19 +152,10 @@ export default function BarangPage() {
       <div className="mt-20 p-4">
         <div className="flex items-center justify-between mb-6">
           <div className="">
-            <h1 className="text-3xl font-bold text-primary">Data Barang</h1>
+            <h1 className="text-3xl font-bold text-primary">Stock Data Barang</h1>
             <p className="mt-4 text-gray-800">
-              Kelola data barang gudang anda.
+              Kelola stock data barang gudang anda.
             </p>
-          </div>
-
-          <div className="">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-primary text-white rounded-md cursor-pointer"
-            >
-              Tambah Barang +
-            </button>
           </div>
         </div>
       </div>
@@ -275,7 +188,7 @@ export default function BarangPage() {
                     Total Barang
                   </h3>
                   <p className="text-text font-medium text-xl pt-2.5">
-                    {totalBarang}
+                    {datas.length}
                   </p>
                 </div>
                 <div className="bg-primary p-4 rounded-sm text-background">
@@ -292,7 +205,7 @@ export default function BarangPage() {
                     Barang Aktif
                   </h3>
                   <p className="text-text font-medium text-xl pt-2.5">
-                    {activeBarang}
+                    {datas.filter(barang => barang.status === 'active').length}
                   </p>
                 </div>
                 <div className="bg-primary p-4 rounded-sm text-background">
@@ -309,7 +222,7 @@ export default function BarangPage() {
                     Barang Non Aktif
                   </h3>
                   <p className="text-text font-medium text-xl pt-2.5">
-                    {unActiveBarang}
+                    {datas.filter(barang => barang.status === 'un-active').length}
                   </p>
                 </div>
                 <div className="bg-primary p-4 rounded-sm text-background">
@@ -326,7 +239,8 @@ export default function BarangPage() {
                     Persentase Aktif
                   </h3>
                   <p className="text-text font-medium text-xl pt-2.5">
-                    {activePercentage}%
+                    {datas.length > 0 ? 
+                      Math.round((datas.filter(barang => barang.status === 'active').length / datas.length) * 100) : 0}%
                   </p>
                 </div>
                 <div className="bg-primary p-4 rounded-sm text-background">
@@ -381,7 +295,7 @@ export default function BarangPage() {
             id="search"
             value={searchTerm}
             onChange={handleSearchChange}
-            placeholder="Cari nama barang, kategori, atau kode QR..."
+            placeholder="Cari nama barang, kategori..."
             className="border border-secondary px-3 sm:px-4 py-2 rounded-sm font-medium text-sm flex-1"
           />
           <button
@@ -397,14 +311,6 @@ export default function BarangPage() {
       <div className="bg-white border border-secondary rounded-lg mx-2 sm:mx-6 mb-6">
         <div className="flex justify-between items-center mx-4 sm:mx-6 py-6">
           <h2 className="font-medium text-text text-2xl">Data Barang</h2>
-          <div className="flex items-center gap-3">
-            <div className="bg-secondary text-white p-2 rounded-sm">
-              <Download />
-            </div>
-            <div className="bg-secondary text-white p-2 rounded-sm">
-              <FolderInput />
-            </div>
-          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -425,9 +331,6 @@ export default function BarangPage() {
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   STATUS
-                </th>
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  KODE QR
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   AKSI
@@ -458,10 +361,6 @@ export default function BarangPage() {
                       <div className="h-6 bg-gray-300 rounded-full w-16 mx-auto"></div>
                     </td>
                     {/* Status Skeleton */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="h-4 bg-gray-300 rounded-md w-20 mx-auto"></div>
-                    </td>
-                    {/* Qr Code Skeleton */}
                     <td className="px-4 sm:px-6 py-4">
                       <div className="h-4 bg-gray-300 rounded-md w-20 mx-auto"></div>
                     </td>
@@ -521,39 +420,21 @@ export default function BarangPage() {
                           : data.status}
                       </span>
                     </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <Canvas
-                        text={data.kodeQr}
-                        options={{
-                          errorCorrectionLevel: "M",
-                          margin: 3,
-                          scale: 4,
-                          width: 100,
-                        }}
-                      />
-                    </td>
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex gap-2.5 justify-center">
                         <button
-                          onClick={() => openDetailModal(data)}
-                          className="text-blue-600 hover:text-blue-800"
-                          title="Lihat Detail"
+                          onClick={() => handleStockIn(data)}
+                          className="text-green-600 hover:text-green-800 transition-colors"
+                          title="Stock In"
                         >
-                          <Eye />
+                          <FileInput className="w-5 h-5" />
                         </button>
                         <button
-                          onClick={() => handleEditBarangClick(data)}
-                          className="text-yellow-600 hover:text-yellow-800"
-                          title="Edit"
+                          onClick={() => handleStockOut(data)}
+                          className="text-red-600 hover:text-red-800 transition-colors"
+                          title="Stock Out"
                         >
-                          <SquarePen />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteIdBarang(data)}
-                          className="text-red-600 hover:text-red-800"
-                          title="Hapus"
-                        >
-                          <Trash />
+                          <FileOutput className="w-5 h-5" />
                         </button>
                       </div>
                     </td>
@@ -616,77 +497,16 @@ export default function BarangPage() {
         </div>
       </div>
 
-      {deleteModal && barangIdToDelete && (
-        <DeleteConfirmationModal
-          isOpen={deleteModal}
-          onClose={() => setDeleteModal(false)}
-          itemName={barangIdToDelete.namaBarang}
-          onConfirm={() => handleDeleteCategory(barangIdToDelete.id)}
-        />
-      )}
-      {isModalOpen && (
-        <CreateBarangModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleCreateBarang}
-        />
-      )}
-      {isEditModalOpen && barangToEdit && (
-        <EditBarangModal
-          isOpen={isEditModalOpen}
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setCategoryToEdit(null);
-          }}
-          onSubmit={handleUpdateBarang}
-          barang={{
-            id: barangToEdit.id, // Pastikan ID disertakan
-            kategori_id: barangToEdit.kategori?.id || barangToEdit.kategori_id,
-            user_id: user?.id,
-            produk: barangToEdit.namaBarang || barangToEdit.produk,
-            production_date:
-              barangToEdit.productionDate || barangToEdit.production_date,
-            kodegrp: barangToEdit.kodeGrp || "",
-            status: barangToEdit.status || "active",
-          }}
-        />
-      )}
-      {/* Detail Transaction Modal */}
-      {isDetailModalOpen && selectedBarang && (
-        <DetailBarangModal
-          isOpen={isDetailModalOpen}
-          onClose={() => setIsDetailModalOpen(false)}
-          barang={selectedBarang as any}
-        />
-      )}
+      {/* Stock In Modal */}
+      <StockInModal
+        isOpen={isStockInModalOpen}
+        onClose={() => {
+          setIsStockInModalOpen(false);
+          setSelectedBarangForStockIn(null);
+        }}
+        onSubmit={handleStockInSubmit}
+        barangData={selectedBarangForStockIn}
+      />
     </>
   );
-}
-{
-  /* {isModalOpen && (
-        <CreateCategoryModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleCreateCategory}
-        />
-      )}
-      {deleteModal && categoryIdToDelete && (
-        <DeleteConfirmationModal
-          isOpen={deleteModal}
-          onClose={() => setDeleteModal(false)}
-          itemName={categoryIdToDelete.kategori}
-          onConfirm={() => handleDeleteCategory(categoryIdToDelete.id)}
-        />
-      )}
-      {isEditModalOpen && categoryToEdit && (
-        <EditCategoryModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onSubmit={handleUpdateCategory}
-          initialData={{
-            kategori: categoryToEdit.kategori,
-            status: categoryToEdit.status,
-          }}
-        />
-      )} */
 }
