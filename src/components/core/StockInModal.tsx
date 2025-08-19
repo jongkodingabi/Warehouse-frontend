@@ -168,6 +168,16 @@ export default function StockInModal({
                     min="1"
                     placeholder="Masukkan jumlah stock"
                     {...form.register("stock")}
+                    onInput={(e) => {
+                      const target = e.target as HTMLInputElement;
+                      const value = parseInt(target.value);
+                      
+                      // Prevent input that exceeds max stock
+                      if (value < 0) {
+                        target.value = "";
+                        form.setValue("stock");
+                      }
+                    }}
                     className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
                   />
                 </div>
