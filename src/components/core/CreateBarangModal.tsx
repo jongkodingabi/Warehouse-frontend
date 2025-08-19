@@ -52,7 +52,7 @@ export default function CreateBarangModal({
   const form = useForm<BarangFormSchema>({
     resolver: zodResolver(barangFormSchema),
     defaultValues: {
-      kategori_id: 0,
+      kategori_id: 1,
       created_by: user?.id || 0,
       produk: "",
       production_date: "",
@@ -86,7 +86,7 @@ export default function CreateBarangModal({
 
         // Set default values setelah data loaded
         form.reset({
-          kategori_id: 0,
+          kategori_id: 1,
           created_by: user.id,
           produk: "",
           production_date: "",

@@ -68,18 +68,16 @@ const userEditFormSchema = z
         message: "Role tidak valid",
       }),
 
-    jabatan_id: z
-      .string()
+    jabatan_id: z.coerce
+      .number()
       .min(1, "Jabatan wajib dipilih")
-      .transform((val) => parseInt(val, 10))
       .refine((val) => !isNaN(val) && val > 0, {
         message: "Jabatan ID harus berupa angka positif",
       }),
 
-    divisi_id: z
-      .string()
+    divisi_id: z.coerce
+      .number()
       .min(1, "Divisi wajib dipilih")
-      .transform((val) => parseInt(val, 10))
       .refine((val) => !isNaN(val) && val > 0, {
         message: "Divisi ID harus berupa angka positif",
       }),
@@ -131,8 +129,8 @@ export default function EditUserModal({
       password: "",
       password_confirmation: "",
       role: "",
-      jabatan_id: "",
-      divisi_id: "",
+      jabatan_id: 1,
+      divisi_id: 1,
     },
   });
 
