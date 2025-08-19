@@ -5,6 +5,7 @@ import Logo from "../../../public/assets/logo.png";
 import Person from "../../../public/assets/person.png";
 import { Bell } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import Link from "next/link";
 export default function Header() {
   // const { data: any } = user();
 
@@ -31,16 +32,18 @@ export default function Header() {
             0
           </span>
         </button>
-        <Image
-          src={Person}
-          alt="Avatar"
-          height={32}
-          width={32}
-          className="w-8 h-8 rounded-full object-contain"
-        />
-        <span className="text-sm font-medium text-gray-700">
-          {user?.name ?? "Guset"}
-        </span>
+        <Link href="/admin/profile">
+          <Image
+            src={Person}
+            alt="Avatar"
+            height={32}
+            width={32}
+            className="w-8 h-8 rounded-full object-contain"
+          />
+          <span className="text-sm font-medium text-gray-700">
+            {user?.name ?? "Guset"}
+          </span>
+        </Link>
       </div>
     </header>
   );

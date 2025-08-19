@@ -418,10 +418,10 @@ export default function BarangPage() {
                   KATEGORI
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  STOK AWAL
+                  KODEGRP
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  STOK SEKARANG
+                  DIVISI
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   STATUS
@@ -498,10 +498,10 @@ export default function BarangPage() {
                       {data.kategori.kategori}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {data.stockAwal}
+                      {data.kodeGrp}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {data.stockSekarang}
+                      {data.divisi.divisi}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <span
