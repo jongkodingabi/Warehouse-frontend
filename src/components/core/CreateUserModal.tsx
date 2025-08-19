@@ -91,6 +91,7 @@ export default function CreateUserModal({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const form = useForm<UserFormSchema>({
     resolver: zodResolver(userFormSchema),
@@ -106,10 +107,32 @@ export default function CreateUserModal({
   });
 
   useEffect(() => {
-    if (isOpen) {
-      fetchJabatan();
-      fetchDivisi();
-    }
+    const loadData = async () => {
+      if (isOpen) {
+        setIsDataLoaded(false);
+
+        // Fetch jabatan and divisi data first
+        const [jabatanData, divisiData] = await Promise.all([
+          fetchJabatan(),
+          fetchDivisi(),
+        ]);
+
+        // Then reset form with user data
+        form.reset({
+          name: "",
+          email: "",
+          password: "",
+          password_confirmation: "",
+          role: "",
+          jabatan_id: 1,
+          divisi_id: 1,
+        });
+
+        setIsDataLoaded(true);
+      }
+    };
+
+    loadData();
   }, [isOpen]);
 
   const fetchJabatan = async () => {
@@ -174,256 +197,266 @@ export default function CreateUserModal({
             <h1 className="font-semibold text-2xl text-text">Tambah User</h1>
           </div>
 
-          <form
-            className="space-y-4"
-            onSubmit={form.handleSubmit(handleSubmit)}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Input Nama */}
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-text font-medium text-sm mb-2"
-                >
-                  Nama Lengkap
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="text-text/30 w-4 h-4" />
-                  </div>
-                  <input
-                    type="text"
-                    id="name"
-                    placeholder="Masukkan nama lengkap"
-                    {...form.register("name")}
-                    className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  />
-                </div>
-                {form.formState.errors.name && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {form.formState.errors.name.message}
-                  </span>
-                )}
-              </div>
-
-              {/* Input Email */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-text font-medium text-sm mb-2"
-                >
-                  Email
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="text-text/30 w-4 h-4" />
-                  </div>
-                  <input
-                    type="email"
-                    id="email"
-                    placeholder="user@example.com"
-                    {...form.register("email")}
-                    className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  />
-                </div>
-                {form.formState.errors.email && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {form.formState.errors.email.message}
-                  </span>
-                )}
-              </div>
-
-              {/* Input Password */}
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-text font-medium text-sm mb-2"
-                >
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="text-text/30 w-4 h-4" />
-                  </div>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    placeholder="Masukkan password"
-                    {...form.register("password")}
-                    className="w-full pl-10 pr-12 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-text/30 hover:text-text"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-                {form.formState.errors.password && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {form.formState.errors.password.message}
-                  </span>
-                )}
-              </div>
-
-              {/* Input Confirm Password */}
-              <div>
-                <label
-                  htmlFor="confirmPassword"
-                  className="block text-text font-medium text-sm mb-2"
-                >
-                  Konfirmasi Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="text-text/30 w-4 h-4" />
-                  </div>
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    id="confirmPassword"
-                    placeholder="Konfirmasi password"
-                    {...form.register("password_confirmation")}
-                    className="w-full pl-10 pr-12 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-text/30 hover:text-text"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-                {form.formState.errors.password_confirmation && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {form.formState.errors.password_confirmation.message}
-                  </span>
-                )}
-              </div>
-
-              {/* Input Role */}
-              <div>
-                <label
-                  htmlFor="role"
-                  className="block text-text font-medium text-sm mb-2"
-                >
-                  Role
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <UserCheck className="text-text/30 w-4 h-4" />
-                  </div>
-                  <select
-                    id="role"
-                    {...form.register("role")}
-                    className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  >
-                    <option value="">Pilih Role</option>
-                    <option value="superadmin">Super Admin</option>
-                    <option value="admingudang">Admin Gudang</option>
-                  </select>
-                </div>
-                {form.formState.errors.role && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {form.formState.errors.role.message}
-                  </span>
-                )}
-              </div>
-
-              {/* Input Jabatan */}
-              <div>
-                <label
-                  htmlFor="jabatan_id"
-                  className="block text-text font-medium text-sm mb-2"
-                >
-                  Jabatan
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Briefcase className="text-text/30 w-4 h-4" />
-                  </div>
-                  <select
-                    id="jabatan_id"
-                    {...form.register("jabatan_id")}
-                    className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  >
-                    <option value="">Pilih Jabatan</option>
-                    {jabatanOptions.map((jabatan) => (
-                      <option key={jabatan.id} value={jabatan.id}>
-                        {jabatan.jabatan}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {form.formState.errors.jabatan_id && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {form.formState.errors.jabatan_id.message}
-                  </span>
-                )}
-              </div>
-
-              {/* Input Divisi */}
-              <div className="md:col-span-2">
-                <label
-                  htmlFor="divisi_id"
-                  className="block text-text font-medium text-sm mb-2"
-                >
-                  Divisi
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Building className="text-text/30 w-4 h-4" />
-                  </div>
-                  <select
-                    id="divisi_id"
-                    {...form.register("divisi_id")}
-                    className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  >
-                    <option value="">Pilih Divisi</option>
-                    {divisiOptions.map((divisi) => (
-                      <option key={divisi.id} value={divisi.id}>
-                        {divisi.kodedivisi} - {divisi.divisi}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {form.formState.errors.divisi_id && (
-                  <span className="text-red-500 text-xs mt-1">
-                    {form.formState.errors.divisi_id.message}
-                  </span>
-                )}
-              </div>
+          {/* Show loading indicator while data is being loaded */}
+          {!isDataLoaded ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600/30 border-t-blue-600"></div>
+              <span className="ml-3 text-text">Memuat data...</span>
             </div>
+          ) : (
+            <form
+              className="space-y-4"
+              onSubmit={form.handleSubmit(handleSubmit)}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Input Nama */}
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Nama Lengkap
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="text-text/30 w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      id="name"
+                      placeholder="Masukkan nama lengkap"
+                      {...form.register("name")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    />
+                  </div>
+                  {form.formState.errors.name && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.name.message}
+                    </span>
+                  )}
+                </div>
 
-            {/* Submit Button */}
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-base hover:bg-primary/90 hover:scale-[1.02] active:bg-primary active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white mr-2"></div>
-                    Menyimpan...
-                  </>
-                ) : (
-                  <>
-                    <Send className="mr-2 w-4 h-4" />
-                    Tambah User
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+                {/* Input Email */}
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Email
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="text-text/30 w-4 h-4" />
+                    </div>
+                    <input
+                      type="email"
+                      id="email"
+                      placeholder="user@example.com"
+                      {...form.register("email")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    />
+                  </div>
+                  {form.formState.errors.email && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.email.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Input Password */}
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="text-text/30 w-4 h-4" />
+                    </div>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      id="password"
+                      placeholder="Masukkan password"
+                      {...form.register("password")}
+                      className="w-full pl-10 pr-12 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-text/30 hover:text-text"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                  {form.formState.errors.password && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.password.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Input Confirm Password */}
+                <div>
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Konfirmasi Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="text-text/30 w-4 h-4" />
+                    </div>
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      id="confirmPassword"
+                      placeholder="Konfirmasi password"
+                      {...form.register("password_confirmation")}
+                      className="w-full pl-10 pr-12 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-text/30 hover:text-text"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                  {form.formState.errors.password_confirmation && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.password_confirmation.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Input Role */}
+                <div>
+                  <label
+                    htmlFor="role"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Role
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <UserCheck className="text-text/30 w-4 h-4" />
+                    </div>
+                    <select
+                      id="role"
+                      {...form.register("role")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    >
+                      <option value="">Pilih Role</option>
+                      <option value="superadmin">Super Admin</option>
+                      <option value="admingudang">Admin Gudang</option>
+                    </select>
+                  </div>
+                  {form.formState.errors.role && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.role.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Input Jabatan */}
+                <div>
+                  <label
+                    htmlFor="jabatan_id"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Jabatan
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Briefcase className="text-text/30 w-4 h-4" />
+                    </div>
+                    <select
+                      id="jabatan_id"
+                      {...form.register("jabatan_id")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    >
+                      <option value="">Pilih Jabatan</option>
+                      {jabatanOptions.map((jabatan) => (
+                        <option key={jabatan.id} value={jabatan.id}>
+                          {jabatan.jabatan}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {form.formState.errors.jabatan_id && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.jabatan_id.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Input Divisi */}
+                <div className="md:col-span-2">
+                  <label
+                    htmlFor="divisi_id"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Divisi
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Building className="text-text/30 w-4 h-4" />
+                    </div>
+                    <select
+                      id="divisi_id"
+                      {...form.register("divisi_id")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    >
+                      <option value="">Pilih Divisi</option>
+                      {divisiOptions.map((divisi) => (
+                        <option key={divisi.id} value={divisi.id}>
+                          {divisi.kodedivisi} - {divisi.divisi}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {form.formState.errors.divisi_id && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.divisi_id.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-base hover:bg-primary/90 hover:scale-[1.02] active:bg-primary active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white mr-2"></div>
+                      Menyimpan...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 w-4 h-4" />
+                      Tambah User
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>

@@ -12,10 +12,9 @@ import { useUser } from "@/context/UserContext";
 
 // Schema untuk edit - tambahkan id untuk update
 const barangFormSchema = z.object({
-  kategori_id: z
-    .string()
+  kategori_id: z.coerce
+    .number()
     .min(1, "Kategori harus dipilih")
-    .transform((val) => parseInt(val, 10))
     .refine((val) => !isNaN(val) && val > 0, {
       message: "Kategori ID harus berupa angka positif",
     }),
@@ -47,7 +46,7 @@ export default function EditBarangModal({
   const form = useForm<BarangFormSchema>({
     resolver: zodResolver(barangFormSchema),
     defaultValues: {
-      kategori_id: "",
+      kategori_id: 0,
       user_id: user?.id || 0,
       produk: "",
       production_date: "",
@@ -83,7 +82,7 @@ export default function EditBarangModal({
           kategori_id: (
             barang.kategori_id ||
             barang.kategori?.id ||
-            ""
+            0
           ).toString(),
           user_id: user.id,
           produk: barang.produk || barang.namaBarang || "",
