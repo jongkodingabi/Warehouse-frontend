@@ -32,7 +32,7 @@ export default function Header() {
             0
           </span>
         </button>
-        <Link href="/admin/profile">
+        <Link href="/admin/profile" className="flex space-x-2">
           <Image
             src={Person}
             alt="Avatar"
@@ -40,7 +40,7 @@ export default function Header() {
             width={32}
             className="w-8 h-8 rounded-full object-contain"
           />
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-gray-700 mt-2">
             {user?.name ?? "Guset"}
           </span>
         </Link>

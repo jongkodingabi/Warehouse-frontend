@@ -59,7 +59,7 @@ export default function CreateBarangModal({
       stock: 0,
       kodegrp: "",
       status: "active" as const,
-      line_divisi: user?.divisi_id || 0,
+      line_divisi: user?.divisi.id || 0,
       main_produk: 1,
     },
   });
@@ -93,7 +93,7 @@ export default function CreateBarangModal({
           stock: 0,
           kodegrp: "",
           status: "active" as const,
-          line_divisi: user.divisi_id || 0,
+          line_divisi: user.divisi.id || 0,
           main_produk: 1,
         });
 
@@ -259,6 +259,16 @@ export default function CreateBarangModal({
                       placeholder="Contoh: 100"
                       min="0"
                       {...form.register("stock")}
+                      onInput={(e) => {
+                        const target = e.target as HTMLInputElement;
+                        const value = parseInt(target.value);
+
+                        // Prevent input that exceeds max stock
+                        if (value < 0) {
+                          target.value = "";
+                          form.setValue("stock", 0);
+                        }
+                      }}
                       className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                       disabled={isSubmitting}
                     />

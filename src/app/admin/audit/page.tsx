@@ -1,192 +1,126 @@
 "use client";
 
 import {
-  BoxesIcon,
-  Archive,
-  ChartPie,
+  FileText,
+  Activity,
+  TrendingUp,
   Search,
-  SquarePen,
-  Trash,
-  Group,
+  Eye,
   Download,
   FolderInput,
-  Eye,
+  User,
+  Package,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { BarangResponse, Barang } from "@/utils/types";
 import axiosInstance from "@/lib/axios";
 import toast, { Toaster } from "react-hot-toast";
-import z from "zod";
-
-import {
-  createBarang,
-  deleteBarang,
-  updateBarang,
-} from "@/app/api/product/route";
-import DeleteConfirmationModal from "@/components/core/Delete.Modal";
-import CreateBarangModal from "@/components/core/CreateBarangModal";
-import EditBarangModal from "@/components/core/EditBarangModal";
 import { useUser } from "@/context/UserContext";
-import { useQRCode } from "next-qrcode";
-import DetailBarangModal from "@/components/core/DetailModalBarang";
 
-const barangFormSchema = z.object({
-  kategori_id: z.number(),
-  created_by: z.number(),
-  produk: z.string(),
-  production_date: z.string(),
-  stock: z.number(),
-  kodegrp: z.string(),
-  status: z.string(),
-  line_divisi: z.number(),
-  main_produk: z.number(),
-});
+// Type definitions untuk audit log
+interface AuditLog {
+  id: number;
+  user: {
+    userId: number;
+    userName: string;
+  };
+  barang: {
+    idBarang: number;
+    namaBarang: string;
+  };
+  type: string;
+}
 
-type BarangFormSchema = z.infer<typeof barangFormSchema>;
+interface AuditLogResponse {
+  data: AuditLog[];
+}
 
-export default function BarangPage() {
-  const [datas, setData] = useState<Barang[]>([]);
+export default function AuditLogPage() {
+  const [datas, setData] = useState<AuditLog[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("-");
-  const [categoryFilter, setCategoryFilter] = useState("-");
+  const [typeFilter, setTypeFilter] = useState("-");
+  const [userFilter, setUserFilter] = useState("-");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [barangIdToDelete, setBarangIdToDelete] = useState<Barang | null>(null);
   const [perPage] = useState(5); // Menampilkan 5 data per halaman
-  const [filteredData, setFilteredData] = useState<Barang[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [barangToEdit, setCategoryToEdit] = useState<any>();
-  const [selectedBarang, setSelectedBarang] = useState<Barang | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [filteredData, setFilteredData] = useState<AuditLog[]>([]);
 
   const { user } = useUser();
-  const { Canvas } = useQRCode();
 
   // Hitung statistik berdasarkan data yang sudah difilter
-  const totalBarang = datas.length;
-  const activeBarang = datas.filter((b) => b.status === "active").length;
-  const unActiveBarang = datas.filter((b) => b.status === "un-active").length;
-  const activePercentage = totalBarang
-    ? ((activeBarang / totalBarang) * 100).toFixed(2)
+  const totalAuditLog = datas.length;
+  const stockInCount = datas.filter((log) => log.type === "Stock In").length;
+  const stockOutCount = datas.filter((log) => log.type === "Stock Out").length;
+  const stockInPercentage = totalAuditLog
+    ? ((stockInCount / totalAuditLog) * 100).toFixed(2)
     : 0;
 
-  // Mendapatkan daftar kategori unik untuk dropdown filter
-  const uniqueCategories = Array.from(
-    new Set(datas.map((barang) => barang.kategori.kategori))
+  // Mendapatkan daftar tipe unik untuk dropdown filter
+  const uniqueTypes = Array.from(new Set(datas.map((log) => log.type))).filter(
+    Boolean
+  );
+
+  // Mendapatkan daftar user unik untuk dropdown filter
+  const uniqueUsers = Array.from(
+    new Set(datas.map((log) => log.user.userName))
   ).filter(Boolean);
 
-  const fetchBarang = async () => {
+  const fetchAuditLog = async () => {
     try {
       setIsLoading(true);
-      const response = await axiosInstance.get("/api/v1/barang");
+      const response = await axiosInstance.get<AuditLogResponse>(
+        "/api/v1/auditlog"
+      );
       setData(response.data.data);
     } catch (error) {
       console.error(error);
+      toast.error("Gagal memuat data audit log");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleUpdateBarang = async (updatedData: any) => {
-    if (!barangToEdit || !barangToEdit.id) {
-      toast.error("ID barang tidak ditemukan");
-      return;
-    }
-
-    try {
-      const result = await updateBarang(barangToEdit.id, updatedData);
-      toast.success("Barang berhasil diperbarui");
-      setIsEditModalOpen(false);
-      setCategoryToEdit(null);
-      await fetchBarang();
-    } catch (error) {
-      toast.error("Gagal memperbarui barang");
-    }
-  };
-
-  const handleEditBarangClick = (barang: Barang) => {
-    setCategoryToEdit(barang);
-    setIsEditModalOpen(true);
-  };
-
-  const handleCreateBarang = async (newBarang: BarangFormSchema) => {
-    try {
-      await createBarang(newBarang);
-      toast.success("Berhasil menambahkan barang");
-      fetchBarang();
-      setIsModalOpen(false);
-    } catch (error) {
-      toast.error("Gagal menambahkan barang");
-    }
-  };
-
-  const handleDeleteIdBarang = async (barang: Barang) => {
-    setBarangIdToDelete(barang);
-    setDeleteModal(true);
-  };
-
-  const handleDeleteCategory = async (id: number) => {
-    try {
-      await deleteBarang(id);
-      toast.success("Berhasil menghapus barang");
-      setDeleteModal(false);
-      fetchBarang();
-    } catch (error) {
-      toast.error("Gagal menghapus barang");
-    }
-  };
-
-  const openDetailModal = (barang: Barang) => {
-    setSelectedBarang(barang);
-    setIsDetailModalOpen(true);
-  };
-
   useEffect(() => {
-    fetchBarang();
+    fetchAuditLog();
   }, []);
 
   // Filter dan search data
   useEffect(() => {
     let filtered = datas;
 
-    // Filter berdasarkan status
-    if (statusFilter !== "-") {
-      filtered = filtered.filter((data) => data.status === statusFilter);
+    // Filter berdasarkan tipe
+    if (typeFilter !== "-") {
+      filtered = filtered.filter((data) => data.type === typeFilter);
     }
 
-    // Filter berdasarkan kategori
-    if (categoryFilter !== "-") {
-      filtered = filtered.filter(
-        (data) => data.kategori.kategori === categoryFilter
-      );
+    // Filter berdasarkan user
+    if (userFilter !== "-") {
+      filtered = filtered.filter((data) => data.user.userName === userFilter);
     }
 
     // Filter berdasarkan pencarian
     if (searchTerm.trim() !== "") {
       filtered = filtered.filter(
         (data) =>
-          data.namaBarang.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          data.kategori.kategori
+          data.user.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          data.barang.namaBarang
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
-          data.kodeQr.toLowerCase().includes(searchTerm.toLowerCase())
+          data.type.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     setFilteredData(filtered);
     setCurrentPage(1); // Reset ke halaman pertama saat filter berubah
-  }, [statusFilter, categoryFilter, searchTerm, datas]);
+  }, [typeFilter, userFilter, searchTerm, datas]);
 
-  // Handle perubahan filter status
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatusFilter(e.target.value);
+  // Handle perubahan filter tipe
+  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTypeFilter(e.target.value);
   };
 
-  // Handle perubahan filter kategori
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCategoryFilter(e.target.value);
+  // Handle perubahan filter user
+  const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setUserFilter(e.target.value);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -229,19 +163,10 @@ export default function BarangPage() {
       <div className="mt-20 p-4">
         <div className="flex items-center justify-between mb-6">
           <div className="">
-            <h1 className="text-3xl font-bold text-primary">Data Barang</h1>
+            <h1 className="text-3xl font-bold text-primary">Audit Log</h1>
             <p className="mt-4 text-gray-800">
-              Kelola data barang gudang anda.
+              Kelola dan pantau aktivitas audit log sistem.
             </p>
-          </div>
-
-          <div className="">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-primary text-white rounded-md cursor-pointer"
-            >
-              Tambah Barang +
-            </button>
           </div>
         </div>
       </div>
@@ -266,70 +191,66 @@ export default function BarangPage() {
           ))
         ) : (
           <>
-            {/* Card 1 - Total Barang */}
+            {/* Card 1 - Total Audit Log */}
             <div className="bg-white rounded-lg shadow-md border p-5">
               <div className="flex justify-between">
                 <div>
                   <h3 className="text-text font-medium text-sm">
-                    Total Barang
+                    Total Audit Log
                   </h3>
                   <p className="text-text font-medium text-xl pt-2.5">
-                    {totalBarang}
+                    {totalAuditLog}
                   </p>
                 </div>
                 <div className="bg-primary p-4 rounded-sm text-background">
-                  <Group className="w-8 h-8" />
+                  <FileText className="w-8 h-8" />
                 </div>
               </div>
             </div>
 
-            {/* Card 2 - Barang Aktif */}
+            {/* Card 2 - Stock In */}
             <div className="bg-white rounded-lg shadow-md border p-5">
               <div className="flex justify-between">
                 <div>
-                  <h3 className="text-text font-medium text-sm">
-                    Barang Aktif
-                  </h3>
+                  <h3 className="text-text font-medium text-sm">Stock In</h3>
                   <p className="text-text font-medium text-xl pt-2.5">
-                    {activeBarang}
+                    {stockInCount}
                   </p>
                 </div>
-                <div className="bg-primary p-4 rounded-sm text-background">
-                  <BoxesIcon className="w-8 h-8" />
+                <div className="bg-green-600 p-4 rounded-sm text-white">
+                  <TrendingUp className="w-8 h-8" />
                 </div>
               </div>
             </div>
 
-            {/* Card 3 - Barang Non Aktif */}
+            {/* Card 3 - Stock Out */}
             <div className="bg-white rounded-lg shadow-md border p-5">
               <div className="flex justify-between">
                 <div>
-                  <h3 className="text-text font-medium text-sm">
-                    Barang Non Aktif
-                  </h3>
+                  <h3 className="text-text font-medium text-sm">Stock Out</h3>
                   <p className="text-text font-medium text-xl pt-2.5">
-                    {unActiveBarang}
+                    {stockOutCount}
                   </p>
                 </div>
-                <div className="bg-primary p-4 rounded-sm text-background">
-                  <Archive className="w-8 h-8" />
+                <div className="bg-red-600 p-4 rounded-sm text-white">
+                  <Activity className="w-8 h-8" />
                 </div>
               </div>
             </div>
 
-            {/* Card 4 - Persentase Aktif */}
+            {/* Card 4 - Persentase Stock In */}
             <div className="bg-white rounded-lg shadow-md border p-5">
               <div className="flex justify-between">
                 <div>
                   <h3 className="text-text font-medium text-sm">
-                    Persentase Aktif
+                    Persentase Stock In
                   </h3>
                   <p className="text-text font-medium text-xl pt-2.5">
-                    {activePercentage}%
+                    {stockInPercentage}%
                   </p>
                 </div>
                 <div className="bg-primary p-4 rounded-sm text-background">
-                  <ChartPie className="w-8 h-8" />
+                  <TrendingUp className="w-8 h-8" />
                 </div>
               </div>
             </div>
@@ -342,31 +263,34 @@ export default function BarangPage() {
         <div className="lg:flex lg:items-center grid gap-3">
           <h1 className="text-sm font-medium text-text">Filter:</h1>
 
-          {/* Filter Status */}
+          {/* Filter Tipe */}
           <select
-            name="status-filter"
-            id="status-filter"
-            value={statusFilter}
-            onChange={handleStatusChange}
+            name="type-filter"
+            id="type-filter"
+            value={typeFilter}
+            onChange={handleTypeChange}
             className="border border-secondary px-3 sm:px-4 py-2 rounded-sm text-text font-medium text-sm"
           >
-            <option value="-">Semua Status</option>
-            <option value="active">Aktif</option>
-            <option value="un-active">Non-aktif</option>
+            <option value="-">Semua Tipe</option>
+            {uniqueTypes.map((type, index) => (
+              <option key={index} value={type}>
+                {type}
+              </option>
+            ))}
           </select>
 
-          {/* Filter Kategori */}
+          {/* Filter User */}
           <select
-            name="category-filter"
-            id="category-filter"
-            value={categoryFilter}
-            onChange={handleCategoryChange}
+            name="user-filter"
+            id="user-filter"
+            value={userFilter}
+            onChange={handleUserChange}
             className="border border-secondary px-3 sm:px-4 py-2 rounded-sm text-text font-medium text-sm"
           >
-            <option value="-">Semua Kategori</option>
-            {uniqueCategories.map((category, index) => (
-              <option key={index} value={category}>
-                {category}
+            <option value="-">Semua User</option>
+            {uniqueUsers.map((userName, index) => (
+              <option key={index} value={userName}>
+                {userName}
               </option>
             ))}
           </select>
@@ -380,7 +304,7 @@ export default function BarangPage() {
             id="search"
             value={searchTerm}
             onChange={handleSearchChange}
-            placeholder="Cari nama barang, kategori, atau kode QR..."
+            placeholder="Cari user, barang, atau tipe aktivitas..."
             className="border border-secondary px-3 sm:px-4 py-2 rounded-sm font-medium text-sm flex-1"
           />
           <button
@@ -395,7 +319,7 @@ export default function BarangPage() {
       {/* Table Section */}
       <div className="bg-white border border-secondary rounded-lg mx-2 sm:mx-6 mb-6">
         <div className="flex justify-between items-center mx-4 sm:mx-6 py-6">
-          <h2 className="font-medium text-text text-2xl">Data Barang</h2>
+          <h2 className="font-medium text-text text-2xl">Data Audit Log</h2>
           <div className="flex items-center gap-3">
             <div className="bg-secondary text-white p-2 rounded-sm">
               <Download />
@@ -411,22 +335,16 @@ export default function BarangPage() {
             <thead className="bg-text/15">
               <tr>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
+                  ID
+                </th>
+                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
+                  USER
+                </th>
+                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   NAMA BARANG
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  KATEGORI
-                </th>
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  KODEGRP
-                </th>
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  DIVISI
-                </th>
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  STATUS
-                </th>
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  KODE QR
+                  TIPE AKTIVITAS
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   AKSI
@@ -440,34 +358,25 @@ export default function BarangPage() {
                     key={`skeleton-${index}`}
                     className="bg-background border-y border-secondary animate-pulse"
                   >
-                    {/* Nama barang Skeleton */}
+                    {/* ID Skeleton */}
+                    <td className="px-4 sm:px-6 py-4">
+                      <div className="h-4 bg-gray-300 rounded-md w-12 mx-auto"></div>
+                    </td>
+                    {/* User Skeleton */}
                     <td className="px-4 sm:px-6 py-4">
                       <div className="h-4 bg-gray-300 rounded-md w-20 mx-auto"></div>
                     </td>
-                    {/* Kategori Skeleton */}
+                    {/* Barang Skeleton */}
                     <td className="px-4 sm:px-6 py-4">
                       <div className="h-4 bg-gray-300 rounded-md w-24 mx-auto"></div>
                     </td>
-                    {/* Stock awal Skeleton */}
+                    {/* Tipe Skeleton */}
                     <td className="px-4 sm:px-6 py-4">
-                      <div className="h-4 bg-gray-300 rounded-md w-16 mx-auto"></div>
-                    </td>
-                    {/* Stock sekarang Skeleton */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="h-6 bg-gray-300 rounded-full w-16 mx-auto"></div>
-                    </td>
-                    {/* Status Skeleton */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="h-4 bg-gray-300 rounded-md w-20 mx-auto"></div>
-                    </td>
-                    {/* Qr Code Skeleton */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="h-4 bg-gray-300 rounded-md w-20 mx-auto"></div>
+                      <div className="h-6 bg-gray-300 rounded-full w-20 mx-auto"></div>
                     </td>
                     {/* Aksi Skeleton */}
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex gap-2.5 justify-center">
-                        <div className="h-6 w-6 bg-gray-300 rounded"></div>
                         <div className="h-6 w-6 bg-gray-300 rounded"></div>
                       </div>
                     </td>
@@ -476,12 +385,12 @@ export default function BarangPage() {
               ) : currentItems.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={5}
                     className="px-4 sm:px-6 py-8 text-center text-text"
                   >
                     {filteredData.length === 0 && datas.length > 0
                       ? "Tidak ada data yang sesuai dengan filter"
-                      : "Tidak ada data barang"}
+                      : "Tidak ada data audit log"}
                   </td>
                 </tr>
               ) : (
@@ -490,69 +399,46 @@ export default function BarangPage() {
                     key={data.id || idx}
                     className="bg-background text-sm font-medium text-text text-center border-y border-secondary"
                   >
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                      {data.id}
+                    </td>
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center justify-center gap-2">
+                        <User className="w-4 h-4 text-gray-500" />
+                        {data.user.userName}
+                      </div>
+                    </td>
                     <td className="px-4 sm:px-6 py-4 uppercase whitespace-nowrap">
-                      {data.namaBarang}
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {data.kategori.kategori}
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {data.kodeGrp}
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {data.divisi.divisi}
+                      <div className="flex items-center justify-center gap-2">
+                        <Package className="w-4 h-4 text-gray-500" />
+                        {data.barang.namaBarang}
+                      </div>
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full
                               ${
-                                data.status === "active"
+                                data.type === "Stock In"
                                   ? "bg-green-500 text-green-100 border border-green-800"
-                                  : data.status === "un-active"
+                                  : data.type === "Stock Out"
                                   ? "bg-red-700 text-red-100 border border-red-800"
                                   : "bg-gray-800/50 text-gray-300 border border-gray-700"
                               }`}
                       >
-                        {data.status === "active"
-                          ? "Aktif"
-                          : data.status === "un-active"
-                          ? "Non-aktif"
-                          : data.status}
+                        {data.type}
                       </span>
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      <Canvas
-                        text={data.kodeQr}
-                        options={{
-                          errorCorrectionLevel: "M",
-                          margin: 3,
-                          scale: 4,
-                          width: 100,
-                        }}
-                      />
                     </td>
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex gap-2.5 justify-center">
                         <button
-                          onClick={() => openDetailModal(data)}
+                          onClick={() => {
+                            // Implementasi detail jika diperlukan
+                            console.log("Detail audit log:", data);
+                          }}
                           className="text-blue-600 hover:text-blue-800"
                           title="Lihat Detail"
                         >
                           <Eye />
-                        </button>
-                        <button
-                          onClick={() => handleEditBarangClick(data)}
-                          className="text-yellow-600 hover:text-yellow-800"
-                          title="Edit"
-                        >
-                          <SquarePen />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteIdBarang(data)}
-                          className="text-red-600 hover:text-red-800"
-                          title="Hapus"
-                        >
-                          <Trash />
                         </button>
                       </div>
                     </td>
@@ -569,7 +455,7 @@ export default function BarangPage() {
             <h3 className="text-sm sm:text-base">
               Menampilkan {indexOfFirstItem + 1}-
               {Math.min(indexOfLastItem, filteredData.length)} dari{" "}
-              {filteredData.length} barang
+              {filteredData.length} audit log
             </h3>
           </div>
 
@@ -614,78 +500,6 @@ export default function BarangPage() {
           </div>
         </div>
       </div>
-
-      {deleteModal && barangIdToDelete && (
-        <DeleteConfirmationModal
-          isOpen={deleteModal}
-          onClose={() => setDeleteModal(false)}
-          itemName={barangIdToDelete.namaBarang}
-          onConfirm={() => handleDeleteCategory(barangIdToDelete.id)}
-        />
-      )}
-      {isModalOpen && (
-        <CreateBarangModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleCreateBarang}
-        />
-      )}
-      {isEditModalOpen && barangToEdit && (
-        <EditBarangModal
-          isOpen={isEditModalOpen}
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setCategoryToEdit(null);
-          }}
-          onSubmit={handleUpdateBarang}
-          barang={{
-            id: barangToEdit.id, // Pastikan ID disertakan
-            kategori_id: barangToEdit.kategori?.id || barangToEdit.kategori_id,
-            user_id: user?.id,
-            produk: barangToEdit.namaBarang || barangToEdit.produk,
-            production_date:
-              barangToEdit.productionDate || barangToEdit.production_date,
-            kodegrp: barangToEdit.kodeGrp || "",
-            status: barangToEdit.status || "active",
-          }}
-        />
-      )}
-      {/* Detail Transaction Modal */}
-      {isDetailModalOpen && selectedBarang && (
-        <DetailBarangModal
-          isOpen={isDetailModalOpen}
-          onClose={() => setIsDetailModalOpen(false)}
-          barang={selectedBarang as any}
-        />
-      )}
     </>
   );
-}
-{
-  /* {isModalOpen && (
-        <CreateCategoryModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleCreateCategory}
-        />
-      )}
-      {deleteModal && categoryIdToDelete && (
-        <DeleteConfirmationModal
-          isOpen={deleteModal}
-          onClose={() => setDeleteModal(false)}
-          itemName={categoryIdToDelete.kategori}
-          onConfirm={() => handleDeleteCategory(categoryIdToDelete.id)}
-        />
-      )}
-      {isEditModalOpen && categoryToEdit && (
-        <EditCategoryModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onSubmit={handleUpdateCategory}
-          initialData={{
-            kategori: categoryToEdit.kategori,
-            status: categoryToEdit.status,
-          }}
-        />
-      )} */
 }

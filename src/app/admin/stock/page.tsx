@@ -7,6 +7,7 @@ import { useUser } from "@/context/UserContext";
 import toast, { Toaster } from "react-hot-toast";
 import { Search } from "lucide-react";
 import StockInModal from "@/components/core/StockInModal";
+import StockOutModal from "@/components/core/StockOutModal";
 
 export default function In() {
   const [datas, setData] = useState<Barang[]>([]);
@@ -28,6 +29,9 @@ export default function In() {
   // State untuk StockIn Modal
   const [isStockInModalOpen, setIsStockInModalOpen] = useState(false);
   const [selectedBarangForStockIn, setSelectedBarangForStockIn] = useState<Barang | null>(null);
+  
+  const [isStockOutModalOpen, setIsStockOutModalOpen] = useState(false);
+  const [selectedBarangForStockOut, setSelectedBarangForStockOut] = useState<Barang | null>(null);
   
   const { user } = useUser();
 
@@ -115,10 +119,20 @@ export default function In() {
     }
   };
 
+  // Handle Stock Out Submit
+  const handleStockOutSubmit = async (data: any) => {
+    try {
+      // Refresh data setelah stock in berhasil
+      await fetchBarang();
+      toast.success("berhasil stock in barang");
+    } catch (error) {
+      toast.error("Gagal Menambah Stock")
+    }
+  };
   // Handle Stock Out (fungsi ini belum ada implementasinya, tambahkan jika diperlukan)
   const handleStockOut = (barang: Barang) => {
-    // Implementasi stock out di sini
-    console.log('Stock out untuk barang:', barang);
+    setSelectedBarangForStockOut(barang);
+    setIsStockOutModalOpen(true);
   };
 
   // Pagination
@@ -506,6 +520,17 @@ export default function In() {
         }}
         onSubmit={handleStockInSubmit}
         barangData={selectedBarangForStockIn}
+      />
+
+      {/* Stock Out Modal */}
+      <StockOutModal
+        isOpen={isStockOutModalOpen}
+        onClose={() => {
+          setIsStockOutModalOpen(false);
+          setSelectedBarangForStockOut(null);
+        }}
+        onSubmit={handleStockOutSubmit}
+        barangData={selectedBarangForStockOut}
       />
     </>
   );

@@ -1,13 +1,6 @@
 import axiosInstance from "@/lib/axios";
 import Cookies from "js-cookie";
-
-export type User = {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  divisi_id: number;
-};
+import { User } from "@/utils/types";
 
 type login = {
   email: string;

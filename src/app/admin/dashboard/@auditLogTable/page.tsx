@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axiosInstance from "@/lib/axios";
 
 const data = [
   {
@@ -21,6 +22,15 @@ const data = [
 ];
 
 export default function AuditLogTable() {
+  const [auditData, setAuditData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchAuditData = async () => {
+    const response = await axiosInstance.get("/api/v1/auditlog");
+    setAuditData(response.data);
+  };
+
+  useEffect(() => {});
   return (
     <div className="border rounded-lg p-4 mx-4 mb-4 bg-white shadow-md">
       <h2 className="text-lg font-semibold mb-4">Audit Log</h2>

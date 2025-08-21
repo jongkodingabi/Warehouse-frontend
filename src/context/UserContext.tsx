@@ -2,7 +2,8 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { fetchUser, User } from "../services/auth";
+import { fetchUser } from "../services/auth";
+import { User } from "@/utils/types";
 
 type UserContextType = {
   user: User | null;
@@ -20,8 +21,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const refreshUser = async () => {
     setLoading(true);
     try {
-      const u = await fetchUser();
-      setUser(u);
+      const response = await fetchUser();
+      setUser(response.data);
     } catch (err) {
       setUser(null);
     } finally {

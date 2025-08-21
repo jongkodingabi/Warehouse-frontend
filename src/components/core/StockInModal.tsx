@@ -9,22 +9,24 @@ import {
   Calendar,
   Hash,
   MessageSquare,
+  List,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import axiosInstance from "@/lib/axios";
+import { useUser } from "@/context/UserContext";
 
 // Stock in form schema - ubah dari quantity ke stock
 const stockInFormSchema = z.object({
-  stock: z
-    .string()
+  stock: z.coerce
+    .number()
     .min(1, "Jumlah stock wajib diisi")
-    .transform((val) => parseInt(val, 10))
     .refine((val) => !isNaN(val) && val > 0, {
       message: "Jumlah stock harus berupa angka positif",
     }),
+  deskripsi: z.string({ message: "Harus Lebih dari satu karakter" }),
 });
 
 type StockInFormSchema = z.infer<typeof stockInFormSchema>;
@@ -37,6 +39,7 @@ interface StockInModalProps {
     id: number;
     namaBarang: string;
     stockSekarang: number;
+    deskripsi: string;
     kategori: {
       kategori: string;
     };
@@ -50,11 +53,13 @@ export default function StockInModal({
   barangData,
 }: StockInModalProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useUser();
 
   const form = useForm<StockInFormSchema>({
     resolver: zodResolver(stockInFormSchema),
     defaultValues: {
-      stock:  0,
+      stock: 0,
+      deskripsi: "",
     },
   });
 
@@ -63,14 +68,16 @@ export default function StockInModal({
 
     setIsLoading(true);
     try {
-      // Call the API endpoint dengan field 'stock' bukan 'quantity'
       await axiosInstance.post(`/api/v1/barang/${barangData.id}/stock-in`, {
-        stock: values.stock, 
+        stock: values.stock,
+        deskripsi: values.deskripsi,
+        user_id: user?.id,
+        type: "Stock In",
       });
 
       // Call the parent onSubmit function
       await onSubmit(values);
-      
+
       // Reset form and close modal
       form.reset();
       onClose();
@@ -168,6 +175,16 @@ export default function StockInModal({
                     min="1"
                     placeholder="Masukkan jumlah stock"
                     {...form.register("stock")}
+                    onInput={(e) => {
+                      const target = e.target as HTMLInputElement;
+                      const value = parseInt(target.value);
+
+                      // Prevent input that exceeds max stock
+                      if (value < 0) {
+                        target.value = "";
+                        form.setValue("stock", 0);
+                      }
+                    }}
                     className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
                   />
                 </div>
@@ -178,37 +195,60 @@ export default function StockInModal({
                 )}
               </div>
 
+              {/* Input deskripsi */}
+              <div>
+                <label
+                  htmlFor="deskripsi"
+                  className="block text-text font-medium text-sm mb-2"
+                >
+                  Deskripsi <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 top-0 pl-3 flex items-center pointer-events-none">
+                    <List className="text-text/30 w-4 h-4" />
+                  </div>
+                  <textarea
+                    id="deskripsi"
+                    placeholder="Masukkan deskripsi stock in"
+                    {...form.register("deskripsi")}
+                    className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all"
+                  />
+                </div>
+                {form.formState.errors.deskripsi && (
+                  <span className="text-red-500 text-xs mt-1">
+                    {form.formState.errors.deskripsi.message}
+                  </span>
+                )}
+              </div>
 
               {/* Preview Section - ubah dari quantity ke stock */}
-                {form.watch('stock') ? (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <h4 className="font-medium text-blue-800 mb-2">Preview:</h4>
-                    <div className="text-sm text-blue-700">
-                        <p>
-                        Stock akan bertambah dari{" "}
-                        <span className="font-semibold">
-                            {barangData.stockSekarang}
-                        </span>{" "}
-                        menjadi{" "}
-                        <span className="font-semibold text-primary">
-                            {barangData.stockSekarang + (parseInt(form.watch("stock")) || 0)}
-                        </span>{" "}
-                        unit
-                        </p>
-                        <p>
-                        Penambahan: +
-                        <span className="font-semibold text-primary">
-                            {form.watch("stock") || 0}
-                        </span>{" "}
-                        unit
-                        </p>
-                    </div>
-                    </div>
-                ) : (
-                    <p> </p>
-                )}
-
-
+              {form.watch("stock") ? (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <h4 className="font-medium text-blue-800 mb-2">Preview:</h4>
+                  <div className="text-sm text-blue-700">
+                    <p>
+                      Stock akan bertambah dari{" "}
+                      <span className="font-semibold">
+                        {barangData.stockSekarang}
+                      </span>{" "}
+                      menjadi{" "}
+                      <span className="font-semibold text-primary">
+                        {barangData.stockSekarang + (form.watch("stock") || 0)}
+                      </span>{" "}
+                      unit
+                    </p>
+                    <p>
+                      Penambahan: +
+                      <span className="font-semibold text-primary">
+                        {form.watch("stock") || 0}
+                      </span>{" "}
+                      unit
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p> </p>
+              )}
 
               {/* Action Buttons - ubah kondisi disabled */}
               <div className="pt-4 flex gap-3">

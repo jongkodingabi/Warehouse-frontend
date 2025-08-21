@@ -22,8 +22,6 @@ import { createUser, deleteUser, updateUser } from "@/app/api/user/route";
 import DeleteConfirmationModal from "@/components/core/Delete.Modal";
 import CreateUserModal from "@/components/core/CreateUserModal";
 import EditUserModal from "@/components/core/EditUserModal";
-// import EditUserModal from "@/components/core/EditUserModal";
-// import DetailUserModal from "@/components/core/DetailUserModal";
 
 const userFormSchema = z
   .object({
@@ -100,10 +98,8 @@ export default function UserPage() {
 
   // Hitung statistik berdasarkan data yang sudah difilter
   const totalUsers = datas.length;
-  const superAdminUsers = datas.filter((u) => u.roles === "superadmin").length;
-  const adminGudangUsers = datas.filter(
-    (u) => u.roles === "admingudang"
-  ).length;
+  const superAdminUsers = datas.filter((u) => u.role === "superadmin").length;
+  const adminGudangUsers = datas.filter((u) => u.role === "admingudang").length;
   const superAdminPercentage = totalUsers
     ? ((superAdminUsers / totalUsers) * 100).toFixed(2)
     : 0;
@@ -115,7 +111,7 @@ export default function UserPage() {
 
   // Mendapatkan daftar role unik untuk dropdown filter
   const uniqueRoles = Array.from(
-    new Set(datas.map((user) => user.roles))
+    new Set(datas.map((user) => user.role))
   ).filter(Boolean);
 
   const fetchUsers = async () => {
@@ -199,7 +195,7 @@ export default function UserPage() {
 
     // Filter berdasarkan role
     if (roleFilter !== "-") {
-      filtered = filtered.filter((data) => data.roles === roleFilter);
+      filtered = filtered.filter((data) => data.role === roleFilter);
     }
 
     // Filter berdasarkan divisi
@@ -213,7 +209,7 @@ export default function UserPage() {
         (data) =>
           data.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           data.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          data.roles.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          data.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
           data.jabatan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           data.divisi.divisi.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -565,10 +561,10 @@ export default function UserPage() {
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(
-                          data.roles
+                          data.role
                         )}`}
                       >
-                        {formatRole(data.roles)}
+                        {formatRole(data.role)}
                       </span>
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
