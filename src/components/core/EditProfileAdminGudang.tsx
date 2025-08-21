@@ -70,7 +70,7 @@ const profileEditFormSchema = z
 
 type ProfileEditFormSchema = z.infer<typeof profileEditFormSchema>;
 
-export default function EditProfileModal({
+export default function EditProfileModalAdminGudang({
   isOpen,
   onClose,
   onSubmit,
@@ -90,8 +90,8 @@ export default function EditProfileModal({
   const form = useForm<ProfileEditFormSchema>({
     resolver: zodResolver(profileEditFormSchema),
     defaultValues: {
-      name: "",
-      email: "",
+      name: userData.name,
+      email: userData.email,
       password: "",
       password_confirmation: "",
     },
@@ -134,10 +134,10 @@ export default function EditProfileModal({
       await onSubmit(submitData);
       form.reset();
       onClose();
-      toast.success("Berhasi mengubah data")
+      toast.success("Berhasil mengubah Password")
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error("Gagal mengubah data")
+      toast.error("Gagal mengubah password")
     } finally {
       setIsLoading(false);
     }
@@ -195,7 +195,7 @@ export default function EditProfileModal({
                 onSubmit={form.handleSubmit(handleSubmit)}
               >
                 {/* Input Nama */}
-                <div>
+                {/* <div>
                   <label
                     htmlFor="name"
                     className="block text-slate-700 font-medium text-sm mb-2"
@@ -207,7 +207,7 @@ export default function EditProfileModal({
                       <User className="text-slate-400 w-4 h-4" />
                     </div>
                     <input
-                      type="text"
+                      type="hidden"
                       id="name"
                       placeholder="Masukkan nama lengkap"
                       {...form.register("name")}
@@ -219,10 +219,10 @@ export default function EditProfileModal({
                       {form.formState.errors.name.message}
                     </span>
                   )}
-                </div>
+                </div> */}
 
                 {/* Input Email */}
-                <div>
+                {/* <div>
                   <label
                     htmlFor="email"
                     className="block text-slate-700 font-medium text-sm mb-2"
@@ -234,7 +234,7 @@ export default function EditProfileModal({
                       <Mail className="text-slate-400 w-4 h-4" />
                     </div>
                     <input
-                      type="email"
+                      type="hidden"
                       id="email"
                       placeholder="user@example.com"
                       {...form.register("email")}
@@ -246,7 +246,7 @@ export default function EditProfileModal({
                       {form.formState.errors.email.message}
                     </span>
                   )}
-                </div>
+                </div> */}
 
                 {/* Input Password */}
                 <div>
