@@ -405,6 +405,9 @@ export default function In() {
                     className="bg-background text-sm font-medium text-text text-center border-y border-secondary"
                   >
                     <td className="px-4 sm:px-6 py-4 uppercase whitespace-nowrap">
+                      {data.id}
+                    </td>
+                    <td className="px-4 sm:px-6 py-4 uppercase whitespace-nowrap">
                       {data.namaBarang}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
