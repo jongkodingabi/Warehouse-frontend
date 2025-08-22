@@ -334,9 +334,7 @@ export default function AuditLogPage() {
           <table className="min-w-full">
             <thead className="bg-text/15">
               <tr>
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  ID
-                </th>
+               
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   USER
                 </th>
@@ -399,9 +397,7 @@ export default function AuditLogPage() {
                     key={data.id || idx}
                     className="bg-background text-sm font-medium text-text text-center border-y border-secondary"
                   >
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {data.id}
-                    </td>
+                 
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center justify-center gap-2">
                         <User className="w-4 h-4 text-gray-500" />
