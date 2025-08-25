@@ -10,11 +10,15 @@ import {
   FolderInput,
   User,
   Package,
+  SquarePen,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import axiosInstance from "@/lib/axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useUser } from "@/context/UserContext";
+import DetailAuditModal from "@/components/core/DetailModalAudit";
+import StockInAuditModal from "@/components/core/EditAuditLogStockIn";
+import StockOutAuditModal from "@/components/core/EditAuditLogStockOut";
 
 // Type definitions untuk audit log
 interface AuditLog {
@@ -43,7 +47,11 @@ export default function AuditLogPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage] = useState(5); // Menampilkan 5 data per halaman
   const [filteredData, setFilteredData] = useState<AuditLog[]>([]);
-
+  const [showAudit, setShowAudit] = useState();
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedAuditForEdit, setSelectedAuditForEdit] = useState<any>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [activeModal, setActiveModal] = useState<any>();
   const { user } = useUser();
 
   // Hitung statistik berdasarkan data yang sudah difilter
@@ -63,6 +71,69 @@ export default function AuditLogPage() {
   const uniqueUsers = Array.from(
     new Set(datas.map((log) => log.user.userName))
   ).filter(Boolean);
+
+  const handleShowAudit = async (data: any) => {
+    setShowAudit(data);
+    setDetailModalOpen(true);
+  };
+
+  const handleEditAudit = async (auditData: any) => {
+    try {
+      // Fetch data barang
+      const response = await axiosInstance.get(
+        `/api/v1/barang/${auditData.barang.idBarang}`
+      );
+
+      // Set data untuk edit
+      setSelectedAuditForEdit({
+        auditData: auditData,
+        barangData: response.data.data,
+      });
+      setIsEditMode(true);
+
+      // Kondisi sederhana berdasarkan tipe
+      switch (auditData.type) {
+        case "Stock In":
+          setActiveModal("stock-in");
+          break;
+        case "Stock Out":
+          setActiveModal("stock-out");
+          break;
+        default:
+          toast.error(`Tipe audit "${auditData.type}" tidak dapat diedit`);
+          return;
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Gagal memuat data barang");
+    }
+  };
+
+  const handleCloseModal = () => {
+    setActiveModal(null);
+    setSelectedAuditForEdit(null);
+    setIsEditMode(false);
+  };
+
+  const handleSubmitAudit = async (data: any) => {
+    try {
+      await fetchAuditLog(); // Refresh data
+
+      const auditType = selectedAuditForEdit?.auditData?.type;
+      const message = isEditMode
+        ? `Data audit ${auditType} berhasil diupdate!`
+        : `${
+            auditType === "Stock In"
+              ? "Stock berhasil ditambahkan!"
+              : "Stock berhasil dikurangi!"
+          }`;
+
+      toast.success(message);
+      handleCloseModal();
+    } catch (error) {
+      toast.error("Operasi gagal");
+    }
+  };
 
   const fetchAuditLog = async () => {
     try {
@@ -431,14 +502,27 @@ export default function AuditLogPage() {
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex gap-2.5 justify-center">
                         <button
-                          onClick={() => {
-                            // Implementasi detail jika diperlukan
-                            console.log("Detail audit log:", data);
-                          }}
-                          className="text-blue-600 hover:text-blue-800"
-                          title="Lihat Detail"
+                          onClick={() => handleShowAudit(data)}
+                          className="text-yellow-600 hover:text-yellow-800"
+                          title="Edit"
                         >
                           <Eye />
+                        </button>
+                        <button
+                          onClick={() => handleEditAudit(data)}
+                          className={`transition-colors ${
+                            data.type === "Stock In"
+                              ? "text-green-600 hover:text-green-800"
+                              : data.type === "Stock Out"
+                              ? "text-red-600 hover:text-red-800"
+                              : "text-gray-400 cursor-not-allowed"
+                          }`}
+                          title={`Edit ${data.type}`}
+                          disabled={
+                            !["Stock In", "Stock Out"].includes(data.type)
+                          }
+                        >
+                          <SquarePen className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -500,6 +584,39 @@ export default function AuditLogPage() {
           </div>
         </div>
       </div>
+
+      {/* Detail Audit Modal */}
+      {detailModalOpen && showAudit && (
+        <DetailAuditModal
+          isOpen={detailModalOpen}
+          onClose={() => setDetailModalOpen(false)}
+          auditLog={showAudit as any}
+        />
+      )}
+
+      {/* Edit Audit Modal */}
+      {activeModal === "stock-in" && (
+        <StockInAuditModal
+          isOpen={true}
+          onClose={handleCloseModal}
+          onSubmit={handleSubmitAudit}
+          barangData={selectedAuditForEdit?.barangData || null}
+          auditData={selectedAuditForEdit?.auditData || null}
+          isEditMode={isEditMode}
+        />
+      )}
+
+      {/* Stock Out Modal */}
+      {activeModal === "stock-out" && (
+        <StockOutAuditModal
+          isOpen={true}
+          onClose={handleCloseModal}
+          onSubmit={handleSubmitAudit}
+          barangData={selectedAuditForEdit?.barangData || null}
+          auditData={selectedAuditForEdit?.auditData || null}
+          isEditMode={isEditMode}
+        />
+      )}
     </>
   );
 }

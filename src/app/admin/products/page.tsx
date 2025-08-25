@@ -650,7 +650,7 @@ export default function BarangPage() {
           }}
         />
       )}
-      {/* Detail Transaction Modal */}
+      {/* Detail Barang Modal */}
       {isDetailModalOpen && selectedBarang && (
         <DetailBarangModal
           isOpen={isDetailModalOpen}

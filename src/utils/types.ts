@@ -59,6 +59,7 @@ type Barang = {
   createdBy: User;
   updatedBy: User;
   namaBarang: string;
+  deskripsi: string;
   kodeQr: string;
   lineDivisi: string;
   productionDate: string;
@@ -83,3 +84,18 @@ type Jabatan = {
 export type { Jabatan };
 
 export type { BarangResponse };
+
+type NotifikasiItem = {
+  id: number;
+  produk: string;
+  kodegrp: string;
+  stockSekarang: number;
+  kategori: Category;
+  divisi: Divisi;
+};
+
+type NotifikasiResponse = {
+  data: NotifikasiItem[];
+};
+
+export type { NotifikasiResponse };
