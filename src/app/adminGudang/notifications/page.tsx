@@ -26,6 +26,7 @@ const NotifikasiStockMenipis = () => {
 
       const response = await axiosInstance.get("/api/v1/notifikasi/10");
       setData(response.data);
+      setIsLoading(true);
     } catch (error) {
     } finally {
       setIsLoading(false);
@@ -85,55 +86,77 @@ const NotifikasiStockMenipis = () => {
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Barang
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {data?.total || 0}
-                  </p>
+            {isLoading ? (
+              // Skeleton Cards
+              Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={`card-skeleton-${index}`}
+                  className="bg-white p-6 rounded-xl shadow-sm border"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="h-4 bg-gray-300 rounded w-24 mb-3"></div>
+                      <div className="h-4 bg-gray-300 rounded w-24 mb-3"></div>
+                    </div>
+                  </div>
                 </div>
-                <Package className="w-8 h-8 text-blue-600" />
-              </div>
-            </div>
+              ))
+            ) : (
+              <>
+                {/* Total Barang */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">
+                        Total Barang
+                      </p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {data?.total || 0}
+                      </p>
+                    </div>
+                    <Package className="w-8 h-8 text-blue-600" />
+                  </div>
+                </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Stock Kritis
-                  </p>
-                  <p className="text-2xl font-bold text-red-600">
-                    {
-                      filteredData.filter(
-                        (item: any) => item.stockSekarang <= 2
-                      ).length
-                    }
-                  </p>
+                {/* Stock Kritis */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">
+                        Stock Kritis
+                      </p>
+                      <p className="text-2xl font-bold text-red-600">
+                        {
+                          filteredData.filter(
+                            (item: any) => item.stockSekarang <= 2
+                          ).length
+                        }
+                      </p>
+                    </div>
+                    <AlertTriangle className="w-8 h-8 text-red-600" />
+                  </div>
                 </div>
-                <AlertTriangle className="w-8 h-8 text-red-600" />
-              </div>
-            </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Perlu Restock
-                  </p>
-                  <p className="text-2xl font-bold text-orange-600">
-                    {
-                      filteredData.filter(
-                        (item: any) => item.stockSekarang <= 5
-                      ).length
-                    }
-                  </p>
+                {/* Perlu Restock */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">
+                        Perlu Restock
+                      </p>
+                      <p className="text-2xl font-bold text-orange-600">
+                        {
+                          filteredData.filter(
+                            (item: any) => item.stockSekarang <= 5
+                          ).length
+                        }
+                      </p>
+                    </div>
+                    <RefreshCw className="w-8 h-8 text-orange-600" />
+                  </div>
                 </div>
-                <RefreshCw className="w-8 h-8 text-orange-600" />
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
 

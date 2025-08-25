@@ -117,12 +117,8 @@ export default function In() {
 
   // Handle Stock In Submit
   const handleStockInSubmit = async (data: any) => {
-    try {
-      // Refresh data setelah stock in berhasil
-      await fetchBarang();
-    } catch (error) {
-      toast.error("Gagal Menambah Stock");
-    }
+    await fetchBarang();
+    toast.success("Stock berhasil ditambahkan!");
   };
 
   // Handle Stock Out Submit

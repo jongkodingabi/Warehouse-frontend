@@ -138,7 +138,7 @@ export default function StockBarChart() {
   };
 
   return (
-    <div className="w-full md:w-full lg:w-full xl:w-[755px] bg-white rounded-md border p-4">
+    <div className="w-full md:w-full lg:w-full xl:w-[700px] bg-white rounded-md border p-4 min-h-[500px] flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Data Barang per Bulan</h2>
 
@@ -156,7 +156,7 @@ export default function StockBarChart() {
         </select>
       </div>
 
-      <div className="w-full" style={{ minWidth: 0 }}>
+      <div className="w-full flex-1" style={{ minWidth: 0 }}>
         {!isMounted ? (
           // Show placeholder while mounting
           <div className="h-[300px] flex items-center justify-center">

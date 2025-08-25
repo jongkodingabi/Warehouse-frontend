@@ -11,6 +11,7 @@ import {
   User,
   Package,
   SquarePen,
+  Package2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import axiosInstance from "@/lib/axios";
@@ -31,6 +32,8 @@ interface AuditLog {
     idBarang: number;
     namaBarang: string;
   };
+  inputValues: number;
+  newValues: number;
   type: string;
 }
 
@@ -415,6 +418,12 @@ export default function AuditLogPage() {
                   NAMA BARANG
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
+                  INPUT STOCK
+                </th>
+                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
+                  STOCK SEKARANG
+                </th>
+                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   TIPE AKTIVITAS
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
@@ -438,6 +447,14 @@ export default function AuditLogPage() {
                       <div className="h-4 bg-gray-300 rounded-md w-20 mx-auto"></div>
                     </td>
                     {/* Barang Skeleton */}
+                    <td className="px-4 sm:px-6 py-4">
+                      <div className="h-4 bg-gray-300 rounded-md w-24 mx-auto"></div>
+                    </td>
+                    {/* Input stock Skeleton */}
+                    <td className="px-4 sm:px-6 py-4">
+                      <div className="h-4 bg-gray-300 rounded-md w-24 mx-auto"></div>
+                    </td>
+                    {/* Stock sekarang Skeleton */}
                     <td className="px-4 sm:px-6 py-4">
                       <div className="h-4 bg-gray-300 rounded-md w-24 mx-auto"></div>
                     </td>
@@ -483,6 +500,18 @@ export default function AuditLogPage() {
                       <div className="flex items-center justify-center gap-2">
                         <Package className="w-4 h-4 text-gray-500" />
                         {data.barang.namaBarang}
+                      </div>
+                    </td>
+                    <td className="px-4 sm:px-6 py-4 uppercase whitespace-nowrap">
+                      <div className="flex items-center justify-center gap-2">
+                        <Package2 className="w-4 h-4 text-gray-500" />
+                        {data.inputValues}
+                      </div>
+                    </td>
+                    <td className="px-4 sm:px-6 py-4 uppercase whitespace-nowrap">
+                      <div className="flex items-center justify-center gap-2">
+                        <Package2 className="w-4 h-4 text-gray-500" />
+                        {data.newValues}
                       </div>
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
