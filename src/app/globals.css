@@ -9,7 +9,7 @@
 }
 
 .glow-box {
-  box-shadow: 0 0 4px rgba(0, 255, 127, 0.75);
+  box-shadow: 0 0 4px rgba(0, 101, 244, 0.75);
 }
 
 .shadow-custom {
@@ -25,8 +25,8 @@
 }
 
 .shadow-card {
-  box-shadow: 10px 10px 16px rgba(16, 185, 129, 0.25),
-    -10px -10px 16px rgba(16, 185, 129, 0.25);
+  box-shadow: 10px 10px 16px rgba(1, 101, 250, 0.25),
+    -10px -10px 16px rgba(1, 101, 250, 0.25);
 }
 
 .animate-fade-in {

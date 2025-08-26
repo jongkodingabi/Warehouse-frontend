@@ -202,9 +202,11 @@ export default function AuditLogTable() {
         <table className="min-w-full text-sm">
           <thead>
             <tr className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-              <th className="px-6 py-4 font-semibold text-left">User</th>
-              <th className="px-6 py-4 font-semibold text-center">Item Name</th>
-              <th className="px-6 py-4 font-semibold text-center">Type</th>
+              <th className="px-6 py-4 font-semibold text-left">Pengguna</th>
+              <th className="px-6 py-4 font-semibold text-center">Nama Barang</th>
+              <th className="px-6 py-4 font-semibold text-center">Stock Sekarang</th>
+              <th className="px-6 py-4 font-semibold text-center">Input Stok</th>
+              <th className="px-6 py-4 font-semibold text-center">Tipe</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -251,6 +253,17 @@ export default function AuditLogTable() {
                       {item.barang?.namaBarang || 'Unknown Item'}
                     </span>
                   </td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="font-semibold text-gray-900">
+                      {item.inputValues || 0}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="font-semibold text-gray-900">
+                      {item.newValues || 0}
+                    </span>
+                  </td>
+
                   <td className="px-6 py-4 text-center">
                     <span
                       className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full border

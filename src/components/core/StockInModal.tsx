@@ -2,13 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Package,
   Send,
   X,
   FileInput,
   Calendar,
   Hash,
-  MessageSquare,
   List,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -27,6 +25,7 @@ const stockInFormSchema = z.object({
       message: "Jumlah stock harus berupa angka positif",
     }),
   deskripsi: z.string().min(1, "Deskripsi wajib diisi"),
+  production_date: z.string(),
 });
 
 type StockInFormSchema = z.infer<typeof stockInFormSchema>;
@@ -81,9 +80,10 @@ export default function StockInModal({
         `/api/v1/barang/${barangData.id}/stock-in`,
         {
           stock: values.stock,
-          deskripsi: values.deskripsi,
+          keterangan: values.deskripsi,
           user_id: user?.id,
           type: "Stock In",
+          production_date: values.production_date
         }
       );
 
@@ -134,7 +134,7 @@ export default function StockInModal({
           exit={{ scale: 0.95, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
           className="bg-background p-6 border border-secondary rounded-xl shadow-xl w-full max-w-lg relative max-h-[90vh] overflow-y-auto"
-          onClick={(e) => e.stopPropagation()} // Prevent backdrop click when clicking modal content
+          onClick={(e) => e.stopPropagation()} 
         >
           <button
             onClick={handleClose}
@@ -213,6 +213,33 @@ export default function StockInModal({
                 </span>
               )}
             </div>
+
+               {/* Input tanggal produksi */}
+                <div>
+                  <label
+                    htmlFor="production_date"
+                    className="block text-text font-medium text-sm mb-2"
+                  >
+                    Tanggal Produksi
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Calendar className="text-text/30 w-4 h-4" />
+                    </div>
+                    <input
+                      type="date"
+                      id="production_date"
+                      {...form.register("production_date")}
+                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    />
+                  </div>
+                  {form.formState.errors.production_date && (
+                    <span className="text-red-500 text-xs mt-1">
+                      {form.formState.errors.production_date.message}
+                    </span>
+                  )}
+                </div>
+
 
             {/* Input deskripsi */}
             <div>

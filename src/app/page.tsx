@@ -167,7 +167,7 @@ export default function Home() {
                 const Icon = data.icon;
                 return (
                   <div
-                    className="border-2 border-slate-800 rounded-sm p-3 sm:p-4 md:p-5 shadow-custom-2 relative w-full"
+                    className="border-2 border-slate-800 shadow-xl p-3 sm:p-4 md:p-5 shadow-custom-2 relative w-full bg-white rounded-2xl"
                     key={idx}
                   >
                     <span className="absolute -top-3 sm:-top-3.5 left-1/2 -translate-x-1/2 bg-text text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium text-xs">
@@ -177,10 +177,10 @@ export default function Home() {
                       <div className="bg-background/25 flex justify-center p-1.5 rounded-full text-text">
                         <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                       </div>
-                      <h1 className="mt-1.5 sm:mt-2 font-medium text-xs sm:text-sm text-text text-center">
+                      <h1 className="mt-1.5 sm:mt-2 font-medium color-text text-xs sm:text-sm text-text text-center">
                         {data.title}
                       </h1>
-                      <p className="text-center text-xs text-white mt-1 sm:mt-2 leading-relaxed">
+                      <p className="text-center text-xs text-grey mt-1 sm:mt-2 leading-relaxed">
                         {data.description}
                       </p>
                     </div>

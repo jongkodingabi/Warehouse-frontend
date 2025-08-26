@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { Warehouse, Home, Code, Clock } from "lucide-react";
+import { Warehouse, Home, Code, Clock, Send, X } from "lucide-react";
 
 const divisiFormSchema = z.object({
   kodedivisi: z.string().min(1, "Kode wajib diisi"),
@@ -124,21 +124,25 @@ export default function EditDivisiModal({
               </div>
             </div>
 
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-5 py-2 rounded-lg bg-text hover:bg-text/50 transition-colors font-medium text-white"
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded"
-              >
-                Simpan
-              </button>
-            </div>
+           {/* Action Buttons */}
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 flex items-center justify-center bg-gray-500 rounded-lg py-3 text-white font-semibold text-base hover:bg-gray-600 hover:scale-[1.02] active:bg-gray-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <X className="mr-2 w-4 h-4" />
+                  Batal
+                </button>
+
+                <button
+                  type="submit"
+                  className="flex-1 flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-base hover:bg-primary/90 hover:scale-[1.02] active:bg-primary/80 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                <Send className="mr-2 w-4 h-4" />
+                Tambah Divisi
+                </button>
+              </div>
           </form>
         </motion.div>
       </motion.div>

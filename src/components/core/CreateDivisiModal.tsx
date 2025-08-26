@@ -135,13 +135,26 @@ export default function CreateDivisiModal({
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="w-full flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-lg hover:bg-primary/90 hover:scale-105 active:bg-primary active:scale-95 transition-all"
-            >
-              <Send className="mr-2" />
-              Submit
-            </button>
+           
+              {/* Action Buttons */}
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 flex items-center justify-center bg-gray-500 rounded-lg py-3 text-white font-semibold text-base hover:bg-gray-600 hover:scale-[1.02] active:bg-gray-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <X className="mr-2 w-4 h-4" />
+                  Batal
+                </button>
+
+                <button
+                  type="submit"
+                  className="flex-1 flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-base hover:bg-primary/90 hover:scale-[1.02] active:bg-primary/80 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                <Send className="mr-2 w-4 h-4" />
+                Tambah Divisi
+                </button>
+              </div>
           </form>
         </motion.div>
       </motion.div>

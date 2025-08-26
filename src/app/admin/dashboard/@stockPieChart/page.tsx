@@ -87,7 +87,7 @@ export default function DonutChart() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col">
+      <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
           <h2 className="text-xl font-semibold mb-4">
           Most Frequently Used Items
         </h2>
@@ -101,7 +101,7 @@ export default function DonutChart() {
 
   if (error) {
     return (
-    <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col">
+    <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
         <h2 className="text-xl font-semibold mb-4">
           Most Frequently Used Items
         </h2>
@@ -121,7 +121,7 @@ export default function DonutChart() {
 
   if (chartData.length === 0) {
     return (
-      <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col">
+      <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
         <h2 className="text-xl font-semibold mb-4">
           Most Frequently Used Items
         </h2>

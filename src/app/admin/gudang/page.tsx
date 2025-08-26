@@ -341,9 +341,6 @@ export default function DivisiPage() {
                   DIVISI
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  SHORT
-                </th>
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   STATUS
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
@@ -413,9 +410,6 @@ export default function DivisiPage() {
                     </td>
                     <td className="px-4 sm:px-6 py-4 uppercase whitespace-nowrap">
                       {data.divisi}
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 uppercase whitespace-nowrap">
-                      {data.short}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <span

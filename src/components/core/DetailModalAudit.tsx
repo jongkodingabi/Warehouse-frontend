@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
 import React from "react";
-import { useQRCode } from "next-qrcode";
 
 interface DetailAuditModalProps {
   isOpen: boolean;
@@ -15,7 +14,6 @@ const DetailAuditModal: React.FC<DetailAuditModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const { Canvas } = useQRCode();
 
   return (
     <AnimatePresence>
@@ -89,7 +87,7 @@ const DetailAuditModal: React.FC<DetailAuditModalProps> = ({
               label="Deskripsi"
               value={
                 <span className="font-medium text-blue-400">
-                  {auditLog.deskripsi}
+                  {auditLog.deskripsi ?? auditLog.keterangan}
                 </span>
               }
             />
@@ -98,7 +96,7 @@ const DetailAuditModal: React.FC<DetailAuditModalProps> = ({
           {/* Footer */}
           <div className="mt-8 flex justify-end">
             <button
-              className="px-5 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="px-5 py-2 bg-primary   text-white rounded-lg font-semibold hover:bg-blue-700 transition"
               onClick={onClose}
             >
               Close
