@@ -52,10 +52,14 @@ export default function Layout({
           {children}
           {/* Stock components */}
           {stock}
-          <div className="grid grid-cols-1 mt-80 md:mt-0 md:grid-cols-2 gap-4 w-full p-4">
+           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 px-5 py-8">
+          <div className="xl:col-span-2">
             <StockBarChart />
+          </div>
+          <div className="xl:col-span-1">
             {stockPieChart}
           </div>
+        </div>
           {auditLogTable}
         </div>
       </div>

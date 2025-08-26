@@ -87,8 +87,8 @@ export default function DonutChart() {
 
   if (loading) {
     return (
-      <div className="w-full max-w-md bg-white rounded-md border ml-0 xl:ml-40 self-end p-4">
-        <h2 className="text-xl font-semibold mb-4">
+      <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col">
+          <h2 className="text-xl font-semibold mb-4">
           Most Frequently Used Items
         </h2>
         <div className="flex items-center justify-center h-64">
@@ -101,7 +101,7 @@ export default function DonutChart() {
 
   if (error) {
     return (
-      <div className="w-full max-w-md bg-white rounded-md border ml-0 xl:ml-40 self-end p-4">
+    <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col">
         <h2 className="text-xl font-semibold mb-4">
           Most Frequently Used Items
         </h2>
@@ -121,7 +121,7 @@ export default function DonutChart() {
 
   if (chartData.length === 0) {
     return (
-      <div className="w-full max-w-md bg-white rounded-md border ml-0 xl:ml-40 self-end p-4">
+      <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col">
         <h2 className="text-xl font-semibold mb-4">
           Most Frequently Used Items
         </h2>
@@ -140,7 +140,7 @@ export default function DonutChart() {
   }
 
   return (
-    <div className="w-full max-w-md bg-white rounded-md border ml-0 xl:ml-40 self-end p-4">
+    <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Most Frequently Used Items</h2>
         <button

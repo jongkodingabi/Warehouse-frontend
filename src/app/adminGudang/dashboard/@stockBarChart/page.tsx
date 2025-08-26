@@ -138,7 +138,7 @@ export default function StockBarChart() {
   };
 
   return (
-    <div className="w-full md:w-full lg:w-full xl:w-[755px] bg-white rounded-md border p-4">
+    <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Data Barang per Bulan</h2>
 
