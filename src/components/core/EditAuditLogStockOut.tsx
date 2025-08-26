@@ -5,10 +5,9 @@ import { Send, X, FileOutput, Hash, MessageSquare } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "@/lib/axios";
 import { useUser } from "@/context/UserContext";
-import { toast } from "react-hot-toast"; // Import toast library
 
 // Stock out form schema - with proper validation
 const createStockOutFormSchema = (maxStock: number) =>
@@ -22,18 +21,18 @@ const createStockOutFormSchema = (maxStock: number) =>
       .refine((val) => val <= maxStock, {
         message: `Stock yang dikeluarkan tidak boleh lebih dari ${maxStock}`,
       }),
-    deskripsi: z.string().optional(),
+    deskripsi: z.string().min(10, "Harus lebih dari sepuluh karakter"),
   });
 
 type StockOutFormSchema = {
   stock: number;
-  deskripsi?: string;
+  deskripsi: string;
 };
 
-interface StockOutModalProps {
+interface StockOutAuditModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { stock: number; deskripsi?: string }) => Promise<void>;
+  onSubmit: (data: StockOutFormSchema) => Promise<void>;
   barangData: {
     id: number;
     namaBarang: string;
@@ -43,19 +42,30 @@ interface StockOutModalProps {
     };
     deskripsi: string;
   } | null;
+  // Tambahan props untuk data audit yang akan di-edit
+  auditData?: {
+    id: number;
+    stock?: number;
+    deskripsi: string;
+    type: string;
+  } | null;
+  isEditMode?: boolean; // Flag untuk menentukan apakah ini mode edit
 }
 
-export default function StockOutModal({
+export default function StockOutAuditModal({
   isOpen,
   onClose,
   onSubmit,
   barangData,
-}: StockOutModalProps) {
+  auditData = null,
+  isEditMode = false,
+}: StockOutAuditModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useUser();
 
   // Create form with dynamic schema based on current stock
   const maxStock = barangData?.stockSekarang || 0;
+
   const form = useForm<StockOutFormSchema>({
     resolver: zodResolver(createStockOutFormSchema(maxStock)),
     defaultValues: {
@@ -64,80 +74,54 @@ export default function StockOutModal({
     },
   });
 
-  // Function to check low stock notification
-  const checkLowStockNotification = async (
-    finalStock: number,
-    namaBarang: string
-  ) => {
-    if (finalStock < 10) {
-      // Show toast notification
-      toast.error(
-        `⚠️ Stock barang "${namaBarang}" sudah kurang dari 10 unit (tersisa ${finalStock} unit)`,
-        {
-          duration: 5000,
-          position: "top-right",
-          style: {
-            background: "#FEF2F2",
-            border: "1px solid #FECACA",
-            color: "#B91C1C",
-          },
-          icon: "📦",
-        }
-      );
-
-      // Optional: You can also call the notification endpoint to log this
-      try {
-        await axiosInstance.get("/api/v1/notifikasi/10");
-      } catch (error) {
-        console.error("Error fetching notification data:", error);
-      }
+  // Effect untuk mengisi form dengan data audit ketika mode edit
+  useEffect(() => {
+    if (isEditMode && auditData && isOpen) {
+      form.reset({
+        stock: auditData.stock || 0,
+        deskripsi: "",
+      });
+    } else if (!isEditMode && isOpen) {
+      // Reset form ketika bukan mode edit
+      form.reset({
+        stock: 0,
+        deskripsi: "",
+      });
     }
-  };
+  }, [isEditMode, auditData, isOpen, form]);
 
   const handleSubmit = async (values: StockOutFormSchema) => {
     if (!barangData) return;
 
     setIsLoading(true);
     try {
-      // Calculate final stock after reduction
-      const finalStock = barangData.stockSekarang - values.stock;
+      if (isEditMode && auditData) {
+        // Update existing audit log
+        await axiosInstance.put(`/api/v1/auditlog/${auditData.id}`, {
+          stock: values.stock,
+          deskripsi: values.deskripsi,
+          user_id: user?.id,
+          type: "Stock Out",
+        });
+      } else {
+        // Create new audit log
+        await axiosInstance.post(`/api/v1/barang/${barangData.id}/stock-out`, {
+          stock: values.stock,
+          deskripsi: values.deskripsi,
+          user_id: user?.id,
+          type: "Stock Out",
+        });
+      }
 
-      // Call the API endpoint for stock out
-      await axiosInstance.post(`/api/v1/barang/${barangData.id}/stock-out`, {
-        stock: values.stock,
-        deskripsi: values.deskripsi || "",
-        user_id: user?.id,
-        type: "Stock Out",
-      });
+      // Call the parent onSubmit function
+      await onSubmit(values);
 
-      // Call parent onSubmit handler
-      await onSubmit({
-        stock: values.stock,
-        deskripsi: values.deskripsi,
-      });
-
-      // Check and show low stock notification
-      await checkLowStockNotification(finalStock, barangData.namaBarang);
-
-      // Show success toast
-      toast.success(
-        `Stock barang "${barangData.namaBarang}" berhasil dikurangi ${values.stock} unit`,
-        {
-          duration: 3000,
-          position: "top-right",
-        }
-      );
-
+      // Reset form and close modal
       form.reset();
       onClose();
     } catch (error) {
-      console.error("Error reducing stock:", error);
-
-      // Show error toast
-      toast.error(`Gagal mengurangi stock barang "${barangData?.namaBarang}"`, {
-        duration: 4000,
-        position: "top-right",
-      });
+      console.error("Error processing stock out:", error);
+      // You might want to show an error toast here
     } finally {
       setIsLoading(false);
     }
@@ -171,11 +155,11 @@ export default function StockOutModal({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="bg-white p-6 border border-gray-200 rounded-xl shadow-xl w-full max-w-lg relative max-h-[90vh] overflow-y-auto"
+            className="bg-background p-6 border border-secondary rounded-xl shadow-xl w-full max-w-lg relative max-h-[90vh] overflow-y-auto"
           >
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-700 transition-colors"
+              className="absolute top-4 right-4 text-text/50 hover:text-text transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -184,35 +168,51 @@ export default function StockOutModal({
               <div className="inline-block bg-red-600 p-3 rounded-lg text-white mr-3">
                 <FileOutput className="w-6 h-6" />
               </div>
-              <h1 className="font-semibold text-2xl text-slate-800">
-                Stock Out
+              <h1 className="font-semibold text-2xl text-text">
+                {isEditMode ? "Edit Stock Out" : "Stock Out"}
               </h1>
             </div>
 
             {/* Barang Info */}
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
               <h3 className="font-semibold text-red-800 mb-2">
-                Informasi Barang
+                Informasi Audit
               </h3>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <span className="text-red-700 font-medium">Nama:</span>
+                  <span className="text-red-800 font-medium">Nama:</span>
                   <p className="text-red-800 uppercase">
                     {barangData.namaBarang}
                   </p>
                 </div>
                 <div>
-                  <span className="text-red-700 font-medium">Kategori:</span>
+                  <span className="text-red-800 font-medium">Kategori:</span>
                   <p className="text-red-800">{barangData.kategori.kategori}</p>
                 </div>
-                <div className="col-span-2">
-                  <span className="text-red-700 font-medium">
+                <div className="">
+                  <span className="text-red-800 font-medium">
                     Stock Saat Ini:
                   </span>
                   <p className="text-red-800 font-semibold">
                     {barangData.stockSekarang} unit
                   </p>
                 </div>
+                <div className="">
+                  <span className="text-red-800 font-medium">Deskripsi:</span>
+                  <p className="text-red-800 font-semibold">
+                    {auditData?.deskripsi}
+                  </p>
+                </div>
+                {isEditMode && auditData && (
+                  <div className="col-span-2 mt-2 pt-2 border-t border-red-200">
+                    <span className="text-red-800 font-medium">
+                      Mode:{" "}
+                      <span className="text-orange-600">
+                        Edit Data Audit #{auditData.id}
+                      </span>
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -224,13 +224,13 @@ export default function StockOutModal({
               <div>
                 <label
                   htmlFor="stock"
-                  className="block text-slate-700 font-medium text-sm mb-2"
+                  className="block text-text font-medium text-sm mb-2"
                 >
                   Jumlah Stock Keluar <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Hash className="text-slate-400 w-4 h-4" />
+                    <Hash className="text-text/30 w-4 h-4" />
                   </div>
                   <input
                     type="number"
@@ -246,10 +246,12 @@ export default function StockOutModal({
                       // Prevent input that exceeds max stock
                       if (value > barangData.stockSekarang) {
                         target.value = barangData.stockSekarang.toString();
+                        form.setValue("stock", barangData.stockSekarang);
                       }
                       // Prevent negative values
                       else if (value < 0) {
                         target.value = "";
+                        form.setValue("stock", 0);
                       }
                     }}
                     onKeyDown={(e) => {
@@ -258,7 +260,7 @@ export default function StockOutModal({
                         e.preventDefault();
                       }
                     }}
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600/20 focus:border-red-600 transition-all"
+                    className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-red-600/20 focus:border-red-600 transition-all"
                   />
                 </div>
                 {form.formState.errors.stock && (
@@ -272,20 +274,20 @@ export default function StockOutModal({
               <div>
                 <label
                   htmlFor="deskripsi"
-                  className="block text-slate-700 font-medium text-sm mb-2"
+                  className="block text-text font-medium text-sm mb-2"
                 >
-                  Deskripsi (Opsional)
+                  Deskripsi <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MessageSquare className="text-slate-400 w-4 h-4" />
+                    <MessageSquare className="text-text/30 w-4 h-4" />
                   </div>
                   <textarea
                     id="deskripsi"
                     placeholder="Masukkan keterangan stock out..."
                     rows={3}
                     {...form.register("deskripsi")}
-                    className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600/20 focus:border-red-600 transition-all resize-none"
+                    className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-red-600/20 focus:border-red-600 transition-all resize-none"
                   />
                 </div>
                 {form.formState.errors.deskripsi && (
@@ -298,32 +300,44 @@ export default function StockOutModal({
               {/* Preview Section */}
               {stockNumber > 0 && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <h4 className="font-medium text-red-800 mb-2">Preview:</h4>
+                  <h4 className="font-medium text-red-800 mb-2">
+                    {isEditMode ? "Preview Perubahan:" : "Preview:"}
+                  </h4>
                   <div className="text-sm text-red-700">
-                    <p>
-                      Stock akan berkurang dari{" "}
-                      <span className="font-semibold">
-                        {barangData.stockSekarang}
-                      </span>{" "}
-                      menjadi{" "}
-                      <span className="font-semibold text-red-800">
-                        {barangData.stockSekarang - stockNumber}
-                      </span>{" "}
-                      unit
-                    </p>
-                    <p>
-                      Pengurangan: -
-                      <span className="font-semibold text-red-600">
-                        {stockNumber}
-                      </span>{" "}
-                      unit
-                    </p>
+                    {isEditMode ? (
+                      <p className="text-orange-700">
+                        <span className="font-semibold">Mode Edit:</span>{" "}
+                        Mengubah data audit log
+                      </p>
+                    ) : (
+                      <>
+                        <p>
+                          Stock akan berkurang dari{" "}
+                          <span className="font-semibold">
+                            {barangData.stockSekarang}
+                          </span>{" "}
+                          menjadi{" "}
+                          <span className="font-semibold text-red-800">
+                            {barangData.stockSekarang - stockNumber}
+                          </span>{" "}
+                          unit
+                        </p>
+                        <p>
+                          Pengurangan: -
+                          <span className="font-semibold text-red-600">
+                            {stockNumber}
+                          </span>{" "}
+                          unit
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
 
-              {/* Warning if stock will be 0 or low */}
-              {stockNumber > 0 &&
+              {/* Warning if stock will be 0 or low - hanya tampil jika bukan mode edit */}
+              {!isEditMode &&
+                stockNumber > 0 &&
                 barangData.stockSekarang - stockNumber === 0 && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                     <p className="text-yellow-800 text-sm font-medium">
@@ -332,13 +346,13 @@ export default function StockOutModal({
                   </div>
                 )}
 
-              {stockNumber > 0 &&
-                barangData.stockSekarang - stockNumber < 10 &&
+              {!isEditMode &&
+                stockNumber > 0 &&
+                barangData.stockSekarang - stockNumber <= 5 &&
                 barangData.stockSekarang - stockNumber > 0 && (
                   <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
                     <p className="text-orange-800 text-sm font-medium">
-                      ⚠️ Peringatan: Stock akan menjadi sangat rendah (&lt; 10
-                      unit)!
+                      ⚠️ Peringatan: Stock akan menjadi rendah (≤ 5 unit)!
                     </p>
                   </div>
                 )}
@@ -360,19 +374,19 @@ export default function StockOutModal({
                     isLoading ||
                     !stockNumber ||
                     stockNumber <= 0 ||
-                    stockNumber > barangData.stockSekarang
+                    (!isEditMode && stockNumber > barangData.stockSekarang) // Validasi hanya untuk mode create
                   }
                   className="flex-1 flex items-center justify-center bg-red-600 rounded-lg py-3 text-white font-semibold text-base hover:bg-red-700 hover:scale-[1.02] active:bg-red-800 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white mr-2"></div>
-                      Mengurangi Stock...
+                      {isEditMode ? "Mengupdate..." : "Mengurangi Stock..."}
                     </>
                   ) : (
                     <>
                       <Send className="mr-2 w-4 h-4" />
-                      Kurangi Stock
+                      {isEditMode ? "Update Stock" : "Kurangi Stock"}
                     </>
                   )}
                 </button>

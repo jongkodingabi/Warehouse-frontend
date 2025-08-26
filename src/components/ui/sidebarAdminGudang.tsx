@@ -82,7 +82,7 @@ export default function SidebarAdminGudang() {
               <Link
                 href="/adminGudang/dashboard"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                  pathname === "/admin/dashboard"
+                  pathname === "/adminGudang/dashboard"
                     ? "bg-primary text-white"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
@@ -92,7 +92,6 @@ export default function SidebarAdminGudang() {
               </Link>
             </li>
 
-           
             {/* Kategori  */}
             <li>
               <Link
@@ -144,7 +143,6 @@ export default function SidebarAdminGudang() {
               </Link>
             </li>
 
-           
             <li>
               <Link
                 href="/adminGudang/audit"

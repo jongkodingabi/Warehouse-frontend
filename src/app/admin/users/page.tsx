@@ -585,13 +585,13 @@ export default function UserPage() {
                     </td>
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex gap-2.5 justify-center">
-                        <button
+                        {/* <button
                           onClick={() => openDetailModal(data)}
                           className="text-blue-600 hover:text-blue-800 transition-colors"
                           title="Lihat Detail"
                         >
                           <Eye className="w-4 h-4" />
-                        </button>
+                        </button> */}
                         <button
                           onClick={() => handleEditUserClick(data)}
                           className="text-yellow-600 hover:text-yellow-800 transition-colors"

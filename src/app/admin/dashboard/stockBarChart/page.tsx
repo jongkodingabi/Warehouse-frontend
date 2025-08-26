@@ -156,7 +156,7 @@ export default function StockBarChart() {
         </select>
       </div>
 
-      <div className="w-full" style={{ minWidth: 0 }}>
+      <div className="w-full flex-1" style={{ minWidth: 0 }}>
         {!isMounted ? (
           // Show placeholder while mounting
           <div className="h-[300px] flex items-center justify-center">
