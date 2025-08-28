@@ -104,24 +104,7 @@ export default function SidebarAdminGudang() {
               >
                 <div className="flex items-center gap-3">
                   <Group className="w-5 h-5" />
-                  Kategori
-                </div>
-              </Link>
-            </li>
-
-            {/* Barang & Product */}
-            <li>
-              <Link
-                href="/adminGudang/products"
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                  pathname === "/adminGudang/products"
-                    ? "bg-primary text-white"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <ClipboardList className="w-5 h-5" />
-                  Barang & Produk
+                  Kategori & Barang
                 </div>
               </Link>
             </li>

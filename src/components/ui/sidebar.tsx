@@ -118,13 +118,13 @@ export default function Sidebar() {
               >
                 <div className="flex items-center gap-3">
                   <Group className="w-5 h-5" />
-                  Kategori
+                  Kategori & Barang
                 </div>
               </Link>
             </li>
 
             {/* Barang & Product */}
-            <li>
+            {/* <li>
               <Link
                 href="/admin/products"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
@@ -138,7 +138,7 @@ export default function Sidebar() {
                   Barang & Produk
                 </div>
               </Link>
-            </li>
+            </li> */}
 
             {/* Dropdown Stock Barang */}
             <li>

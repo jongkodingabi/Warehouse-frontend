@@ -1,14 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Send,
-  X,
-  FileInput,
-  Calendar,
-  Hash,
-  List,
-} from "lucide-react";
+import { Send, X, FileInput, Calendar, Hash, List } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,7 +30,7 @@ interface StockInModalProps {
   barangData: {
     id: number;
     namaBarang: string;
-    stockSekarang: number;
+    totalStock: number;
     deskripsi: string;
     kategori: {
       kategori: string;
@@ -83,7 +76,7 @@ export default function StockInModal({
           keterangan: values.deskripsi,
           user_id: user?.id,
           type: "Stock In",
-          production_date: values.production_date
+          production_date: values.production_date,
         }
       );
 
@@ -134,7 +127,7 @@ export default function StockInModal({
           exit={{ scale: 0.95, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
           className="bg-background p-6 border border-secondary rounded-xl shadow-xl w-full max-w-lg relative max-h-[90vh] overflow-y-auto"
-          onClick={(e) => e.stopPropagation()} 
+          onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={handleClose}
@@ -172,7 +165,7 @@ export default function StockInModal({
                   Stock Saat Ini:
                 </span>
                 <p className="text-primary font-semibold">
-                  {barangData.stockSekarang} unit
+                  {barangData.totalStock} unit
                 </p>
               </div>
             </div>
@@ -214,32 +207,31 @@ export default function StockInModal({
               )}
             </div>
 
-               {/* Input tanggal produksi */}
-                <div>
-                  <label
-                    htmlFor="production_date"
-                    className="block text-text font-medium text-sm mb-2"
-                  >
-                    Tanggal Produksi
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Calendar className="text-text/30 w-4 h-4" />
-                    </div>
-                    <input
-                      type="date"
-                      id="production_date"
-                      {...form.register("production_date")}
-                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    />
-                  </div>
-                  {form.formState.errors.production_date && (
-                    <span className="text-red-500 text-xs mt-1">
-                      {form.formState.errors.production_date.message}
-                    </span>
-                  )}
+            {/* Input tanggal produksi */}
+            <div>
+              <label
+                htmlFor="production_date"
+                className="block text-text font-medium text-sm mb-2"
+              >
+                Tanggal Produksi
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Calendar className="text-text/30 w-4 h-4" />
                 </div>
-
+                <input
+                  type="date"
+                  id="production_date"
+                  {...form.register("production_date")}
+                  className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                />
+              </div>
+              {form.formState.errors.production_date && (
+                <span className="text-red-500 text-xs mt-1">
+                  {form.formState.errors.production_date.message}
+                </span>
+              )}
+            </div>
 
             {/* Input deskripsi */}
             <div>
@@ -276,11 +268,11 @@ export default function StockInModal({
                   <p>
                     Stock akan bertambah dari{" "}
                     <span className="font-semibold">
-                      {barangData.stockSekarang}
+                      {barangData.totalStock}
                     </span>{" "}
                     menjadi{" "}
                     <span className="font-semibold text-primary">
-                      {barangData.stockSekarang + stockNumber}
+                      {barangData.totalStock + stockNumber}
                     </span>{" "}
                     unit
                   </p>

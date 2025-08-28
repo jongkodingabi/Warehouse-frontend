@@ -32,14 +32,32 @@ type Product = {
 
 export type { Product };
 
+type CreatedBy = {
+  id: number;
+  name: string;
+  email: string;
+  jabatan: {
+    id: number;
+    name: string;
+  };
+  divisi: {
+    id: number;
+    kodedivisi: string;
+    divisi: string;
+    short: number;
+    status: string;
+  };
+};
+
 type Category = {
   id: number;
   kategori: string;
   status: string;
-  created_at: string;
+  createdAt: string;
+  createdBy?: CreatedBy;
 };
 
-export type { Category };
+export type { Category, CreatedBy };
 
 type Divisi = {
   id: number;
@@ -61,15 +79,19 @@ type Barang = {
   namaBarang: string;
   deskripsi: string;
   kodeQr: string;
-  lineDivisi: string;
+  lineDivisi: LineDivisi;
   productionDate: string;
-  stockAwal: number;
-  stockSekarang: number;
+  totalStock: number;
   status: string;
   kodeGrp?: string;
 };
 
 export type { Barang };
+
+type LineDivisi = {
+  id: number;
+  divisi: string;
+};
 
 type BarangResponse = {
   data: Barang[];

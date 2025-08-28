@@ -8,6 +8,7 @@ import {
   SquarePen,
   Trash,
   Group,
+  Eye,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Category } from "@/utils/types";
@@ -22,6 +23,7 @@ import toast, { Toaster } from "react-hot-toast";
 import z from "zod";
 import DeleteConfirmationModal from "@/components/core/Delete.Modal";
 import EditCategoryModal from "@/components/core/EditCategoryModal";
+import Link from "next/link";
 
 const categoryFormSchema = z.object({
   kategori: z.string(),
@@ -60,7 +62,7 @@ export default function CategoryPage() {
     try {
       setIsLoading(true);
       const response = await axiosInstance.get("/api/v1/kategori");
-      setData(response.data);
+      setData(response.data.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -416,8 +418,8 @@ export default function CategoryPage() {
                       </span>
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {data.created_at
-                        ? new Date(data.created_at).toLocaleDateString()
+                      {data.createdAt
+                        ? new Date(data.createdAt).toLocaleDateString()
                         : "—"}
                     </td>
                     <td className="px-4 sm:px-6 py-4">
@@ -429,13 +431,21 @@ export default function CategoryPage() {
                         >
                           <SquarePen />
                         </button>
+                        <Link href={`/admin/categories/barang/${data.id}`}>
+                          <button
+                            className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                            title="Lihat Barang"
+                          >
+                            <Eye />
+                          </button>
+                        </Link>
                         <button
                           onClick={() =>
                             handleDeleteIdCategory({
                               id: data.id,
                               kategori: data.kategori,
                               status: data.status,
-                              created_at: data.created_at,
+                              createdAt: data.createdAt,
                             })
                           }
                           className="text-red-600 hover:text-red-800 cursor-pointer"

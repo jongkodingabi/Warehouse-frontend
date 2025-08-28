@@ -354,9 +354,7 @@ export default function In() {
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   KATEGORI
                 </th>
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  STOK AWAL
-                </th>
+
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   STOK SEKARANG
                 </th>
@@ -382,10 +380,6 @@ export default function In() {
                     {/* Kategori Skeleton */}
                     <td className="px-4 sm:px-6 py-4">
                       <div className="h-4 bg-gray-300 rounded-md w-24 mx-auto"></div>
-                    </td>
-                    {/* Stock awal Skeleton */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="h-4 bg-gray-300 rounded-md w-16 mx-auto"></div>
                     </td>
                     {/* Stock sekarang Skeleton */}
                     <td className="px-4 sm:px-6 py-4">
@@ -428,10 +422,7 @@ export default function In() {
                       {data.kategori.kategori}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {data.stockAwal}
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {data.stockSekarang}
+                      {data.totalStock}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <span

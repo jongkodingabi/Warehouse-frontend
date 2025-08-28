@@ -39,15 +39,20 @@ export default function CreateBarangModal({
   isOpen,
   onClose,
   onSubmit,
+  categoryId,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: BarangFormSchema) => void;
+  categoryId: string; // Ubah dari number ke string karena dari useParams
 }) {
   const { user } = useUser();
   const [categoriesOption, setCategoriesOption] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
 
   const form = useForm<BarangFormSchema>({
     resolver: zodResolver(barangFormSchema),
@@ -67,7 +72,17 @@ export default function CreateBarangModal({
   const fetchCategories = async () => {
     try {
       const response = await axiosInstance.get("/api/v1/kategori");
-      setCategoriesOption(response.data);
+      setCategoriesOption(response.data.data);
+
+      // Cari kategori yang sesuai dengan categoryId
+      const currentCategory = response.data.data.find(
+        (cat: Category) => cat.id === parseInt(categoryId)
+      );
+
+      if (currentCategory) {
+        setSelectedCategory(currentCategory);
+      }
+
       return response.data;
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -78,15 +93,15 @@ export default function CreateBarangModal({
   // Load data ketika modal dibuka
   useEffect(() => {
     const loadData = async () => {
-      if (isOpen && user?.id) {
+      if (isOpen && user?.id && categoryId) {
         setIsDataLoaded(false);
 
         // Fetch categories terlebih dahulu
-        const categoriesData = await fetchCategories();
+        await fetchCategories();
 
-        // Set default values setelah data loaded
+        // Set default values setelah data loaded dengan categoryId dari props
         form.reset({
-          kategori_id: 1,
+          kategori_id: parseInt(categoryId), // Gunakan categoryId dari props
           created_by: user.id,
           produk: "",
           production_date: "",
@@ -102,7 +117,7 @@ export default function CreateBarangModal({
     };
 
     loadData();
-  }, [isOpen, user, form]);
+  }, [isOpen, user, form, categoryId]); // Tambahkan categoryId sebagai dependency
 
   // Handle submit dengan loading state
   const handleSubmit = async (values: BarangFormSchema) => {
@@ -132,6 +147,7 @@ export default function CreateBarangModal({
     if (!isSubmitting) {
       form.reset();
       setIsDataLoaded(false);
+      setSelectedCategory(null);
       onClose();
     }
   };
@@ -165,7 +181,9 @@ export default function CreateBarangModal({
             <div className="inline-block bg-primary p-3 rounded-lg text-white mr-3">
               <Warehouse className="w-6 h-6" />
             </div>
-            <h1 className="font-semibold text-2xl text-text">Tambah Barang</h1>
+            <h1 className="font-semibold text-2xl text-text">
+              Tambah Barang - {selectedCategory?.kategori || "Loading..."}
+            </h1>
           </div>
 
           {/* Show loading indicator while data is being loaded */}
@@ -183,6 +201,15 @@ export default function CreateBarangModal({
               <input type="hidden" {...form.register("created_by")} />
               <input type="hidden" {...form.register("line_divisi")} />
               <input type="hidden" {...form.register("main_produk")} />
+              <input type="hidden" {...form.register("kategori_id")} />
+
+              {/* Display selected category info */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-blue-800 text-sm">
+                  <strong>Kategori yang dipilih:</strong>{" "}
+                  {selectedCategory?.kategori || "Loading..."}
+                </p>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Input nama barang */}
@@ -308,7 +335,7 @@ export default function CreateBarangModal({
                 </div>
 
                 {/* Input status */}
-                <div>
+                <div className="md:col-span-2">
                   <label
                     htmlFor="status"
                     className="block text-text font-medium text-sm mb-2"
@@ -335,48 +362,13 @@ export default function CreateBarangModal({
                     </span>
                   )}
                 </div>
-
-                {/* Input kategori */}
-                <div className="md:col-span-2">
-                  <label
-                    htmlFor="kategori_id"
-                    className="block text-text font-medium text-sm mb-2"
-                  >
-                    Kategori
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Warehouse className="text-text/30 w-4 h-4" />
-                    </div>
-                    <select
-                      id="kategori_id"
-                      {...form.register("kategori_id")}
-                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                      disabled={isSubmitting}
-                    >
-                      <option value="">Pilih Kategori</option>
-                      {categoriesOption.map((category) => (
-                        <option
-                          key={category.id}
-                          value={category.id.toString()}
-                        >
-                          {category.kategori}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  {form.formState.errors.kategori_id && (
-                    <span className="text-red-500 text-xs mt-1">
-                      {form.formState.errors.kategori_id.message}
-                    </span>
-                  )}
-                </div>
               </div>
 
               {/* Info Text */}
               <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                 <p className="text-green-800 text-sm">
-                  <strong>Info:</strong> Pastikan semua informasi barang sudah
+                  <strong>Info:</strong> Barang akan ditambahkan ke kategori "
+                  {selectedCategory?.kategori}". Pastikan semua informasi sudah
                   benar sebelum menyimpan data.
                 </p>
               </div>

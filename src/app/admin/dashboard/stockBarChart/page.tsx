@@ -249,12 +249,6 @@ export default function StockBarChart() {
                 {chartData.reduce((sum, item) => sum + item.value, 0)}
               </p>
             </div>
-            <div className="bg-green-50 p-3 rounded-lg">
-              <p className="text-sm text-gray-600">Total Stock</p>
-              <p className="text-xl font-bold text-green-600">
-                {chartData.reduce((sum, item) => sum + item.stockTotal, 0)}
-              </p>
-            </div>
             <div className="bg-purple-50 p-3 rounded-lg">
               <p className="text-sm text-gray-600">Bulan Terbanyak</p>
               <p className="text-lg font-bold text-purple-600">
