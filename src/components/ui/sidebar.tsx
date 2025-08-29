@@ -20,6 +20,7 @@ import {
   PackageOpen,
   Group,
   Briefcase,
+  WatchIcon,
 } from "lucide-react";
 import Cookies from "js-cookie";
 
@@ -184,6 +185,7 @@ export default function Sidebar() {
                 Jabatan
               </Link>
             </li>
+
             <li>
               <Link
                 href="/admin/audit"
@@ -195,6 +197,20 @@ export default function Sidebar() {
               >
                 <Scroll className="w-5 h-5" />
                 Audit Log
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/admin/aktivitas"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname === "/admin/aktifitas"
+                    ? "bg-[#2563EB] text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <WatchIcon className="w-5 h-5" />
+                Log Aktivitas
               </Link>
             </li>
           </ul>

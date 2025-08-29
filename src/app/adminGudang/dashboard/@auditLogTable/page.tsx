@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Search, RefreshCw, Filter, Calendar } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  RefreshCw,
+  Filter,
+  Calendar,
+} from "lucide-react";
 import axiosInstance from "@/lib/axios";
 
 export default function AuditLogTable() {
@@ -41,8 +48,12 @@ export default function AuditLogTable() {
     if (searchTerm) {
       filtered = filtered.filter(
         (item) =>
-          item.user?.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.barang?.namaBarang?.toLowerCase().includes(searchTerm.toLowerCase())
+          item.user?.userName
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          item.barang?.namaBarang
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase())
       );
     }
 
@@ -55,7 +66,7 @@ export default function AuditLogTable() {
     filtered.sort((a, b) => {
       const aValue = a.createdAt || a.timestamp || a.id || 0;
       const bValue = b.createdAt || b.timestamp || b.id || 0;
-      return sortOrder === "desc" 
+      return sortOrder === "desc"
         ? new Date(bValue).getTime() - new Date(aValue).getTime()
         : new Date(aValue).getTime() - new Date(bValue).getTime();
     });
@@ -83,12 +94,16 @@ export default function AuditLogTable() {
     const range = [];
     const rangeWithDots = [];
 
-    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
       range.push(i);
     }
 
     if (currentPage - delta > 2) {
-      rangeWithDots.push(1, '...');
+      rangeWithDots.push(1, "...");
     } else {
       rangeWithDots.push(1);
     }
@@ -96,7 +111,7 @@ export default function AuditLogTable() {
     rangeWithDots.push(...range);
 
     if (currentPage + delta < totalPages - 1) {
-      rangeWithDots.push('...', totalPages);
+      rangeWithDots.push("...", totalPages);
     } else {
       rangeWithDots.push(totalPages);
     }
@@ -131,7 +146,9 @@ export default function AuditLogTable() {
             disabled={isLoading}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
+            />
             Refresh
           </button>
         </div>
@@ -203,29 +220,44 @@ export default function AuditLogTable() {
           <thead>
             <tr className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
               <th className="px-6 py-4 font-semibold text-left">Pengguna</th>
-              <th className="px-6 py-4 font-semibold text-center">Nama Barang</th>
-              <th className="px-6 py-4 font-semibold text-center">Stock Sekarang</th>
-              <th className="px-6 py-4 font-semibold text-center">Input Stok</th>
+              <th className="px-6 py-4 font-semibold text-center">
+                Nama Barang
+              </th>
+              <th className="px-6 py-4 font-semibold text-center">
+                Stock Sekarang
+              </th>
+              <th className="px-6 py-4 font-semibold text-center">
+                Input Stok
+              </th>
               <th className="px-6 py-4 font-semibold text-center">Tipe</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {currentData.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-6 py-12 text-center text-gray-500">
+                <td
+                  colSpan={3}
+                  className="px-6 py-12 text-center text-gray-500"
+                >
                   {searchTerm || filterType !== "All" ? (
                     <div>
                       <Search className="h-12 w-12 mx-auto text-gray-300 mb-4" />
                       <p className="text-lg font-medium">No records found</p>
-                      <p className="text-sm">Try adjusting your search or filter criteria</p>
+                      <p className="text-sm">
+                        Try adjusting your search or filter criteria
+                      </p>
                     </div>
                   ) : (
                     <div>
                       <div className="h-12 w-12 mx-auto bg-gray-200 rounded-full flex items-center justify-center mb-4">
                         <Filter className="h-6 w-6 text-gray-400" />
                       </div>
-                      <p className="text-lg font-medium">No audit data available</p>
-                      <p className="text-sm">Check back later for new entries</p>
+                      <p className="text-lg font-medium">
+                        No audit data available
+                      </p>
+                      <p className="text-sm">
+                        Check back later for new entries
+                      </p>
                     </div>
                   )}
                 </td>
@@ -240,27 +272,27 @@ export default function AuditLogTable() {
                     <div className="flex items-center">
                       <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                         <span className="text-blue-600 font-semibold text-sm">
-                          {item.user?.userName?.charAt(0)?.toUpperCase() || 'U'}
+                          {item.user?.userName?.charAt(0)?.toUpperCase() || "U"}
                         </span>
                       </div>
                       <span className="font-medium text-gray-900">
-                        {item.user?.userName || 'Unknown User'}
+                        {item.user?.userName || "Unknown User"}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-center">
                     <span className="font-semibold text-gray-900">
-                      {item.barang?.namaBarang || 'Unknown Item'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span className="font-semibold text-gray-900">
-                      {item.inputValues || 0}
+                      {item.barang?.namaBarang || "Unknown Item"}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-center">
                     <span className="font-semibold text-gray-900">
                       {item.newValues || 0}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="font-semibold text-gray-900">
+                      {item.inputValues || 0}
                     </span>
                   </td>
 
@@ -275,7 +307,7 @@ export default function AuditLogTable() {
                             : "bg-gray-50 text-gray-700 border-gray-200"
                         }`}
                     >
-                      {item.type || 'Unknown'}
+                      {item.type || "Unknown"}
                     </span>
                   </td>
                 </tr>
@@ -289,9 +321,11 @@ export default function AuditLogTable() {
       {totalPages > 1 && (
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-gray-700">
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} results
+            Showing {startIndex + 1} to{" "}
+            {Math.min(endIndex, filteredData.length)} of {filteredData.length}{" "}
+            results
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <button
               onClick={() => goToPage(currentPage - 1)}
@@ -306,14 +340,14 @@ export default function AuditLogTable() {
               {getPageNumbers().map((page, index) => (
                 <button
                   key={index}
-                  onClick={() => typeof page === 'number' && goToPage(page)}
-                  disabled={page === '...'}
+                  onClick={() => typeof page === "number" && goToPage(page)}
+                  disabled={page === "..."}
                   className={`px-3 py-2 text-sm font-medium rounded-lg ${
                     page === currentPage
-                      ? 'bg-blue-600 text-white'
-                      : page === '...'
-                      ? 'text-gray-400 cursor-default'
-                      : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                      ? "bg-blue-600 text-white"
+                      : page === "..."
+                      ? "text-gray-400 cursor-default"
+                      : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
                   }`}
                 >
                   {page}

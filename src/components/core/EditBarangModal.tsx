@@ -58,7 +58,7 @@ export default function EditBarangModal({
   const fetchCategories = async () => {
     try {
       const response = await axiosInstance.get("/api/v1/kategori");
-      setCategoriesOption(response.data);
+      setCategoriesOption(response.data.data);
       return response.data;
     } catch (error) {
       console.error("Error fetching categories:", error);

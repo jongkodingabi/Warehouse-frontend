@@ -5,22 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
-import {
-  LogOut,
-  ClipboardList,
-  Menu,
-  HomeIcon,
-  Box,
-  ChevronDown,
-  ChevronUp,
-  TrendingUp,
-  TrendingDown,
-  Scroll,
-  Users,
-  PackageOpen,
-  Group,
-  Briefcase,
-} from "lucide-react";
+import { LogOut, Menu, Box, Scroll, Group, WatchIcon } from "lucide-react";
 import Cookies from "js-cookie";
 
 import { ChartLine } from "lucide-react";
@@ -137,6 +122,20 @@ export default function SidebarAdminGudang() {
               >
                 <Scroll className="w-5 h-5" />
                 Audit Log
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/admin/aktivitas"
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                  pathname === "/admin/aktifitas"
+                    ? "bg-[#2563EB] text-white"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <WatchIcon className="w-5 h-5" />
+                Log Aktivitas
               </Link>
             </li>
           </ul>
