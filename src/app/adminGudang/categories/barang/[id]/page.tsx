@@ -92,28 +92,94 @@ export default function CategoryProductsPage() {
   const fetchCategoryProducts = async () => {
     try {
       setIsLoading(true);
-      // Sesuaikan dengan endpoint API Anda
+
+      // Request ke endpoint kategori
       const response = await axiosInstance.get(
         `/api/v1/kategori/${categoryId}`
       );
 
-      // Jika response memiliki struktur seperti contoh yang diberikan
-      if (response.data.data) {
-        setData(response.data.data);
+      // Debug: Cek struktur response (hapus setelah selesai debug)
 
-        // Set category info dari data pertama (asumsi semua barang memiliki kategori yang sama)
-        if (response.data.data.length > 0) {
-          setCategoryInfo(response.data.data[0].kategori);
+      // Set data barang - handle jika data kosong atau undefined
+      if (response.data.data && Array.isArray(response.data.data)) {
+        setData(response.data.data);
+      } else {
+        setData([]);
+      }
+
+      // Set category info dengan berbagai kemungkinan struktur response
+      let categoryData = null;
+
+      // Kemungkinan 1: API mengembalikan info kategori terpisah
+      if (response.data.category) {
+        categoryData = response.data.category;
+      }
+      // Kemungkinan 2: Info kategori ada di level root response
+      else if (response.data.kategori) {
+        categoryData = {
+          id: response.data.id,
+          kategori: response.data.kategori,
+          status: response.data.status,
+          createdAt: response.data.createdAt,
+          updatedAt: response.data.updatedAt,
+        };
+      }
+      // Kemungkinan 3: Ambil dari barang pertama jika ada
+      else if (
+        response.data.data &&
+        response.data.data.length > 0 &&
+        response.data.data[0].kategori
+      ) {
+        categoryData = response.data.data[0].kategori;
+      }
+      // Kemungkinan 4: Jika tidak ada info kategori sama sekali, buat request terpisah
+      else {
+        try {
+          // Coba request terpisah untuk info kategori (sesuaikan endpoint)
+          const categoryResponse = await axiosInstance.get(
+            `/api/v1/kategori/info/${categoryId}`
+          );
+          categoryData = categoryResponse.data.data || categoryResponse.data;
+        } catch (categoryError) {
+          console.warn(
+            "Gagal mengambil info kategori terpisah:",
+            categoryError
+          );
+
+          // Fallback: Set info kategori minimal
+          categoryData = {
+            id: parseInt(categoryId),
+            kategori: `Kategori ${categoryId}`,
+            status: "aktif",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
         }
+      }
+
+      // Set category info ke state
+      if (categoryData) {
+        setCategoryInfo(categoryData);
       }
     } catch (error) {
       console.error("Error fetching category products:", error);
       toast.error("Gagal memuat data barang kategori");
+
+      // Set data kosong saat error
+      setData([]);
+
+      // Set category info default saat error
+      setCategoryInfo({
+        id: parseInt(categoryId),
+        kategori: "Error memuat kategori",
+        status: "error",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
     } finally {
       setIsLoading(false);
     }
   };
-
   const handleCreateBarang = async (newBarang: BarangFormSchema) => {
     try {
       await createBarang(newBarang);
@@ -553,7 +619,7 @@ export default function CategoryProductsPage() {
                     </td>
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex gap-2.5 justify-center">
-                        <Link href={`/adminGudang/products/detail/${data.id}`}>
+                        <Link href={`/admin/products/detail/${data.id}`}>
                           <button
                             className="text-blue-600 hover:text-blue-800"
                             title="Lihat Detail"

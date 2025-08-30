@@ -580,6 +580,9 @@ export default function ProductDetailPage() {
                   JUMLAH
                 </th>
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
+                  KODE QR
+                </th>
+                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   KETERANGAN
                 </th>
               </tr>
@@ -665,6 +668,17 @@ export default function ProductDetailPage() {
                           {stock.type === "Stock Out" ? "-" : "+"}
                           {stock.stock}
                         </span>
+                      </td>
+                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap ml-2">
+                        <Canvas
+                          text={stock.kodeQr}
+                          options={{
+                            errorCorrectionLevel: "M",
+                            margin: 3,
+                            scale: 4,
+                            width: 100,
+                          }}
+                        />{" "}
                       </td>
                       <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                         {stock.keterangan || "-"}

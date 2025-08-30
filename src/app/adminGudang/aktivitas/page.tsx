@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 import axiosInstance from "@/lib/axios";
 import toast, { Toaster } from "react-hot-toast";
-import DeleteConfirmationModal from "@/components/core/Delete.Modal";
 import api from "@/lib/axios";
 
 interface AuditLogItem {
@@ -52,9 +51,7 @@ const AuditLogPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [filteredData, setFilteredData] = useState<AuditLogItem[]>([]);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [activityIdToDelete, setActivityIdToDelete] =
-    useState<AuditLogItem | null>();
+
   const itemsPerPage = 10;
 
   // Fetch data from API
@@ -75,23 +72,6 @@ const AuditLogPage: React.FC = () => {
       console.error("Error fetching audit data:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleIdActivityToDelete = async (activity: AuditLogItem) => {
-    setActivityIdToDelete(activity);
-    setDeleteModal(true);
-  };
-
-  const handleDeleteActivity = async (id: number) => {
-    try {
-      await api.delete(`/api/v1/activitylog/${id}`);
-      toast.success("Berhasil menghapus aktifitas");
-      fetchAuditData();
-      setDeleteModal(false);
-    } catch (error) {
-      toast.error("Gagal menghapus aktivitas");
-      console.error(error);
     }
   };
 
@@ -347,16 +327,6 @@ const AuditLogPage: React.FC = () => {
                             {/* <div className="text-sm text-slate-500 text-right">
                             {formatDate(item.created_at)}
                           </div> */}
-
-                            {/* Action Buttons */}
-                            <div className="flex items-center mt-10 gap-1 bg-red-100 rounded-full group group-hover:bg-red-50">
-                              <button
-                                onClick={() => handleIdActivityToDelete(item)}
-                                className="p-4 text-slate-400 hover:text-slate-600 rounded"
-                              >
-                                <Trash className="w-5 h-5 text-red-600 group-hover:text-red-500 cursor-pointer" />
-                              </button>
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -418,15 +388,6 @@ const AuditLogPage: React.FC = () => {
           </div>
         )}
       </div>
-
-      {deleteModal && activityIdToDelete && (
-        <DeleteConfirmationModal
-          isOpen={deleteModal}
-          onClose={() => setDeleteModal(false)}
-          itemName={activityIdToDelete.activitas}
-          onConfirm={() => handleDeleteActivity(activityIdToDelete.id)}
-        />
-      )}
     </>
   );
 };

@@ -242,10 +242,10 @@ export default function AuditLogTable() {
                   {searchTerm || filterType !== "All" ? (
                     <div>
                       <Search className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                      <p className="text-lg font-medium">No records found</p>
-                      <p className="text-sm">
-                        Try adjusting your search or filter criteria
+                      <p className="text-lg font-medium">
+                        Tidak ada audit ditemukan
                       </p>
+                      <p className="text-sm">Coba terapkan filter data</p>
                     </div>
                   ) : (
                     <div>
@@ -253,11 +253,9 @@ export default function AuditLogTable() {
                         <Filter className="h-6 w-6 text-gray-400" />
                       </div>
                       <p className="text-lg font-medium">
-                        No audit data available
+                        Tidak ada data audit tersedia saat ini
                       </p>
-                      <p className="text-sm">
-                        Check back later for new entries
-                      </p>
+                      <p className="text-sm">Coba lagi beberapa waktu</p>
                     </div>
                   )}
                 </td>
