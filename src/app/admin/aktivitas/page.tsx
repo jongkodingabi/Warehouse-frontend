@@ -276,12 +276,16 @@ const AuditLogPage: React.FC = () => {
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
-              <span className="ml-2 text-slate-600">Loading audit data...</span>
+              <span className="ml-2 text-slate-600">
+                Memuat data aktifitas...
+              </span>
             </div>
           ) : paginatedData.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <p className="text-slate-500 mb-2">No audit data found</p>
+                <p className="text-slate-500 mb-2">
+                  Belum ada data aktivitas yang tercatat
+                </p>
                 {searchTerm && (
                   <p className="text-sm text-slate-400">
                     Try adjusting your search terms

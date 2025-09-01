@@ -375,10 +375,6 @@ export default function DivisiPage() {
                     <td className="px-4 sm:px-6 py-4">
                       <div className="h-6 bg-gray-300 rounded-full w-16 mx-auto"></div>
                     </td>
-                    {/* Tanggal Skeleton */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="h-4 bg-gray-300 rounded-md w-20 mx-auto"></div>
-                    </td>
                     {/* Aksi Skeleton */}
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex gap-2.5 justify-center">
@@ -526,14 +522,7 @@ export default function DivisiPage() {
           onSubmit={handleCreateDivisi}
         />
       )}
-      {deleteModal && divisiIdToDelete && (
-        <DeleteConfirmationModal
-          isOpen={deleteModal}
-          onClose={() => setDeleteModal(false)}
-          itemName={divisiIdToDelete.divisi}
-          onConfirm={() => handleDeleteDivisi(divisiIdToDelete.id)}
-        />
-      )}
+
       {isEditModalOpen && divisiToEdit && (
         <EditDivisiModal
           isOpen={isEditModalOpen}
@@ -544,6 +533,15 @@ export default function DivisiPage() {
             divisi: divisiToEdit.divisi,
             status: divisiToEdit.status,
           }}
+        />
+      )}
+
+      {deleteModal && divisiIdToDelete && (
+        <DeleteConfirmationModal
+          isOpen={deleteModal}
+          onClose={() => setDeleteModal(false)}
+          itemName={divisiIdToDelete.divisi}
+          onConfirm={() => handleDeleteDivisi(divisiIdToDelete.id)}
         />
       )}
     </>

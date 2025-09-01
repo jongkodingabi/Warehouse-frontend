@@ -124,25 +124,25 @@ export default function EditDivisiModal({
               </div>
             </div>
 
-           {/* Action Buttons */}
-              <div className="pt-4 flex gap-3">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="flex-1 flex items-center justify-center bg-gray-500 rounded-lg py-3 text-white font-semibold text-base hover:bg-gray-600 hover:scale-[1.02] active:bg-gray-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <X className="mr-2 w-4 h-4" />
-                  Batal
-                </button>
+            {/* Action Buttons */}
+            <div className="pt-4 flex gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 flex items-center justify-center bg-gray-500 rounded-lg py-3 text-white font-semibold text-base hover:bg-gray-600 hover:scale-[1.02] active:bg-gray-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <X className="mr-2 w-4 h-4" />
+                Batal
+              </button>
 
-                <button
-                  type="submit"
-                  className="flex-1 flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-base hover:bg-primary/90 hover:scale-[1.02] active:bg-primary/80 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
+              <button
+                type="submit"
+                className="flex-1 flex items-center justify-center bg-primary rounded-lg py-3 text-white font-semibold text-base hover:bg-primary/90 hover:scale-[1.02] active:bg-primary/80 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <Send className="mr-2 w-4 h-4" />
-                Tambah Divisi
-                </button>
-              </div>
+                Simpan Perubahan
+              </button>
+            </div>
           </form>
         </motion.div>
       </motion.div>

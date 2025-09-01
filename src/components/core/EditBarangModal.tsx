@@ -49,8 +49,8 @@ export default function EditBarangModal({
       kategori_id: 0,
       user_id: user?.id || 0,
       produk: "",
-      production_date: "",
-      kodegrp: "",
+      production_date: barang.productionDate,
+      kodegrp: barang.kodegrp,
       status: "active",
     },
   });
@@ -287,21 +287,21 @@ export default function EditBarangModal({
                 </div>
 
                 {/* Kategori */}
-                <div className="md:col-span-2">
+                <div className="md:col-span-2 hidden">
                   <label
                     htmlFor="kategori_id"
                     className="block text-text font-medium text-sm mb-2"
                   >
                     Kategori
                   </label>
-                  <div className="relative">
+                  <div className="relative hidden">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Warehouse className="text-text/30 w-4 h-4" />
                     </div>
                     <select
                       id="kategori_id"
                       {...form.register("kategori_id")}
-                      className="w-full pl-10 pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      className="w-full pl-10 hidden pr-3 py-2.5 bg-background border border-secondary text-text rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                       disabled={isSubmitting}
                     >
                       <option value="">Pilih Kategori</option>

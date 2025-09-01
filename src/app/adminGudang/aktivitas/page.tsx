@@ -36,7 +36,7 @@ interface AuditLogItem {
 }
 
 interface ApiResponse {
-  data: AuditLogItem[]; // Hapus message di root level
+  data: AuditLogItem[]; 
 }
 interface UserInfo {
   name: string;
