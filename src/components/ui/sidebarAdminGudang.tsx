@@ -127,9 +127,9 @@ export default function SidebarAdminGudang() {
 
             <li>
               <Link
-                href="/admin/aktivitas"
+                href="/adminGudang/aktivitas"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                  pathname === "/admin/aktifitas"
+                  pathname === "/adminGudang/aktifitas"
                     ? "bg-[#2563EB] text-white"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}

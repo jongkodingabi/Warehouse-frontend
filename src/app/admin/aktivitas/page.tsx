@@ -37,7 +37,7 @@ interface AuditLogItem {
 }
 
 interface ApiResponse {
-  data: AuditLogItem[]; // Hapus message di root level
+  data: AuditLogItem[];
 }
 interface UserInfo {
   name: string;
@@ -242,7 +242,7 @@ const AuditLogPage: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Search Log"
+                placeholder="Cari Aktifitas"
                 value={searchTerm}
                 onChange={handleSearch}
                 className="pl-10 pr-4 py-2 w-full border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
