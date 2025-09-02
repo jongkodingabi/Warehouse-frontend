@@ -175,7 +175,7 @@ export default function AuditLogTable() {
               onChange={(e) => setFilterType(e.target.value)}
               className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white min-w-[140px]"
             >
-              <option value="All">All Types</option>
+              <option value="All">Semua Tipe</option>
               <option value="Stock In">Stock In</option>
               <option value="Stock Out">Stock Out</option>
             </select>
@@ -189,14 +189,14 @@ export default function AuditLogTable() {
               onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
               className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white min-w-[120px]"
             >
-              <option value="desc">Newest</option>
-              <option value="asc">Oldest</option>
+              <option value="desc">Terbaru</option>
+              <option value="asc">Terlama</option>
             </select>
           </div>
 
           {/* Items per page */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Show:</span>
+            <span className="text-sm text-gray-600">Lihat:</span>
             <select
               value={itemsPerPage}
               onChange={(e) => {

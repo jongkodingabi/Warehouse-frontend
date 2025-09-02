@@ -204,7 +204,7 @@ export default function Sidebar() {
               <Link
                 href="/admin/aktivitas"
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
-                  pathname === "/admin/aktifitas"
+                  pathname === "/admin/aktivitas"
                     ? "bg-[#2563EB] text-white"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}

@@ -12,6 +12,13 @@
   box-shadow: 0 0 4px rgba(0, 101, 244, 0.75);
 }
 
+/* Hilangkan arrow di input number */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .shadow-custom {
   box-shadow: 0 0 24px rgba(0, 0, 0, 0.25);
 }
