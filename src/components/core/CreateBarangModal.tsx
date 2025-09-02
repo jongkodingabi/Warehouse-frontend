@@ -10,30 +10,41 @@ import { Category } from "@/utils/types";
 import axiosInstance from "@/lib/axios";
 import { useUser } from "@/context/UserContext";
 
-// Perbaiki schema dengan transformasi yang lebih eksplisit
 const barangFormSchema = z.object({
-  kategori_id: z.coerce
-    .number()
-    .min(1, "Kategori harus dipilih")
-    .refine((val) => !isNaN(val) && val > 0, {
-      message: "Kategori ID harus berupa angka positif",
-    }),
+  kategori_id: z.preprocess((val) => {
+    if (typeof val === "string") {
+      const num = parseInt(val, 10);
+      return isNaN(num) ? 0 : num;
+    }
+    return typeof val === "number" ? val : 0;
+  }, z.number().min(1, "Kategori harus dipilih")),
   created_by: z.number(),
   produk: z.string().min(1, "Nama produk harus diisi"),
   production_date: z.string().min(1, "Tanggal produksi harus diisi"),
-  stock: z.coerce
-    .number()
-    .min(1, "Stock harus diisi")
-    .refine((val) => !isNaN(val) && val >= 0, {
-      message: "Stock tidak boleh negatif",
-    }),
+  stock: z.preprocess((val) => {
+    if (typeof val === "string") {
+      const num = parseInt(val, 10);
+      return isNaN(num) ? 0 : num;
+    }
+    return typeof val === "number" ? val : 0;
+  }, z.number().min(0, "Stock tidak boleh negatif")),
   kodegrp: z.string().min(1, "Kode grup harus diisi"),
   status: z.enum(["active", "un-active"]),
   line_divisi: z.number(),
   main_produk: z.number(),
 });
 
-type BarangFormSchema = z.infer<typeof barangFormSchema>;
+type BarangFormSchema = {
+  kategori_id: number;
+  created_by: number;
+  produk: string;
+  production_date: string;
+  stock: number;
+  kodegrp: string;
+  status: "active" | "un-active";
+  line_divisi: number;
+  main_produk: number;
+};
 
 export default function CreateBarangModal({
   isOpen,
@@ -44,7 +55,7 @@ export default function CreateBarangModal({
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: BarangFormSchema) => void;
-  categoryId: string; // Ubah dari number ke string karena dari useParams
+  categoryId: string;
 }) {
   const { user } = useUser();
   const [categoriesOption, setCategoriesOption] = useState<Category[]>([]);
@@ -55,7 +66,7 @@ export default function CreateBarangModal({
   );
 
   const form = useForm<BarangFormSchema>({
-    resolver: zodResolver(barangFormSchema),
+    resolver: zodResolver(barangFormSchema) as any,
     defaultValues: {
       kategori_id: 1,
       created_by: user?.id || 0,
@@ -90,18 +101,15 @@ export default function CreateBarangModal({
     }
   };
 
-  // Load data ketika modal dibuka
   useEffect(() => {
     const loadData = async () => {
       if (isOpen && user?.id && categoryId) {
         setIsDataLoaded(false);
 
-        // Fetch categories terlebih dahulu
         await fetchCategories();
 
-        // Set default values setelah data loaded dengan categoryId dari props
         form.reset({
-          kategori_id: parseInt(categoryId), // Gunakan categoryId dari props
+          kategori_id: parseInt(categoryId),
           created_by: user.id,
           produk: "",
           production_date: "",
@@ -117,20 +125,21 @@ export default function CreateBarangModal({
     };
 
     loadData();
-  }, [isOpen, user, form, categoryId]); // Tambahkan categoryId sebagai dependency
+  }, [isOpen, user, form, categoryId]);
 
-  // Handle submit dengan loading state
   const handleSubmit = async (values: BarangFormSchema) => {
     if (isSubmitting) return;
 
     setIsSubmitting(true);
 
     try {
-      // Prepare data for submission - convert string values back to numbers
-      const submitData = {
+      const submitData: BarangFormSchema = {
         ...values,
-        kategori_id: parseInt(values.kategori_id.toString(), 10),
-        stock: parseInt(values.stock.toString(), 10),
+        kategori_id: Number(values.kategori_id),
+        stock: Number(values.stock),
+        created_by: Number(values.created_by),
+        line_divisi: Number(values.line_divisi),
+        main_produk: Number(values.main_produk),
       };
 
       await onSubmit(submitData);
@@ -285,12 +294,14 @@ export default function CreateBarangModal({
                       id="stock"
                       placeholder="Contoh: 100"
                       min="0"
-                      {...form.register("stock")}
+                      {...form.register("stock", {
+                        valueAsNumber: true,
+                      })}
                       onInput={(e) => {
                         const target = e.target as HTMLInputElement;
                         const value = parseInt(target.value);
 
-                        // Prevent input that exceeds max stock
+                        // Prevent negative input
                         if (value < 0) {
                           target.value = "";
                           form.setValue("stock", 0);

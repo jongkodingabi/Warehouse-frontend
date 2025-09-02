@@ -7,7 +7,6 @@ import { useUser } from "@/context/UserContext";
 import { useState } from "react";
 import EditProfileModal from "@/components/core/EditProfileModal";
 import axiosInstance from "@/lib/axios"; // Adjust import path as needed
-import { fetchUser } from "@/services/auth";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function ProfilePage() {
@@ -21,17 +20,23 @@ export default function ProfilePage() {
       await axiosInstance.post("/api/v1/me", data);
       await refreshUser();
       toast.success("Berhasil update profile");
-
-      // You might want to show a success toast here
       console.log("Profile updated successfully");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      // You might want to show an error toast here
+    } catch (error: string | any) {
+      if (error.response && error.response.status === 422) {
+        const message = "Email sudah terpakai";
+        toast.error(message);
+      } else {
+        toast.error(
+          "Gagal mengubah data: " +
+            (error.response?.data?.message || error.message)
+        );
+      }
     }
   };
 
   return (
     <main className="flex-1 mt-20 p-6 space-y-6">
+      <Toaster position="top-right" />
       {/* Profile Header */}
       <div className="flex items-center gap-6 p-6 bg-white rounded-2xl shadow">
         <div className="relative flex flex-col items-center">

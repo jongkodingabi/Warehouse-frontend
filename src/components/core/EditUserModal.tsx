@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Jabatan, Divisi } from "@/utils/types";
 import axiosInstance from "@/lib/axios";
+import toast, { Toaster } from "react-hot-toast";
 
 // User edit form schema - password is optional for editing
 const userEditFormSchema = z
@@ -122,7 +123,7 @@ export default function EditUserModal({
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const form = useForm<UserEditFormSchema>({
-    resolver: zodResolver(userEditFormSchema),
+    resolver: zodResolver(userEditFormSchema) as any,
     defaultValues: {
       name: "",
       email: "",
@@ -206,8 +207,9 @@ export default function EditUserModal({
       await onSubmit(submitData);
       form.reset();
       onClose();
-    } catch (error) {
+    } catch (error: string | any) {
       console.error("Error submitting form:", error);
+      toast.error("Gagal mengubah data", error);
     } finally {
       setIsLoading(false);
     }
@@ -223,6 +225,7 @@ export default function EditUserModal({
 
   return (
     <>
+      <Toaster position="top-right" />
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0 }}

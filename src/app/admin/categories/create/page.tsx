@@ -1,6 +1,6 @@
 "use client";
 
-import { createCategory } from "@/app/api/category/route";
+import { createCategory } from "@/lib/api/category/route";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Warehouse, User, Send, Watch } from "lucide-react";
 import { useForm } from "react-hook-form";

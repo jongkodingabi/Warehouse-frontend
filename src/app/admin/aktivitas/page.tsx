@@ -55,7 +55,7 @@ const AuditLogPage: React.FC = () => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [activityIdToDelete, setActivityIdToDelete] =
     useState<AuditLogItem | null>();
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
 
   // Fetch data from API
   const fetchAuditData = async (): Promise<void> => {
@@ -392,7 +392,7 @@ const AuditLogPage: React.FC = () => {
                     onClick={() => handlePageChange(page)}
                     className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                       currentPage === page
-                        ? "bg-blue-600 text-white"
+                        ? "bg-primary text-white"
                         : "text-slate-600 hover:bg-slate-100"
                     }`}
                   >

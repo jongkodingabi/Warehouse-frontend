@@ -88,8 +88,8 @@ export default function DonutChart() {
   if (loading) {
     return (
       <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
-          <h2 className="text-xl font-semibold mb-4">
-          Most Frequently Used Items
+        <h2 className="text-xl font-semibold mb-4">
+          Barang yang Paling Sering Muncul
         </h2>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -101,13 +101,13 @@ export default function DonutChart() {
 
   if (error) {
     return (
-    <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
+      <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
         <h2 className="text-xl font-semibold mb-4">
-          Most Frequently Used Items
+          Barang yang Paling Sering Muncul
         </h2>
         <div className="flex flex-col items-center justify-center h-64 text-center">
-          <div className="text-red-500 mb-2">⚠️ Error loading data</div>
-          <p className="text-gray-600 text-sm mb-4">{error}</p>
+          <div className="text-red-500 mb-2">⚠️ Gagal memuat data</div>
+          <p className="text-gray-600 text-sm mb-4">Server sedang bermasalah</p>
           <button
             onClick={handleRefresh}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
@@ -123,11 +123,13 @@ export default function DonutChart() {
     return (
       <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
         <h2 className="text-xl font-semibold mb-4">
-          Most Frequently Used Items
+          Barang yang Paling Sering Muncul
         </h2>
         <div className="flex flex-col items-center justify-center h-64 text-center">
-          <div className="text-gray-500 mb-2">📊 No data available</div>
-          <p className="text-gray-600 text-sm mb-4">No audit log data found</p>
+          <div className="text-gray-500 mb-2">📊 Tidak ada data tersedia</div>
+          <p className="text-gray-600 text-sm mb-4">
+            Tidak ada data audit log tersediad
+          </p>
           <button
             onClick={handleRefresh}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
@@ -142,7 +144,10 @@ export default function DonutChart() {
   return (
     <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Most Frequently Used Items</h2>
+        <h2 className="text-xl font-semibold">
+          {" "}
+          Barang yang Paling Sering Muncul
+        </h2>
         <button
           onClick={handleRefresh}
           className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
@@ -185,10 +190,10 @@ export default function DonutChart() {
       {/* Summary info */}
       <div className="mt-4 text-sm text-gray-600">
         <p>
-          Total items tracked:{" "}
+          Total barang tercatat:{" "}
           {chartData.reduce((sum, item) => sum + item.value, 0)}
         </p>
-        <p>Showing top {chartData.length} most frequent items</p>
+        <p>Memunculkan {chartData.length} barang yang sering muncul</p>
       </div>
     </div>
   );

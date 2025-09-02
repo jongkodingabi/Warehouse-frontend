@@ -44,7 +44,7 @@ export default function EditBarangModal({
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const form = useForm<BarangFormSchema>({
-    resolver: zodResolver(barangFormSchema),
+    resolver: zodResolver(barangFormSchema) as any,
     defaultValues: {
       kategori_id: 0,
       user_id: user?.id || 0,
@@ -55,6 +55,11 @@ export default function EditBarangModal({
     },
   });
 
+  /**
+   * Fetches categories from API and stores them in state
+   *
+   * @returns {Promise<Category[]>} - Promise that resolves with an array of categories
+   */
   const fetchCategories = async () => {
     try {
       const response = await axiosInstance.get("/api/v1/kategori");

@@ -1,13 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Send,
-  X,
-  FileInput,
-  Hash,
-  List,
-} from "lucide-react";
+import { Send, X, FileInput, Hash, List } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
@@ -15,18 +9,22 @@ import { useState } from "react";
 import axiosInstance from "@/lib/axios";
 import { useUser } from "@/context/UserContext";
 
-// Stock in form schema - ubah dari quantity ke stock
 const stockInFormSchema = z.object({
-  stock: z.coerce
-    .number()
-    .min(1, "Jumlah stock wajib diisi")
-    .refine((val) => !isNaN(val) && val > 0, {
-      message: "Jumlah stock harus berupa angka positif",
-    }),
-  deskripsi: z.string({ message: "Harus Lebih dari satu karakter" }),
+  stock: z.preprocess((val) => {
+    // Convert string to number, handle edge cases
+    if (typeof val === "string") {
+      const num = parseInt(val, 10);
+      return isNaN(num) ? 0 : num;
+    }
+    return typeof val === "number" ? val : 0;
+  }, z.number().min(1, "Jumlah stock wajib diisi")),
+  deskripsi: z.string().min(1, "Deskripsi wajib diisi"),
 });
 
-type StockInFormSchema = z.infer<typeof stockInFormSchema>;
+type StockInFormSchema = {
+  stock: number;
+  deskripsi: string;
+};
 
 interface StockInModalProps {
   isOpen: boolean;
@@ -53,7 +51,7 @@ export default function StockInModal({
   const { user } = useUser();
 
   const form = useForm<StockInFormSchema>({
-    resolver: zodResolver(stockInFormSchema),
+    resolver: zodResolver(stockInFormSchema) as any, // Temporary type assertion
     defaultValues: {
       stock: 0,
       deskripsi: "",
@@ -154,7 +152,7 @@ export default function StockInModal({
               className="space-y-4"
               onSubmit={form.handleSubmit(handleSubmit)}
             >
-              {/* Input Stock - ubah dari quantity ke stock */}
+              {/* Input Stock */}
               <div>
                 <label
                   htmlFor="stock"
@@ -171,12 +169,14 @@ export default function StockInModal({
                     id="stock"
                     min="1"
                     placeholder="Masukkan jumlah stock"
-                    {...form.register("stock")}
+                    {...form.register("stock", {
+                      valueAsNumber: true, // ✅ Ensure number type
+                    })}
                     onInput={(e) => {
                       const target = e.target as HTMLInputElement;
                       const value = parseInt(target.value);
 
-                      // Prevent input that exceeds max stock
+                      // Prevent negative input
                       if (value < 0) {
                         target.value = "";
                         form.setValue("stock", 0);
@@ -218,8 +218,8 @@ export default function StockInModal({
                 )}
               </div>
 
-              {/* Preview Section - ubah dari quantity ke stock */}
-              {form.watch("stock") ? (
+              {/* Preview Section */}
+              {form.watch("stock") && form.watch("stock") > 0 ? (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <h4 className="font-medium text-blue-800 mb-2">Preview:</h4>
                   <div className="text-sm text-blue-700">
@@ -244,10 +244,10 @@ export default function StockInModal({
                   </div>
                 </div>
               ) : (
-                <p> </p>
+                <div className="h-4"></div>
               )}
 
-              {/* Action Buttons - ubah kondisi disabled */}
+              {/* Action Buttons */}
               <div className="pt-4 flex gap-3">
                 <button
                   type="button"
@@ -260,7 +260,11 @@ export default function StockInModal({
 
                 <button
                   type="submit"
-                  disabled={isLoading || !form.watch("stock")}
+                  disabled={
+                    isLoading ||
+                    !form.watch("stock") ||
+                    form.watch("stock") <= 0
+                  }
                   className="flex-1 flex items-center justify-center bg-blue-600 rounded-lg py-3 text-white font-semibold text-base hover:bg-blue-700 hover:scale-[1.02] active:bg-blue-800 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (

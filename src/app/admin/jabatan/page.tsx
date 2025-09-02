@@ -20,7 +20,7 @@ import {
   createJabatan,
   deleteJabatan,
   updateJabatan,
-} from "@/app/api/jabatan/route";
+} from "@/lib/api/jabatan/route";
 import EditJabatanModal from "@/components/core/EditJabatanModal";
 
 const jabatanFormSchema = z.object({
@@ -331,7 +331,7 @@ export default function JabatanPage() {
                   onClick={() => handlePageChange(pageNum)}
                   className={`px-3 sm:px-4 py-2 rounded-sm font-medium text-sm ${
                     currentPage === pageNum
-                      ? "bg-text text-background glow-box"
+                      ? "bg-primary text-background glow-box"
                       : "border border-secondary text-text hover:bg-gray-50"
                   }`}
                 >

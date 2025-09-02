@@ -7,7 +7,7 @@ import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 
 // Profile edit form schema - password is optional for editing
 const profileEditFormSchema = z
@@ -120,7 +120,6 @@ export default function EditProfileModal({
 
   const handleSubmit = async (values: ProfileEditFormSchema) => {
     setIsLoading(true);
-    // console.log(values);
     try {
       // Prepare data for submission
       const submitData = { ...values };
@@ -134,10 +133,16 @@ export default function EditProfileModal({
       await onSubmit(submitData);
       form.reset();
       onClose();
-      toast.success("Berhasi mengubah data")
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Gagal mengubah data")
+    } catch (error: string | any) {
+      if (error.response && error.response.status === 422) {
+        const message = "Email sudah terpakai";
+        toast.error(message);
+      } else {
+        toast.error(
+          "Gagal mengubah data: " +
+            (error.response?.data?.message || error.message)
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -153,6 +158,7 @@ export default function EditProfileModal({
 
   return (
     <>
+      <Toaster position="top-right" />
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0 }}

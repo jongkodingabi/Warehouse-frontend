@@ -21,7 +21,7 @@ import {
   createDivisi,
   deleteDivisi,
   updateDivisi,
-} from "@/app/api/divisi/route";
+} from "@/lib/api/divisi/route";
 
 const divisiFormSchema = z.object({
   divisi: z.string(),
@@ -491,7 +491,7 @@ export default function DivisiPage() {
                 onClick={() => handlePageChange(pageNum)}
                 className={`px-3 sm:px-4 py-2 rounded-sm font-medium text-sm ${
                   currentPage === pageNum
-                    ? "bg-text text-background glow-box"
+                    ? "bg-primary text-background glow-box"
                     : "border border-secondary text-text hover:bg-gray-50"
                 }`}
               >

@@ -67,7 +67,7 @@ export default function StockOutAuditModal({
   const maxStock = barangData?.stockSekarang || 0;
 
   const form = useForm<StockOutFormSchema>({
-    resolver: zodResolver(createStockOutFormSchema(maxStock)),
+    resolver: zodResolver(createStockOutFormSchema(maxStock)) as any,
     defaultValues: {
       stock: 0,
       deskripsi: "",

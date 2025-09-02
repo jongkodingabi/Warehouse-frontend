@@ -87,18 +87,8 @@ const DetailBarangModal: React.FC<DetailBarangModalProps> = ({
               }
             />
             <DetailRow
-              label="Stock Awal"
-              value={
-                <span className="font-medium text-blue-400">
-                  {barang.stockAwal}
-                </span>
-              }
-            />
-            <DetailRow
               label="Stock Sekarang"
-              value={
-                <span className="text-red-400">{barang.stockSekarang}</span>
-              }
+              value={<span className="text-red-400">{barang.totalStock}</span>}
             />
 
             <Canvas

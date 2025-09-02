@@ -94,7 +94,7 @@ export default function CreateUserModal({
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   const form = useForm<UserFormSchema>({
-    resolver: zodResolver(userFormSchema),
+    resolver: zodResolver(userFormSchema) as any,
     defaultValues: {
       name: "",
       email: "",

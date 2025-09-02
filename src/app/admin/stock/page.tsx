@@ -496,7 +496,7 @@ export default function In() {
                 onClick={() => handlePageChange(pageNum)}
                 className={`px-3 sm:px-4 py-2 rounded-sm font-medium text-sm ${
                   currentPage === pageNum
-                    ? "bg-text text-background glow-box"
+                    ? "bg-primary text-background glow-box"
                     : "border border-secondary text-text hover:bg-gray-50"
                 }`}
               >

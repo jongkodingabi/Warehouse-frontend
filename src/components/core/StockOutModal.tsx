@@ -70,7 +70,7 @@ export default function StockOutModal({
   // Create form with dynamic schema based on current stock
   const maxStock = barangData?.totalStock || 0;
   const form = useForm<StockOutFormSchema>({
-    resolver: zodResolver(createStockOutFormSchema(maxStock)),
+    resolver: zodResolver(createStockOutFormSchema(maxStock)) as any,
     defaultValues: {
       stock: 0,
       keterangan: "",

@@ -48,7 +48,7 @@ export default function StockInModal({
   const { user } = useUser();
 
   const form = useForm<StockInFormSchema>({
-    resolver: zodResolver(stockInFormSchema),
+    resolver: zodResolver(stockInFormSchema) as any,
     defaultValues: {
       stock: 0,
       deskripsi: "",

@@ -11,6 +11,11 @@ import { Mail, Lock } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { login } from "@/services/auth";
 
+type LoginData = {
+  email: string;
+  password: string;
+};
+
 export default function LoginPage() {
   const { refreshUser } = useUser();
   const [loading, setLoading] = useState(false);
@@ -22,7 +27,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await login(email, password);
+      const res = await login({ email, password });
       // If backend returns token in JSON, optionally store as fallback (NOT recommended for security)
       const token = (res.data as any).token;
       if (token) {

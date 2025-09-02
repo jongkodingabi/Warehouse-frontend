@@ -1,7 +1,14 @@
 "use client";
 import axiosInstance from "@/lib/axios";
 import { useState, useEffect } from "react"; // Tambahkan useEffect
-import { Group, BoxesIcon, ChartPie, Archive, FileInput, FileOutput } from "lucide-react";
+import {
+  Group,
+  BoxesIcon,
+  ChartPie,
+  Archive,
+  FileInput,
+  FileOutput,
+} from "lucide-react";
 import { Barang } from "@/utils/types";
 import { useUser } from "@/context/UserContext";
 import toast, { Toaster } from "react-hot-toast";
@@ -16,23 +23,18 @@ export default function In() {
   const [categoryFilter, setCategoryFilter] = useState("-");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [barangIdToDelete, setBarangIdToDelete] = useState<Barang | null>(null);
   const [perPage] = useState(5); // Menampilkan 5 data per halaman
   const [filteredData, setFilteredData] = useState<Barang[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [barangToEdit, setCategoryToEdit] = useState<any>();
-  const [selectedBarang, setSelectedBarang] = useState<Barang | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  
+
   // State untuk StockIn Modal
   const [isStockInModalOpen, setIsStockInModalOpen] = useState(false);
-  const [selectedBarangForStockIn, setSelectedBarangForStockIn] = useState<Barang | null>(null);
-  
+  const [selectedBarangForStockIn, setSelectedBarangForStockIn] =
+    useState<Barang | null>(null);
+
   const [isStockOutModalOpen, setIsStockOutModalOpen] = useState(false);
-  const [selectedBarangForStockOut, setSelectedBarangForStockOut] = useState<Barang | null>(null);
-  
+  const [selectedBarangForStockOut, setSelectedBarangForStockOut] =
+    useState<Barang | null>(null);
+
   const { user } = useUser();
 
   // Mendapatkan daftar kategori unik untuk dropdown filter
@@ -68,14 +70,19 @@ export default function In() {
 
     // Filter berdasarkan kategori
     if (categoryFilter !== "-") {
-      filtered = filtered.filter((barang) => barang.kategori.kategori === categoryFilter);
+      filtered = filtered.filter(
+        (barang) => barang.kategori.kategori === categoryFilter
+      );
     }
 
     // Filter berdasarkan search term
     if (searchTerm.trim() !== "") {
-      filtered = filtered.filter((barang) =>
-        barang.namaBarang.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        barang.kategori.kategori.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (barang) =>
+          barang.namaBarang.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          barang.kategori.kategori
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
       );
     }
 
@@ -110,13 +117,8 @@ export default function In() {
 
   // Handle Stock In Submit
   const handleStockInSubmit = async (data: any) => {
-    try {
-      // Refresh data setelah stock in berhasil
-      await fetchBarang();
-      toast.success("berhasil stock in barang");
-    } catch (error) {
-      toast.error("Gagal Menambah Stock")
-    }
+    await fetchBarang();
+    toast.success("Stock berhasil ditambahkan!");
   };
 
   // Handle Stock Out Submit
@@ -126,7 +128,7 @@ export default function In() {
       await fetchBarang();
       toast.success("berhasil stock in barang");
     } catch (error) {
-      toast.error("Gagal Menambah Stock")
+      toast.error("Gagal Menambah Stock");
     }
   };
   // Handle Stock Out (fungsi ini belum ada implementasinya, tambahkan jika diperlukan)
@@ -166,7 +168,9 @@ export default function In() {
       <div className="mt-20 p-4">
         <div className="flex items-center justify-between mb-6">
           <div className="">
-            <h1 className="text-3xl font-bold text-primary">Stock Data Barang</h1>
+            <h1 className="text-3xl font-bold text-primary">
+              Stock Data Barang
+            </h1>
             <p className="mt-4 text-gray-800">
               Kelola stock data barang gudang anda.
             </p>
@@ -219,7 +223,10 @@ export default function In() {
                     Barang Aktif
                   </h3>
                   <p className="text-text font-medium text-xl pt-2.5">
-                    {datas.filter(barang => barang.status === 'active').length}
+                    {
+                      datas.filter((barang) => barang.status === "active")
+                        .length
+                    }
                   </p>
                 </div>
                 <div className="bg-primary p-4 rounded-sm text-background">
@@ -236,7 +243,10 @@ export default function In() {
                     Barang Non Aktif
                   </h3>
                   <p className="text-text font-medium text-xl pt-2.5">
-                    {datas.filter(barang => barang.status === 'un-active').length}
+                    {
+                      datas.filter((barang) => barang.status === "un-active")
+                        .length
+                    }
                   </p>
                 </div>
                 <div className="bg-primary p-4 rounded-sm text-background">
@@ -253,8 +263,15 @@ export default function In() {
                     Persentase Aktif
                   </h3>
                   <p className="text-text font-medium text-xl pt-2.5">
-                    {datas.length > 0 ? 
-                      Math.round((datas.filter(barang => barang.status === 'active').length / datas.length) * 100) : 0}%
+                    {datas.length > 0
+                      ? Math.round(
+                          (datas.filter((barang) => barang.status === "active")
+                            .length /
+                            datas.length) *
+                            100
+                        )
+                      : 0}
+                    %
                   </p>
                 </div>
                 <div className="bg-primary p-4 rounded-sm text-background">
@@ -337,9 +354,7 @@ export default function In() {
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   KATEGORI
                 </th>
-                <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
-                  STOK AWAL
-                </th>
+
                 <th className="px-4 sm:px-6 py-4 font-bold text-xs text-secondary whitespace-nowrap">
                   STOK SEKARANG
                 </th>
@@ -365,10 +380,6 @@ export default function In() {
                     {/* Kategori Skeleton */}
                     <td className="px-4 sm:px-6 py-4">
                       <div className="h-4 bg-gray-300 rounded-md w-24 mx-auto"></div>
-                    </td>
-                    {/* Stock awal Skeleton */}
-                    <td className="px-4 sm:px-6 py-4">
-                      <div className="h-4 bg-gray-300 rounded-md w-16 mx-auto"></div>
                     </td>
                     {/* Stock sekarang Skeleton */}
                     <td className="px-4 sm:px-6 py-4">
@@ -411,10 +422,7 @@ export default function In() {
                       {data.kategori.kategori}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {data.stockAwal}
-                    </td>
-                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                      {data.stockSekarang}
+                      {data.totalStock}
                     </td>
                     <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       <span
@@ -488,7 +496,7 @@ export default function In() {
                 onClick={() => handlePageChange(pageNum)}
                 className={`px-3 sm:px-4 py-2 rounded-sm font-medium text-sm ${
                   currentPage === pageNum
-                    ? "bg-text text-background glow-box"
+                    ? "bg-primary text-background glow-box"
                     : "border border-secondary text-text hover:bg-gray-50"
                 }`}
               >

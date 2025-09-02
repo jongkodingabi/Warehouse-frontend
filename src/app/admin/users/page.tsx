@@ -18,7 +18,8 @@ import { User } from "@/utils/types";
 import axiosInstance from "@/lib/axios";
 import toast, { Toaster } from "react-hot-toast";
 import z from "zod";
-import { createUser, deleteUser, updateUser } from "@/app/api/user/route";
+// import { createUser, deleteUser, updateUser } from "@/app/lib/api/user/route";
+import { createUser, deleteUser, updateUser } from "@/lib/api/user/route";
 import DeleteConfirmationModal from "@/components/core/Delete.Modal";
 import CreateUserModal from "@/components/core/CreateUserModal";
 import EditUserModal from "@/components/core/EditUserModal";
@@ -645,7 +646,7 @@ export default function UserPage() {
                   onClick={() => handlePageChange(pageNum)}
                   className={`px-3 sm:px-4 py-2 rounded-sm font-medium text-sm transition-colors ${
                     currentPage === pageNum
-                      ? "bg-text text-background glow-box"
+                      ? "bg-primary text-background glow-box"
                       : "border border-secondary text-text hover:bg-gray-50"
                   }`}
                 >

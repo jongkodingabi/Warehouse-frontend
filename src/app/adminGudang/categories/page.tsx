@@ -18,7 +18,7 @@ import {
   createCategory,
   deleteCategory,
   updateCategory,
-} from "@/app/api/category/route";
+} from "@/lib/api/category/route";
 import toast, { Toaster } from "react-hot-toast";
 import z from "zod";
 import DeleteConfirmationModal from "@/components/core/Delete.Modal";
@@ -492,7 +492,7 @@ export default function CategoryPage() {
                 onClick={() => handlePageChange(pageNum)}
                 className={`px-3 sm:px-4 py-2 rounded-sm font-medium text-sm ${
                   currentPage === pageNum
-                    ? "bg-text text-background glow-box"
+                    ? "bg-primary text-background glow-box"
                     : "border border-secondary text-text hover:bg-gray-50"
                 }`}
               >

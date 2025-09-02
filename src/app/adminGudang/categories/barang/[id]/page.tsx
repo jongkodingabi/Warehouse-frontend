@@ -23,7 +23,7 @@ import {
   createBarang,
   deleteBarang,
   updateBarang,
-} from "@/app/api/product/route";
+} from "@/lib/api/product/route";
 import DeleteConfirmationModal from "@/components/core/Delete.Modal";
 import EditBarangModal from "@/components/core/EditBarangModal";
 import { useUser } from "@/context/UserContext";
@@ -619,7 +619,7 @@ export default function CategoryProductsPage() {
                     </td>
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex gap-2.5 justify-center">
-                        <Link href={`/admin/products/detail/${data.id}`}>
+                        <Link href={`/adminGudang/products/detail/${data.id}`}>
                           <button
                             className="text-blue-600 hover:text-blue-800"
                             title="Lihat Detail"
@@ -679,7 +679,7 @@ export default function CategoryProductsPage() {
                 onClick={() => handlePageChange(pageNum)}
                 className={`px-3 sm:px-4 py-2 rounded-sm font-medium text-sm ${
                   currentPage === pageNum
-                    ? "bg-text text-background glow-box"
+                    ? "bg-primary text-background glow-box"
                     : "border border-secondary text-text hover:bg-gray-50"
                 }`}
               >
