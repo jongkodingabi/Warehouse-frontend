@@ -15,10 +15,14 @@ export default function Header() {
 
   const fetcher = (url: string) =>
     axiosInstance.get(url).then((res) => res.data);
-  const { data, isLoading } = useSWR("/api/v1/notifikasi/10", fetcher, {
-    refreshInterval: 3000,
-    revalidateOnFocus: true,
-  });
+  const { data, isLoading } = useSWR(
+    user ? "/api/v1/notifikasi/10" : null, // Key menjadi null jika user logout
+    fetcher,
+    {
+      refreshInterval: 3000,
+      revalidateOnFocus: true,
+    }
+  );
 
   const totalNotif = data?.data?.length;
 
