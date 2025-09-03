@@ -18,7 +18,7 @@ interface BarangData {
   namaBarang: string;
   productionDate: string;
   stockAwal: number;
-  stockSekarang: number;
+  totalStock: number;
   kategori: {
     kategori: string;
   };
@@ -26,9 +26,9 @@ interface BarangData {
 }
 
 interface ChartData {
-  name: string; // Nama bulan
-  value: number; // Jumlah produk
-  stockTotal: number; // Total stock untuk tooltip
+  name: string;
+  value: number;
+  totalStock: number;
 }
 
 export default function StockBarChart() {
@@ -83,7 +83,7 @@ export default function StockBarChart() {
     const monthlyStats = monthNames.map((month, index) => ({
       name: month,
       value: 0,
-      stockTotal: 0,
+      totalStock: 0,
       month: index,
     }));
 
@@ -99,7 +99,7 @@ export default function StockBarChart() {
       const monthIndex = productionDate.getMonth();
 
       monthlyStats[monthIndex].value += 1; // Tambah jumlah produk
-      monthlyStats[monthIndex].stockTotal += item.stockSekarang; // Tambah total stock
+      monthlyStats[monthIndex].totalStock += item.totalStock; // Tambah total stock
     });
 
     return monthlyStats;
@@ -130,7 +130,7 @@ export default function StockBarChart() {
         <div className="bg-white p-3 border rounded-lg shadow-lg">
           <p className="font-semibold text-gray-800">{`Bulan: ${label}`}</p>
           <p className="text-blue-600">{`Jumlah Produk: ${data.value}`}</p>
-          <p className="text-green-600">{`Total Stock: ${data.stockTotal}`}</p>
+          <p className="text-green-600">{`Total Stock: ${data.totalStock}`}</p>
         </div>
       );
     }

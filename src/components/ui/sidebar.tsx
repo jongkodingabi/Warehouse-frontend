@@ -7,17 +7,11 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import {
   LogOut,
-  ClipboardList,
   Menu,
   HomeIcon,
   Box,
-  ChevronDown,
-  ChevronUp,
-  TrendingUp,
-  TrendingDown,
   Scroll,
   Users,
-  PackageOpen,
   Group,
   Briefcase,
   WatchIcon,
@@ -25,7 +19,7 @@ import {
 import Cookies from "js-cookie";
 
 import { ChartLine } from "lucide-react";
-import axiosInstance  from "@/lib/axios";
+import axiosInstance from "@/lib/axios";
 import { cancelAllRequests } from "@/lib/axios";
 import LogoutConfirmationModal from "../core/LogoutModal";
 
