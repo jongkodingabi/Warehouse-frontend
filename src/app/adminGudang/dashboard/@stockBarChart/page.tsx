@@ -68,7 +68,6 @@ export default function StockBarChart() {
       const monthlyData = processDataByMonth(barangData, selectedYear);
       setChartData(monthlyData);
     } catch (error) {
-      console.error("Error fetching barang data:", error);
       toast.error("Gagal memuat data chart");
     } finally {
       setIsLoading(false);

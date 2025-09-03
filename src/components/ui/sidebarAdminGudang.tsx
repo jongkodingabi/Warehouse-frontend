@@ -7,11 +7,11 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { LogOut, Menu, Box, Scroll, Group, WatchIcon } from "lucide-react";
 import Cookies from "js-cookie";
-
+import Logo from "../../../public/assets/logo.png";
 import { ChartLine } from "lucide-react";
 import axiosInstance from "@/lib/axios";
-import { cancelAllRequests } from "@/lib/axios";
 import LogoutConfirmationModal from "../core/LogoutModal";
+import Image from "next/image";
 
 export default function SidebarAdminGudang() {
   const [open, setOpen] = useState(false);
@@ -24,15 +24,12 @@ export default function SidebarAdminGudang() {
 
   const handleLogout = async () => {
     try {
-      cancelAllRequests();
       const response = await axiosInstance.post("/api/v1/logout");
       const token = response.data.token;
       Cookies.remove("token", token);
       setUser(null);
-      console.log(token);
       router.push("/");
     } catch (error) {
-      console.error("Logout failed:", error);
       // Handle error (e.g., show a notification)
     }
   };
@@ -40,13 +37,25 @@ export default function SidebarAdminGudang() {
   return (
     <>
       {/* Mobile Hamburger */}
-      <button
-        className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg border border-gray-300"
-        onClick={() => setOpen(true)}
-        aria-label="Open sidebar"
-      >
-        <Menu className="w-6 h-6 text-gray-800" />
-      </button>
+      <div className="flex">
+        <button
+          className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg border border-gray-300"
+          onClick={() => setOpen(true)}
+          aria-label="Open sidebar"
+        >
+          <Menu className="w-6 h-6 text-gray-800" />
+        </button>
+        <div className="flex md:hidden space-x-2 text-xl font-semibold text-gray-800">
+          <Image
+            src={Logo}
+            height={50}
+            width={50}
+            alt="logo"
+            className="w-8 ml-4"
+          />
+          <h3 className="text-sm mt-1.5">Warehouse Management</h3>
+        </div>
+      </div>
 
       {/* Overlay */}
       {open && (

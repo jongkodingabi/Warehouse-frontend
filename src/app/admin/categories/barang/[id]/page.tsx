@@ -162,7 +162,6 @@ export default function CategoryProductsPage() {
         setCategoryInfo(categoryData);
       }
     } catch (error) {
-      console.error("Error fetching category products:", error);
       toast.error("Gagal memuat data barang kategori");
 
       // Set data kosong saat error

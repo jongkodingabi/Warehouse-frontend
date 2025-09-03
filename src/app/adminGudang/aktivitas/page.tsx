@@ -69,7 +69,6 @@ const AuditLogPage: React.FC = () => {
         setTotalPages(Math.ceil(result.data.length / itemsPerPage));
       }
     } catch (error) {
-      console.error("Error fetching audit data:", error);
     } finally {
       setLoading(false);
     }

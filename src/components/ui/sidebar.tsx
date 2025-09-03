@@ -20,8 +20,9 @@ import Cookies from "js-cookie";
 
 import { ChartLine } from "lucide-react";
 import axiosInstance from "@/lib/axios";
-import { cancelAllRequests } from "@/lib/axios";
 import LogoutConfirmationModal from "../core/LogoutModal";
+import Image from "next/image";
+import Logo from "../../../public/assets/logo.png";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
@@ -34,27 +35,36 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      cancelAllRequests();
       const response = await axiosInstance.post("/api/v1/logout");
       const token = response.data.token;
       setUser(null);
       router.push("/");
       Cookies.remove("token", token);
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+    } catch (error) {}
   };
 
   return (
     <>
       {/* Mobile Hamburger */}
-      <button
-        className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg border border-gray-300"
-        onClick={() => setOpen(true)}
-        aria-label="Open sidebar"
-      >
-        <Menu className="w-6 h-6 text-gray-800" />
-      </button>
+      <div className="flex">
+        <button
+          className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg border border-gray-300"
+          onClick={() => setOpen(true)}
+          aria-label="Open sidebar"
+        >
+          <Menu className="w-6 h-6 text-gray-800" />
+        </button>
+        <div className="flex md:hidden space-x-2 text-xl font-semibold text-gray-800">
+          <Image
+            src={Logo}
+            height={50}
+            width={50}
+            alt="logo"
+            className="w-8 ml-4"
+          />
+          <h3 className="text-sm mt-1.5">Warehouse Management</h3>
+        </div>
+      </div>
 
       {/* Overlay */}
       {open && (
@@ -70,6 +80,17 @@ export default function Sidebar() {
           open ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
+        {/* <div className="flex md:hidden space-x-2 text-xl font-semibold text-gray-800">
+          <Image
+            src={Logo}
+            height={50}
+            width={50}
+            alt="logo"
+            className="w-8 ml-4"
+          />
+          <h3 className="text-sm mt-1.5">Warehouse Management</h3>
+        </div> */}
+
         {/* Navigation */}
         <nav className="flex-1 px-4 py-4 overflow-auto">
           <ul className="space-y-2">

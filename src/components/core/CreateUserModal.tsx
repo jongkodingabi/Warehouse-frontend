@@ -139,18 +139,14 @@ export default function CreateUserModal({
     try {
       const response = await axiosInstance.get("/api/v1/jabatan");
       setJabatanOptions(response.data.data);
-    } catch (error) {
-      console.log("Error fetching jabatan:", error);
-    }
+    } catch (error) {}
   };
 
   const fetchDivisi = async () => {
     try {
       const response = await axiosInstance.get("/api/v1/divisi");
       setDivisiOptions(response.data);
-    } catch (error) {
-      console.log("Error fetching divisi:", error);
-    }
+    } catch (error) {}
   };
 
   const handleSubmit = async (values: UserFormSchema) => {
@@ -160,7 +156,6 @@ export default function CreateUserModal({
       form.reset();
       onClose();
     } catch (error) {
-      console.error("Error submitting form:", error);
     } finally {
       setIsLoading(false);
     }

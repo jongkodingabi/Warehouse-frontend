@@ -64,8 +64,6 @@ export default function StockInModal({
   const handleSubmit = async (values: StockInFormSchema) => {
     if (!barangData || isLoading) return; // Prevent double submission
 
-    console.log("Form submitted with values:", values); // Debug log
-
     setIsLoading(true);
     try {
       // Make API call
@@ -89,7 +87,6 @@ export default function StockInModal({
       form.reset({ stock: 0, deskripsi: "" });
       onClose();
     } catch (error) {
-      console.error("Error adding stock:", error);
       // Show error to user
     } finally {
       setIsLoading(false);

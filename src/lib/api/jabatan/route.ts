@@ -9,7 +9,6 @@ export const createJabatan = async (newJabatan: { jabatan: string }) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error creating product:", error);
     throw error;
   }
 };
@@ -36,7 +35,6 @@ export const updateJabatan = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error updating category:", error);
     throw error;
   }
 };

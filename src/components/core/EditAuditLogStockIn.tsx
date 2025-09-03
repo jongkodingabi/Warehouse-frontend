@@ -110,7 +110,6 @@ export default function StockInAuditModal({
       form.reset();
       onClose();
     } catch (error) {
-      console.error("Error processing stock:", error);
       // You might want to show an error toast here
     } finally {
       setIsLoading(false);

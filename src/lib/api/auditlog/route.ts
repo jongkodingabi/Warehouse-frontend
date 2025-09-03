@@ -6,8 +6,8 @@ export const audtiData = async (
     user_id: number;
     deskripsi: string;
     stock: number;
-    type: string
-}
+    type: string;
+  }
 ) => {
   try {
     const response = await axiosInstance.patch(
@@ -21,7 +21,6 @@ export const audtiData = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error updating category:", error);
     throw error;
   }
 };

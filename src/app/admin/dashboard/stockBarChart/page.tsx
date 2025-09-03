@@ -68,7 +68,6 @@ export default function StockBarChart() {
       const monthlyData = processDataByMonth(barangData, selectedYear);
       setChartData(monthlyData);
     } catch (error) {
-      console.error("Error fetching barang data:", error);
       toast.error("Gagal memuat data chart");
     } finally {
       setIsLoading(false);
@@ -138,7 +137,7 @@ export default function StockBarChart() {
   };
 
   return (
-    <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
+    <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5 top-20 md:top-0">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Data Barang per Bulan</h2>
 

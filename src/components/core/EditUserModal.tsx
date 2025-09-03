@@ -141,7 +141,6 @@ export default function EditUserModal({
       setJabatanOptions(response.data.data);
       return response.data.data;
     } catch (error) {
-      console.log("Error fetching jabatan:", error);
       return [];
     }
   };
@@ -152,7 +151,6 @@ export default function EditUserModal({
       setDivisiOptions(response.data);
       return response.data;
     } catch (error) {
-      console.log("Error fetching divisi:", error);
       return [];
     }
   };
@@ -208,7 +206,6 @@ export default function EditUserModal({
       form.reset();
       onClose();
     } catch (error: string | any) {
-      console.error("Error submitting form:", error);
       toast.error("Gagal mengubah data", error);
     } finally {
       setIsLoading(false);

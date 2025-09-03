@@ -9,7 +9,6 @@ export const useProducts = () => {
     refreshInterval: 3000, // Refresh every 10 seconds
   });
 
-  // console.log(data.data);
   return {
     products: data?.data || {
       message: "No products found",

@@ -51,7 +51,6 @@ export default function JabatanPage() {
       const response = await axiosInstance.get("/api/v1/jabatan");
       setData(response.data.data);
     } catch (error) {
-      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +97,6 @@ export default function JabatanPage() {
       fetchJabatan();
     } catch (error) {
       toast.error("Gagal menghapus jabatan");
-      console.log(error);
     }
   };
 

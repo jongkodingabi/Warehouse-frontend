@@ -38,7 +38,6 @@ export default function CreateJabatanModal({
       form.reset();
       onClose();
     } catch (error) {
-      console.error("Error submitting form:", error);
     } finally {
       setIsSubmitting(false);
     }

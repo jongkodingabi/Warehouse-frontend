@@ -63,7 +63,6 @@ export default function CategoryPage() {
       const response = await axiosInstance.get("/api/v1/kategori");
       setData(response.data.data);
     } catch (error) {
-      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +109,6 @@ export default function CategoryPage() {
       fetchCategories();
     } catch (error) {
       toast.error("Gagal menghapus kategori");
-      console.log(error);
     }
   };
 

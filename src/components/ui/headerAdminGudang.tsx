@@ -50,7 +50,7 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-30">
       {/* Logo */}
-      <div className="flex space-x-2 text-xl font-semibold text-gray-800">
+      <div className="hidden md:flex space-x-2 text-xl font-semibold text-gray-800">
         <Image
           src={Logo}
           height={50}
@@ -62,11 +62,11 @@ export default function Header() {
       </div>
 
       {/* Profil */}
-      <div className="flex items-center gap-3">
+      <div className="flex translate-x-10 md:translate-x-0 items-end justify-end md:justify-center md:items-center gap-3">
         <Link href="/adminGudang/notifications">
           <button className="relative ">
-            <Bell className="w-8 h-8 text-gray-600 cursor-pointer hover:text-gray-500 transition-colors duration-200 ease-in-out" />
-            <span className="absolute -top-2 -right-2 text-white bg-red-600 rounded-full px-2 py-0.5 text-xs font-bold shadow-md">
+            <Bell className="w-8 h-8 text-gray-600 cursor-pointer hover:text-gray-500 transition-colors duration-200 ease-in-out mt-1.5" />
+            <span className="absolute -top-2 -right-2 text-white bg-red-600 rounded-full px-2 py-0.5 text-xs font-bold shadow-md mt-1.5">
               {totalNotif ?? 0}
             </span>
           </button>

@@ -66,7 +66,6 @@ export default function EditBarangModal({
       setCategoriesOption(response.data.data);
       return response.data;
     } catch (error) {
-      console.error("Error fetching categories:", error);
       return [];
     }
   };
@@ -81,7 +80,6 @@ export default function EditBarangModal({
         const categoriesData = await fetchCategories();
 
         // Kemudian reset form dengan data barang
-        console.log("Resetting form with data:", barang);
 
         form.reset({
           kategori_id: (
@@ -110,8 +108,6 @@ export default function EditBarangModal({
     setIsSubmitting(true);
 
     try {
-      console.log("Submitting values:", values);
-
       // Prepare data for submission - convert kategori_id back to number
       const submitData = {
         ...values,
@@ -121,7 +117,6 @@ export default function EditBarangModal({
       await onSubmit(submitData);
       onClose();
     } catch (error) {
-      console.error("Error submitting form:", error);
     } finally {
       setIsSubmitting(false);
     }
