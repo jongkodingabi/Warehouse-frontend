@@ -25,8 +25,7 @@ import {
 import Cookies from "js-cookie";
 
 import { ChartLine } from "lucide-react";
-import axiosInstance  from "@/lib/axios";
-import { cancelAllRequests } from "@/lib/axios";
+import axiosInstance from "@/lib/axios";
 import LogoutConfirmationModal from "../core/LogoutModal";
 
 export default function Sidebar() {
@@ -40,14 +39,15 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      cancelAllRequests();
       const response = await axiosInstance.post("/api/v1/logout");
       const token = response.data.token;
-      setUser(null);
-      router.push("/");
       Cookies.remove("token", token);
+      setUser(null);
+      console.log(token);
+      router.push("/");
     } catch (error) {
       console.error("Logout failed:", error);
+      // Handle error (e.g., show a notification)
     }
   };
 
