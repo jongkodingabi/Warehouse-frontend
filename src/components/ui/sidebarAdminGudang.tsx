@@ -10,6 +10,7 @@ import Cookies from "js-cookie";
 
 import { ChartLine } from "lucide-react";
 import axiosInstance from "@/lib/axios";
+import { cancelAllRequests } from "@/lib/axios";
 import LogoutConfirmationModal from "../core/LogoutModal";
 
 export default function SidebarAdminGudang() {
@@ -23,6 +24,7 @@ export default function SidebarAdminGudang() {
 
   const handleLogout = async () => {
     try {
+      cancelAllRequests();
       const response = await axiosInstance.post("/api/v1/logout");
       const token = response.data.token;
       Cookies.remove("token", token);

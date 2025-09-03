@@ -6,6 +6,8 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
+let controllers: AbortController[] = [];
+
 api.interceptors.request.use((config) => {
   const token = Cookies.get("token");
   const expiresAt = Cookies.get("token_expires_at");
@@ -21,8 +23,15 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  const controller = new AbortController();
+  config.signal = controller.signal;
+  controllers.push(controller);
 
   return config;
 });
+export const cancelAllRequests = () => {
+  controllers.forEach((c) => c.abort());
+  controllers = [];
+};
 
 export default api;
