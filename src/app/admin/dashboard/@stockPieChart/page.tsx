@@ -34,6 +34,14 @@ interface ChartData {
   value: number;
 }
 
+// Custom label function dengan proper typing
+const renderLabel = (entry: any) => {
+  if (entry.percent) {
+    return `${(entry.percent * 100).toFixed(0)}%`;
+  }
+  return "";
+};
+
 export default function DonutChart() {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -127,7 +135,7 @@ export default function DonutChart() {
         <div className="flex flex-col items-center justify-center h-64 text-center">
           <div className="text-gray-500 mb-2">📊 Tidak ada data tersedia</div>
           <p className="text-gray-600 text-sm mb-4">
-            Tidak ada data audit log tersediad
+            Tidak ada data audit log tersedia
           </p>
           <button
             onClick={handleRefresh}
@@ -144,7 +152,6 @@ export default function DonutChart() {
     <div className="bg-white rounded-lg border shadow-sm h-full flex flex-col p-5">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">
-          {" "}
           Barang yang Paling Sering Muncul
         </h2>
         <button
@@ -166,9 +173,6 @@ export default function DonutChart() {
             outerRadius={90}
             paddingAngle={3}
             dataKey="value"
-            label={({ percent }: { percent?: number }) =>
-              percent ? `${(percent * 100).toFixed(0)}%` : ""
-            }
           >
             {chartData.map((_, index) => (
               <Cell
@@ -192,7 +196,7 @@ export default function DonutChart() {
           Total barang tercatat:{" "}
           {chartData.reduce((sum, item) => sum + item.value, 0)}
         </p>
-        <p>Memunculkan {chartData.length} barang yang sering muncul</p>
+        <p>Menampilkan {chartData.length} barang yang sering muncul</p>
       </div>
     </div>
   );
