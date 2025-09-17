@@ -16,9 +16,18 @@ export const login = async (values: login) => {
 
 export const fetchUser = async () => {
   const token = Cookies.get("token");
-  const res = await axiosInstance.get<{ user: User } | User>("/api/v1/me");
 
-  return (res.data as any).user ?? (res.data as any);
+  // Cek apakah token ada
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const res = await axiosInstance.get<{ user: User } | User>("/api/v1/me");
+    return (res.data as any).user ?? (res.data as User);
+  } catch (error) {
+    return null;
+  }
 };
 
 export const logout = async () => {

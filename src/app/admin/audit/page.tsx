@@ -107,7 +107,6 @@ export default function AuditLogPage() {
           return;
       }
     } catch (error) {
-      console.error("Error:", error);
       toast.error("Gagal memuat data barang");
     }
   };
@@ -146,7 +145,6 @@ export default function AuditLogPage() {
       );
       setData(response.data.data);
     } catch (error) {
-      console.error(error);
       toast.error("Gagal memuat data audit log");
     } finally {
       setIsLoading(false);

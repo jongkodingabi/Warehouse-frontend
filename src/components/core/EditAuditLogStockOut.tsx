@@ -120,7 +120,6 @@ export default function StockOutAuditModal({
       form.reset();
       onClose();
     } catch (error) {
-      console.error("Error processing stock out:", error);
       // You might want to show an error toast here
     } finally {
       setIsLoading(false);

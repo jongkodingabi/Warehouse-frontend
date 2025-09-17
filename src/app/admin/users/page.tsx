@@ -121,7 +121,6 @@ export default function UserPage() {
       const response = await axiosInstance.get("/api/v1/user");
       setData(response.data.data);
     } catch (error) {
-      console.error("Error fetching users:", error);
       toast.error("Gagal memuat data user");
     } finally {
       setIsLoading(false);
@@ -142,12 +141,10 @@ export default function UserPage() {
       await fetchUsers();
     } catch (error) {
       toast.error("Gagal memperbarui user");
-      console.error("Error updating user:", error);
     }
   };
 
   const handleEditUserClick = (user: User) => {
-    console.log(user);
     setUserToEdit(user);
     setIsEditModalOpen(true);
   };
@@ -160,7 +157,6 @@ export default function UserPage() {
       setIsModalOpen(false);
     } catch (error) {
       toast.error("Gagal menambahkan user");
-      console.error("Error creating user:", error);
     }
   };
 
@@ -177,7 +173,6 @@ export default function UserPage() {
       fetchUsers();
     } catch (error) {
       toast.error("Gagal menghapus user");
-      console.error("Error deleting user:", error);
     }
   };
 

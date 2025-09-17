@@ -96,7 +96,6 @@ export default function CreateBarangModal({
 
       return response.data;
     } catch (error) {
-      console.error("Error fetching categories:", error);
       return [];
     }
   };
@@ -146,7 +145,6 @@ export default function CreateBarangModal({
       form.reset();
       onClose();
     } catch (error) {
-      console.error("Error submitting form:", error);
     } finally {
       setIsSubmitting(false);
     }

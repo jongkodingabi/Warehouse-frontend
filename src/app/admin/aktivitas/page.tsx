@@ -72,7 +72,6 @@ const AuditLogPage: React.FC = () => {
         setTotalPages(Math.ceil(result.data.length / itemsPerPage));
       }
     } catch (error) {
-      console.error("Error fetching audit data:", error);
     } finally {
       setLoading(false);
     }
@@ -91,7 +90,6 @@ const AuditLogPage: React.FC = () => {
       setDeleteModal(false);
     } catch (error) {
       toast.error("Gagal menghapus aktivitas");
-      console.error(error);
     }
   };
 

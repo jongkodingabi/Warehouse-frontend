@@ -12,7 +12,6 @@ export const createBarang = async (newProduct: {
   created_by: any;
 }) => {
   try {
-    console.log("Create new product:", newProduct);
     const response = await axiosInstance.post("/api/v1/barang", newProduct, {
       headers: {
         "Content-Type": "application/json",
@@ -20,7 +19,6 @@ export const createBarang = async (newProduct: {
     });
     return response.data;
   } catch (error) {
-    console.error("Error creating product:", error);
     throw error;
   }
 };
@@ -38,9 +36,6 @@ export const updateBarang = async (
   }
 ) => {
   try {
-    console.log("Sending data:", updatedBarang);
-    console.log("To endpoint:", `/api/v1/barang/${id}`);
-
     const response = await axiosInstance.patch(
       `/api/v1/barang/${id}`,
       updatedBarang,
@@ -52,7 +47,6 @@ export const updateBarang = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error updating barang:", error);
     // Log error response untuk debugging
 
     throw error;

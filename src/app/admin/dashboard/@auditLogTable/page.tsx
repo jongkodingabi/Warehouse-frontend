@@ -28,7 +28,6 @@ export default function AuditLogTable() {
       setAuditData(response.data.data || []);
       setFilteredData(response.data.data || []);
     } catch (error) {
-      console.error("Error fetching audit data:", error);
       setAuditData([]);
       setFilteredData([]);
     } finally {

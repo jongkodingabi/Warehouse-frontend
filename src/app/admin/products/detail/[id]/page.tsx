@@ -53,9 +53,7 @@ export default function ProductDetailPage() {
       setError(null);
       const response = await axosInstance.get(`/api/v1/barang/${productId}`);
       setProduct(response.data.data);
-      console.log("Product data:", response.data.data);
     } catch (err: any) {
-      console.error("Error fetching product:", err);
       if (err.response?.status === 404) {
         setError("Produk tidak ditemukan");
       } else if (err.response?.data?.message) {

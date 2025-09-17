@@ -59,7 +59,6 @@ export default function DivisiPage() {
       const response = await axiosInstance.get("/api/v1/divisi");
       setData(response.data);
     } catch (error) {
-      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +105,6 @@ export default function DivisiPage() {
       fetchDivisi();
     } catch (error) {
       toast.error("Gagal menghapus divisi");
-      console.log(error);
     }
   };
 

@@ -37,7 +37,6 @@ export default function LoginPage() {
       await refreshUser();
       router.replace("/admin/dashboard");
     } catch (err) {
-      console.error("Login failed:", err);
       // show notification
     } finally {
       setLoading(false);

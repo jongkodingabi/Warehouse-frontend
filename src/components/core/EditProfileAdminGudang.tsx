@@ -120,7 +120,6 @@ export default function EditProfileModalAdminGudang({
 
   const handleSubmit = async (values: ProfileEditFormSchema) => {
     setIsLoading(true);
-    // console.log(values);
     try {
       // Prepare data for submission
       const submitData = { ...values };
@@ -134,10 +133,9 @@ export default function EditProfileModalAdminGudang({
       await onSubmit(submitData);
       form.reset();
       onClose();
-      toast.success("Berhasil mengubah Password")
+      toast.success("Berhasil mengubah Password");
     } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Gagal mengubah password")
+      toast.error("Gagal mengubah password");
     } finally {
       setIsLoading(false);
     }

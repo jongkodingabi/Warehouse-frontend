@@ -77,7 +77,6 @@ export default function StockInModal({
       form.reset();
       onClose();
     } catch (error) {
-      console.error("Error adding stock:", error);
       // You might want to show an error toast here
     } finally {
       setIsLoading(false);

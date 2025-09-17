@@ -15,7 +15,6 @@ export default function Stock() {
       const response = await axiosInstance.get("/api/v1/barang");
       setBarang(response.data.data);
     } catch (error) {
-      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -32,7 +31,7 @@ export default function Stock() {
   return (
     <>
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-50 px-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-50 px-5 mb-70 md:mb-0">
           {/* Card 1 */}
           <div className="animate-pulse rounded-lg shadow-md border p-4 flex flex-col gap-4">
             <div className="flex justify-between items-start">
@@ -70,7 +69,7 @@ export default function Stock() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-50 px-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-50 px-5 mb-70 md:mb-0">
           {/* Card 1 */}
           <div className="bg-white rounded-lg shadow-md border p-4 flex flex-col gap-4">
             <div className="flex justify-between items-start">

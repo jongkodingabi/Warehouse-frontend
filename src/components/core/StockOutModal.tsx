@@ -102,9 +102,7 @@ export default function StockOutModal({
       // Optional: You can also call the notification endpoint to log this
       try {
         await axiosInstance.get("/api/v1/notifikasi/10");
-      } catch (error) {
-        console.error("Error fetching notification data:", error);
-      }
+      } catch (error) {}
     }
   };
 
@@ -143,8 +141,6 @@ export default function StockOutModal({
       form.reset();
       onClose();
     } catch (error) {
-      console.error("Error reducing stock:", error);
-
       // Show error toast
       toast.error(`Gagal mengurangi stock barang "${barangData?.namaBarang}"`, {
         duration: 4000,

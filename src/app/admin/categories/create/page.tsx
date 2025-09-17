@@ -26,7 +26,6 @@ export default function Createkategori() {
       await createCategory(newCategory);
       router.push("/admin/categories");
     } catch (error) {
-      console.log(error);
     } finally {
       form.reset();
     }

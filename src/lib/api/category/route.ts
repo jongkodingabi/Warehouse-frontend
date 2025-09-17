@@ -13,7 +13,6 @@ export const createCategory = async (newCategory: {
     });
     return response.data;
   } catch (error) {
-    console.error("Error creating product:", error);
     throw error;
   }
 };
@@ -42,7 +41,6 @@ export const updateCategory = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error updating category:", error);
     throw error;
   }
 };

@@ -74,7 +74,6 @@ export default function DonutChart() {
         throw new Error("Invalid data format received from API");
       }
     } catch (err) {
-      console.error("Error fetching audit data:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch data");
     } finally {
       setLoading(false);

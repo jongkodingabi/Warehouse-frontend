@@ -35,8 +35,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     refreshUser();
   }, []);
 
-  console.log(user);
-
   return (
     <UserContext.Provider value={{ user, setUser, loading, refreshUser }}>
       {children}

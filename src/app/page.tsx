@@ -52,7 +52,6 @@ const datas = [
 
 export default function Home() {
   const token = Cookies.get("token");
-  console.log(token);
   const { user, loading } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -69,7 +68,7 @@ export default function Home() {
               <span className="sm:hidden">WMS</span>
             </div>
           </div>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden sm:block">
             <Link
@@ -86,7 +85,11 @@ export default function Home() {
             className="sm:hidden p-2 text-text hover:bg-gray-100 rounded-md"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
 
           {/* Mobile Menu */}
@@ -129,7 +132,6 @@ export default function Home() {
       {/* Main Content Section - Fully Responsive */}
       <div className="bg-gradient-to-br from-slate-400 to-slate-500 my-8 sm:my-12 md:my-16 mx-4 sm:mx-8 md:mx-12 lg:mx-18 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-card animate-fade-in">
         <div className="flex flex-col lg:flex-row lg:justify-between gap-6 lg:gap-8">
-          
           {/* Image Section - Responsive */}
           <div className="flex justify-center lg:justify-start lg:flex-1">
             <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
@@ -160,7 +162,7 @@ export default function Home() {
             <h1 className="font-bold text-xl sm:text-2xl md:text-3xl text-center text-text mb-4 sm:mb-6">
               Solusi Untuk Manajemen Operasi Gudang Anda
             </h1>
-            
+
             {/* Features Grid - Fully Responsive */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 py-4 sm:py-5 w-full max-w-4xl">
               {datas.map((data, idx) => {

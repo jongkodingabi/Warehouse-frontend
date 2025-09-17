@@ -28,7 +28,6 @@ export default function ProfilePage() {
       await axiosInstance.post("/api/v1/me", data);
       await refreshUser();
       toast.success("Berhasil update profile");
-      console.log("Profile updated successfully");
     } catch (error: string | any) {
       if (error.response && error.response.status === 422) {
         const message = "Email sudah terpakai";
