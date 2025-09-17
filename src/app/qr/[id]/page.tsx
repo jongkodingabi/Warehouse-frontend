@@ -1,6 +1,3 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
 import {
   Package,
   Calendar,
@@ -11,10 +8,10 @@ import {
   Clock,
   User,
   QrCode,
-  ArrowLeft,
 } from "lucide-react";
-import { useRouter, useParams } from "next/navigation";
 import axiosInstance from "@/lib/axios";
+import { notFound } from "next/navigation";
+export const revalidate = 30;
 
 // Type definition berdasarkan struktur data Anda
 interface Barang {
@@ -43,42 +40,30 @@ interface Barang {
   };
 }
 
-export default function ProductDetailPage() {
-  const [product, setProduct] = useState<Barang | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-  const params = useParams();
-  const productId = params?.id;
+export async function generateStaticParams(): Promise<{ id: string }[]> {
+  try {
+    const response = await axiosInstance.get("/api/v1/barang");
+    const products: Barang[] = response.data.data;
 
-  // Fungsi untuk fetch data produk berdasarkan ID
-  const fetchProductDetail = async () => {
-    try {
-      setLoading(true);
-      // Menggunakan axiosInstance sesuai dengan struktur yang ada
-      const response = await axiosInstance.get(`/api/v1/barang/${productId}`);
+    return products.map((product) => ({ id: product.id.toString() }));
+  } catch (error) {
+    return [];
+  }
+}
 
-      // Axios otomatis menghandle JSON response
-      setProduct(response.data.data);
-    } catch (err: any) {
-      // Handle axios error
-      if (err.response?.status === 404) {
-        setError("Produk tidak ditemukan");
-      } else if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("Terjadi kesalahan saat memuat data produk");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+export default async function ProductDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const res = await axiosInstance.get(`/api/v1/barang/${id}`);
 
-  useEffect(() => {
-    if (productId) {
-      fetchProductDetail();
-    }
-  }, [productId]);
+  if (res.status === 404) {
+    notFound();
+  }
+
+  const product: Barang = res.data.data;
 
   // Format tanggal
   const formatDate = (dateString: string) => {
@@ -126,41 +111,6 @@ export default function ProductDetailPage() {
         return status;
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Memuat detail produk...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !product) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="bg-red-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
-            <Package className="w-8 h-8 text-red-600 mx-auto" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Produk Tidak Ditemukan
-          </h1>
-          <p className="text-gray-600 mb-6">
-            {error || "Produk yang Anda cari tidak tersedia."}
-          </p>
-          <button
-            onClick={() => router.back()}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Kembali
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

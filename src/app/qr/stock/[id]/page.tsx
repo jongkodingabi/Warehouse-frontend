@@ -1,6 +1,3 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
 import {
   Package,
   Calendar,
@@ -8,7 +5,6 @@ import {
   Building2,
   Hash,
   Activity,
-  Clock,
   User,
   QrCode,
   Package2,
@@ -16,9 +12,10 @@ import {
   TrendingDown,
   Info,
 } from "lucide-react";
-import { useRouter, useParams } from "next/navigation";
-import { useQRCode } from "next-qrcode";
 import axiosInstance from "@/lib/axios";
+import { notFound } from "next/navigation";
+import PrintButton from "./PrintButton";
+export const revalidate = 30;
 
 // Type definition berdasarkan struktur data yang baru
 interface StockDetail {
@@ -59,41 +56,30 @@ interface StockDetail {
   };
 }
 
-export default function ProductDetailPage() {
-  const [product, setProduct] = useState<StockDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-  const params = useParams();
-  const productId = params?.id;
-  const { Canvas } = useQRCode();
+export async function generateStaticParams(): Promise<{ id: string }[]> {
+  try {
+    const response = await axiosInstance.get("/api/v1/stock");
+    const stocks: StockDetail[] = response.data.data;
 
-  // Fungsi untuk fetch data produk berdasarkan ID
-  const fetchProductDetail = async () => {
-    try {
-      setLoading(true);
-      const response = await axiosInstance.get(
-        `/api/v1/barang/${productId}/stock`
-      );
-      setProduct(response.data.data);
-    } catch (err: any) {
-      if (err.response?.status === 404) {
-        setError("Produk tidak ditemukan");
-      } else if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("Terjadi kesalahan saat memuat data produk");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+    return stocks.map((stock) => ({ id: stock.id.toString() }));
+  } catch (error) {
+    return [];
+  }
+}
 
-  useEffect(() => {
-    if (productId) {
-      fetchProductDetail();
-    }
-  }, [productId]);
+export default async function ProductDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const res = await axiosInstance.get(`/api/v1/barang/${id}/stock`);
+
+  if (res.status === 404) {
+    notFound();
+  }
+
+  const product: StockDetail = res.data.data;
 
   // Format tanggal
   const formatDate = (dateString: string) => {
@@ -171,41 +157,6 @@ export default function ProductDetailPage() {
         return <Activity className="w-4 h-4" />;
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Memuat detail produk...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !product) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="bg-red-100 rounded-full p-4 w-16 h-16 mx-auto mb-4">
-            <Package className="w-8 h-8 text-red-600 mx-auto" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Produk Tidak Ditemukan
-          </h1>
-          <p className="text-gray-600 mb-6">
-            {error || "Produk yang Anda cari tidak tersedia."}
-          </p>
-          <button
-            onClick={() => router.back()}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Kembali
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -470,29 +421,6 @@ export default function ProductDetailPage() {
 
           {/* Right Column - QR Code & Quick Info */}
           <div className="space-y-6">
-            {/* QR Code Card */}
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">
-                QR Code
-              </h3>
-              <div className="flex justify-center mb-4">
-                <div className="p-4 bg-white border-2 border-gray-200 rounded-lg">
-                  <Canvas
-                    text={product.productionDate}
-                    options={{
-                      errorCorrectionLevel: "M",
-                      margin: 3,
-                      scale: 4,
-                      width: 100,
-                    }}
-                  />
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 text-center break-all">
-                {product.kodeQr}
-              </p>
-            </div>
-
             {/* Stock Overview Card */}
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">
@@ -622,19 +550,7 @@ export default function ProductDetailPage() {
 
         {/* Action Buttons */}
         <div className="mt-8 flex justify-center gap-4">
-          <button
-            onClick={() => router.back()}
-            className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
-          >
-            Kembali
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-          >
-            <QrCode className="w-4 h-4" />
-            Print Detail
-          </button>
+          <PrintButton />
         </div>
       </div>
     </div>
